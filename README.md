@@ -6,7 +6,7 @@
 
 ## 주요 기능
 
-### 사용자 등록
+### [사용자 등록](https://github.com/OUS-KR/ASH.KR/issues/new?template=01-user-register-application-by-issue.yml)
 
 - `ASH.KR/u/{사용자 아이디}` 주소 기반의 사용자 등록
   - 사용자 예제: [ASH.KR/u/ash](https://ASH.KR/u/ash)

@@ -1,5 +1,36 @@
 # [ASH.KR](https://ash.kr)
 
+## 주요 기능
+
+### 사용자 등록
+
+- `ASH.KR/u/{사용자 아이디}` 주소 기반의 사용자 등록
+  - 사용자 예제: [ASH.KR/u/ash](https://ASH.KR/u/ash)
+- `ASH.KR/@{사용자 아이디}` 형태의 짧은 주소 지원
+  - 사용자 예제: [ASH.KR/@ash](https://ASH.KR/@ash)
+- 부적절한 아이디 (욕설, 관리자 등)는 제한되어 등록 시 삭제
+
+## 기타 기능
+
+### 유튜브 단축주소
+
+- 유튜브 영상: `ASH.KR/yt/{유튜브 영상 아이디}`
+  - 예제: [ASH.KR/yt/1ZX1vEDTfY4](https://ASH.KR/yt/1ZX1vEDTfY4), [ASH.KR/yt/yebNIHKAC4A](https://ASH.KR/yt/yebNIHKAC4A)
+- 유튜브 영상 + 시작 시간 옵션: `ASH.KR/{유튜브 영상 아이디}/{시작 시간}`
+  - 예제: [ASH.KR/yt/1ZX1vEDTfY4/1m6s](https://ASH.KR/yt/1ZX1vEDTfY4/1m6s), [ASH.KR/yt/yebNIHKAC4A/56](https://ASH.KR/yt/yebNIHKAC4A/56)
+- 유튜브 영상 썸네일: `ASH.KR/yt/img/{유튜브 영상 아이디}`
+  - 예제: [ASH.KR/yt/img/1ZX1vEDTfY4](https://ASH.KR/yt/img/1ZX1vEDTfY4), [ASH.KR/yt/img/yebNIHKAC4A](https://ASH.KR/yt/img/yebNIHKAC4A)
+- 유튜브 채널 RSS: `ASH.KR/yt/rss/{유튜브 채널 아이디}`
+  - 예제: [ASH.KR/yt/rss/UC-Fnix71vRP64WXeo0ikd0Q](https://ASH.KR/yt/rss/UC-Fnix71vRP64WXeo0ikd0Q)
+
+#### 마크다운 작성 시 사용 방법
+
+- 유튜브 영상 썸네일 링크: `[![{유튜브 영상 썸네일 텍스트}]({유튜브 영상 썸네일 주소})]({유튜브 영상 주소})`
+  - 예제: `[![FIFTY FIFTY (피프티피프티) 'Pookie' Official MV](https://ASH.KR/yt/img/1ZX1vEDTfY4)](https://ASH.KR/yt/1ZX1vEDTfY4/1m6s)`
+  [![FIFTY FIFTY (피프티피프티) 'Pookie' Official MV](https://ASH.KR/yt/img/1ZX1vEDTfY4)](https://ASH.KR/yt/1ZX1vEDTfY4/1m6s)
+  - 예제: `[![“Golden” Official Lyric Video | KPop Demon Hunters | Sony Animation](https://ASH.KR/yt/img/yebNIHKAC4A)](https://ASH.KR/yt/yebNIHKAC4A/56)`
+  [![“Golden” Official Lyric Video | KPop Demon Hunters | Sony Animation](https://ASH.KR/yt/img/yebNIHKAC4A)](https://ASH.KR/yt/yebNIHKAC4A/56)
+
 ## 주의사항
 
 - 다음과 같은 콘텐츠 포함 시 제재

@@ -3,94 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASH.KR</title>
+    <title>ASH.KR | The Remaining Embers</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ash-black: #0c0c0c;
+            --ember-orange: #ff4d00;
+        }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: radial-gradient(circle at top left, #1a1a1a, #000000);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            margin: 0;
+            background-color: var(--ash-black);
+            font-family: 'Noto Sans KR', sans-serif;
             overflow: hidden;
+            color: #d1d5db;
         }
+        .font-cinzel { font-family: 'Cinzel', serif; }
 
-        /* 배경 장식용 애니메이션 */
-        .blob {
+        /* 타오르는 불씨 애니메이션 */
+        .ember {
             position: absolute;
-            width: 500px;
-            height: 500px;
-            background: linear-gradient(135deg, rgba(100, 100, 100, 0.2) 0%, rgba(50, 50, 50, 0.1) 100%);
-            filter: blur(80px);
+            background: radial-gradient(circle, var(--ember-orange) 0%, transparent 70%);
             border-radius: 50%;
-            z-index: -1;
-            animation: move 20s infinite alternate;
+            pointer-events: none;
+            opacity: 0;
+            animation: rise 5s linear infinite;
         }
 
-        @keyframes move {
-            from { transform: translate(-10%, -10%); }
-            to { transform: translate(10%, 10%); }
+        @keyframes rise {
+            0% { transform: translateY(100vh) translateX(0) scale(1); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-10vh) translateX(100px) scale(0); opacity: 0; }
+        }
+
+        /* 텍스트 노이즈 효과 */
+        .glitch {
+            text-shadow: 0 0 10px rgba(255, 77, 0, 0.5);
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 22%, 24%, 55% { opacity: 0.7; }
         }
     </style>
 </head>
-<body class="bg-black text-slate-200 antialiased">
+<body class="flex items-center justify-center min-h-screen">
 
-    <div class="blob"></div>
+    <div id="ember-container" class="fixed inset-0 z-0"></div>
+    
+    <div class="fixed inset-0 bg-[radial-gradient(circle,transparent_20%,rgba(0,0,0,0.8)_100%)] z-10 pointer-events-none"></div>
 
-    <main class="relative z-10 w-full max-w-md px-6 text-center">
-        <div class="mb-8 flex flex-col items-center">
-            <div class="w-24 h-24 bg-gradient-to-tr from-gray-500 to-slate-800 rounded-3xl mb-6 shadow-2xl flex items-center justify-center border border-white/10 ring-1 ring-white/20">
-                <span class="text-3xl font-light tracking-tighter text-white">ASH</span>
-            </div>
-            <h1 class="text-4xl font-semibold tracking-tight text-white mb-2">
-                ash.kr
+    <main class="relative z-20 text-center space-y-12">
+        
+        <header class="space-y-2 group">
+            <h1 class="font-cinzel text-8xl md:text-9xl font-bold tracking-[0.2em] text-white glitch select-none transition-transform duration-700 group-hover:scale-105">
+                ASH
             </h1>
-            <p class="text-slate-400 font-light leading-relaxed">
-                Personal Digital Space
+            <p class="font-cinzel text-sm md:text-base tracking-[0.5em] text-orange-500/80 uppercase">
+                The Remaining Embers
             </p>
-        </div>
+        </header>
 
-        <nav class="space-y-4">
-            <a href="#" class="group block w-full p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 backdrop-blur-md">
-                <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium tracking-wide">Writing & Blog</span>
-                    <span class="opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">→</span>
-                </div>
+        <nav class="flex flex-col items-center space-y-6">
+            <a href="#start" class="game-btn group">
+                <span class="text-xl tracking-widest uppercase transition-all group-hover:text-white group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]">New Journey</span>
+                <div class="w-0 h-[1px] bg-orange-600 transition-all duration-300 group-hover:w-full mt-1"></div>
+            </a>
+            
+            <a href="#archives" class="game-btn group">
+                <span class="text-xl tracking-widest uppercase transition-all group-hover:text-white">Archives</span>
+                <div class="w-0 h-[1px] bg-orange-600 transition-all duration-300 group-hover:w-full mt-1"></div>
             </a>
 
-            <a href="#" class="group block w-full p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 backdrop-blur-md">
-                <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium tracking-wide">Projects</span>
-                    <span class="opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">→</span>
-                </div>
+            <a href="#config" class="game-btn group">
+                <span class="text-xl tracking-widest uppercase transition-all group-hover:text-white">Configurations</span>
+                <div class="w-0 h-[1px] bg-orange-600 transition-all duration-300 group-hover:w-full mt-1"></div>
             </a>
 
-            <a href="mailto:hello@ash.kr" class="group block w-full p-4 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 backdrop-blur-md">
-                <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium tracking-wide text-white">Contact Me</span>
-                    <span class="text-white">📧</span>
-                </div>
+            <a href="mailto:hello@ash.kr" class="game-btn group">
+                <span class="text-xl tracking-widest uppercase transition-all group-hover:text-white text-orange-700">Quit to Reality</span>
+                <div class="w-0 h-[1px] bg-red-900 transition-all duration-300 group-hover:w-full mt-1"></div>
             </a>
         </nav>
 
-        <footer class="mt-16">
-            <div class="flex justify-center space-x-6 mb-4">
-                <a href="#" class="text-slate-500 hover:text-white transition-colors">GitHub</a>
-                <a href="#" class="text-slate-500 hover:text-white transition-colors">Twitter</a>
-                <a href="#" class="text-slate-500 hover:text-white transition-colors">Instagram</a>
+        <footer class="pt-20 opacity-40 hover:opacity-100 transition-opacity duration-1000">
+            <div class="flex flex-col items-center gap-2">
+                <div class="w-48 h-1 bg-gray-900 rounded-full overflow-hidden border border-white/10">
+                    <div class="w-1/3 h-full bg-orange-600 shadow-[0_0_10px_#ff4d00]"></div>
+                </div>
+                <p class="text-[10px] font-cinzel tracking-widest uppercase">Server Status: Stable | LV. 2026</p>
             </div>
-            <p class="text-[10px] uppercase tracking-[0.2em] text-slate-600">
-                &copy; 2026 ASH. All rights reserved.
-            </p>
         </footer>
     </main>
 
+    <script>
+        // 불씨 생성 스크립트
+        const container = document.getElementById('ember-container');
+        function createEmber() {
+            const ember = document.createElement('div');
+            ember.classList.add('ember');
+            
+            const size = Math.random() * 4 + 1 + 'px';
+            const left = Math.random() * 100 + 'vw';
+            const duration = Math.random() * 3 + 4 + 's';
+            const delay = Math.random() * 5 + 's';
+
+            ember.style.width = size;
+            ember.style.height = size;
+            ember.style.left = left;
+            ember.style.animationDuration = duration;
+            ember.style.animationDelay = delay;
+
+            container.appendChild(ember);
+
+            // 애니메이션 종료 후 요소 제거
+            setTimeout(() => {
+                ember.remove();
+            }, (parseFloat(duration) + parseFloat(delay)) * 1000);
+        }
+
+        // 초기 불씨 생성
+        for(let i = 0; i < 30; i++) {
+            createEmber();
+        }
+        // 주기적으로 불씨 추가
+        setInterval(createEmber, 300);
+    </script>
 </body>
 </html>
-

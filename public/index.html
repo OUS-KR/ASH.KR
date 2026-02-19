@@ -9,12 +9,18 @@
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: 'Inter', sans-serif; touch-action: none; }
         .font-game { font-family: 'Cinzel', serif; }
-        canvas { display: block; filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.3)); }
-        #ui-layer { pointer-events: none; }
+        
+        /* 캔버스가 이벤트를 가장 먼저 받도록 설정 */
+        canvas { display: block; filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.3)); position: absolute; top: 0; left: 0; z-index: 1; cursor: none; }
+        
+        /* UI 레이어는 캔버스 위에 떠 있지만 클릭/이동 이벤트를 통과시켜야 함 */
+        #ui-layer { position: relative; z-index: 10; pointer-events: none; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 0; }
+        
+        /* 버튼과 슬라이더만 이벤트를 받도록 설정 */
         .btn-active { pointer-events: auto; cursor: pointer; }
+        
         #yt-player-container { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
         
-        /* 슬라이더 스타일 */
         input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 99px; height: 6px; outline: none; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #f97316; cursor: pointer; border: 2px solid white; }
     </style>
@@ -23,7 +29,9 @@
 
     <div id="yt-player-container"><div id="player"></div></div>
 
-    <div id="ui-layer" class="fixed inset-0 z-10 flex flex-col items-center justify-between py-10">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="ui-layer">
         <div class="w-full max-w-md px-6 space-y-2">
             <div class="flex justify-between items-end">
                 <span class="font-game text-2xl tracking-tighter text-orange-500" id="score-display">0</span>
@@ -34,36 +42,35 @@
             </div>
         </div>
 
-        <div id="overlay" class="text-center space-y-6 bg-black/90 backdrop-blur-2xl p-6 md:p-10 rounded-[2.5rem] border border-white/10 w-[92%] max-w-sm hidden shadow-2xl">
-            
-            <div class="flex justify-center gap-6 btn-active mb-2">
+        <div id="overlay" class="text-center space-y-6 bg-black/90 backdrop-blur-2xl p-6 md:p-10 rounded-[2.5rem] border border-white/10 w-[92%] max-w-sm shadow-2xl btn-active">
+            <div class="flex justify-center gap-6 mb-2">
                 <button onclick="setLanguage('ko')" class="lang-btn text-xs tracking-widest font-bold transition-all" id="btn-ko">한글</button>
                 <button onclick="setLanguage('en')" class="lang-btn text-xs tracking-widest font-bold transition-all" id="btn-en">ENG</button>
             </div>
 
             <div class="space-y-3">
-                <h2 id="status-title" class="font-game text-3xl sm:text-5xl tracking-normal text-white leading-tight break-keep">ASH</h2>
+                <h2 id="status-title" class="font-game text-3xl sm:text-4xl tracking-normal text-white leading-tight break-keep">ASH</h2>
                 <p id="status-desc" class="text-gray-400 text-xs sm:text-sm font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
             </div>
 
-            <div class="space-y-5 py-5 border-y border-white/5 text-left btn-active">
+            <div class="space-y-5 py-5 border-y border-white/5 text-left">
                 <div class="space-y-2">
                     <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
                         <span id="label-bgm">배경 음악</span>
                         <span id="bgm-val" class="font-bold text-orange-500">50%</span>
                     </div>
-                    <input type="range" id="bgm-slider" min="0" max="100" value="50" class="w-full volume-slider">
+                    <input type="range" id="bgm-slider" min="0" max="100" value="50" class="w-full">
                 </div>
                 <div class="space-y-2">
                     <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
                         <span id="label-sfx">효과음</span>
                         <span id="sfx-val" class="font-bold text-orange-500">50%</span>
                     </div>
-                    <input type="range" id="sfx-slider" min="0" max="100" value="50" class="w-full volume-slider">
+                    <input type="range" id="sfx-slider" min="0" max="100" value="50" class="w-full">
                 </div>
             </div>
 
-            <div class="flex flex-col gap-3 btn-active">
+            <div class="flex flex-col gap-3">
                 <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all active:scale-95 shadow-lg">
                     점화
                 </button>
@@ -71,228 +78,192 @@
                     여정 공유
                 </button>
             </div>
+            <p class="text-[9px] text-gray-600 uppercase tracking-widest mt-2">Mouse / Arrows / Touch</p>
         </div>
 
         <div class="opacity-30 text-[10px] tracking-[0.3em] uppercase">ash.kr</div>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
-
     <script>
-        /** 다국어 설정 **/
+        const bgmList = ['Q4SStm-yBPk', 'gqjoyl_vkz4', 'E4Wh5wsBWOc', 'uZv0Uk79fkQ', '5sh8LpjwRx8', '5b4S2kT7egY', 'iyK-vTg7t7I', 'LCbkt71v_XY', 'P4OShWBVhag', 'ASUAbRudPpM', 'TAFJdIwS_1g', 'BOVxiaIjd0A', 'AcvXo4EsFTI', 'cTn8g7IBRjE', 'o4NAUDlm9w8', 'xUx3FMDzKPA', 'j6HWJsBZM_s', 'OLQy_0yD4M8', 'DPxFVLI8gIA'];
         const i18n = {
-            ko: {
-                title: "ASH",
-                desc: "마지막 불씨가 꺼지지 않게 하세요.",
-                extinguished: "불씨가 꺼졌습니다",
-                scoreLabel: "최종 기록: ",
-                heat: "온기 레벨",
-                bgm: "배경 음악",
-                sfx: "효과음",
-                ignite: "점화",
-                rekindle: "다시 태우기",
-                share: "여정 공유",
-                copyAlert: "주소가 복사되었습니다."
-            },
-            en: {
-                title: "ASH",
-                desc: "Keep the last ember alive.",
-                extinguished: "EXTINGUISHED",
-                scoreLabel: "Final Score: ",
-                heat: "Heat Level",
-                bgm: "Background Music",
-                sfx: "Sound Effects",
-                ignite: "IGNITE",
-                rekindle: "REKINDLE",
-                share: "Share Journey",
-                copyAlert: "URL copied to clipboard."
-            }
+            ko: { title: "ASH", desc: "마지막 불씨가 꺼지지 않게 하세요.", extinguished: "불씨가 꺼졌습니다", scoreLabel: "최종 기록: ", heat: "온기 레벨", bgm: "배경 음악", sfx: "효과음", ignite: "점화", rekindle: "다시 태우기", share: "여정 공유", copyAlert: "주소가 복사되었습니다." },
+            en: { title: "ASH", desc: "Keep the last ember alive.", extinguished: "EXTINGUISHED", scoreLabel: "Final Score: ", heat: "Heat Level", bgm: "Background Music", sfx: "Sound Effects", ignite: "IGNITE", rekindle: "REKINDLE", share: "Share Journey", copyAlert: "URL copied to clipboard." }
         };
 
-        let currentLang = 'ko';
-        let gameActive = false;
-        let score = 0;
+        let currentLang = 'ko', gameActive = false, score = 0, volBGM = 0.5, volSFX = 0.5;
+        let heat = 100, items = [], particles = [];
+        const player = { x: window.innerWidth/2, y: window.innerHeight*0.8, targetX: window.innerWidth/2 };
+        const keys = { ArrowLeft: false, ArrowRight: false };
+        let lastTouchX = null;
 
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('overlay');
+        const startBtn = document.getElementById('start-btn');
+
+        /** 언어 설정 **/
         function setLanguage(lang) {
             currentLang = lang;
             const t = i18n[lang];
-            
             document.getElementById('label-heat').innerText = t.heat;
             document.getElementById('label-bgm').innerText = t.bgm;
             document.getElementById('label-sfx').innerText = t.sfx;
             document.getElementById('share-btn').innerText = t.share;
-
-            // 오버레이 텍스트 업데이트
-            const titleEl = document.getElementById('status-title');
-            const descEl = document.getElementById('status-desc');
-            const startBtnEl = document.getElementById('start-btn');
-
-            if (!gameActive) {
-                if (score === 0) {
-                    titleEl.innerText = t.title;
-                    descEl.innerText = t.desc;
-                    startBtnEl.innerText = t.ignite;
-                } else {
-                    titleEl.innerText = t.extinguished;
-                    descEl.innerText = t.scoreLabel + score;
-                    startBtnEl.innerText = t.rekindle;
-                }
-            }
-
-            // 버튼 스타일 업데이트
+            document.getElementById('status-title').innerText = score === 0 ? t.title : t.extinguished;
+            document.getElementById('status-desc').innerText = score === 0 ? t.desc : t.scoreLabel + score;
+            startBtn.innerText = score === 0 ? t.ignite : t.rekindle;
             document.getElementById('btn-ko').style.opacity = lang === 'ko' ? '1' : '0.3';
             document.getElementById('btn-en').style.opacity = lang === 'en' ? '1' : '0.3';
         }
 
         /** 유튜브 API **/
         var ytPlayer;
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
         function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('player', {
-                height: '0', width: '0', videoId: 'DPxFVLI8gIA',
-                playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': 'DPxFVLI8gIA' }
-            });
+            ytPlayer = new YT.Player('player', { height: '0', width: '0', playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1 } });
         }
+        var tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
+        document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
 
-        /** 사운드 엔진 **/
-        let volBGM = 0.5, volSFX = 0.5;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const SFX = {
-            play(type) {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                const masterGain = volSFX * 0.1;
-                if (type === 'collect') {
-                    osc.type = 'triangle'; osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(masterGain, audioCtx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
-                    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-                } else if (type === 'hit') {
-                    const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
-                    const data = buffer.getChannelData(0);
-                    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-                    const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
-                    const nGain = audioCtx.createGain(); nGain.gain.setValueAtTime(masterGain, audioCtx.currentTime);
-                    noise.connect(nGain); nGain.connect(audioCtx.destination);
-                    noise.start();
-                }
+        /** [중요] 조작 이벤트 처리 (Pointer Events 통합) **/
+        
+        // 마우스 호버 및 터치 이동 상시 감지
+        window.addEventListener('pointermove', (e) => {
+            if (!gameActive) return;
+            
+            if (e.pointerType === 'mouse') {
+                // 마우스인 경우: 절대 위치 추적 (호버 동작)
+                player.targetX = e.clientX;
+            } else if (lastTouchX !== null) {
+                // 터치인 경우: 상대 위치 이동
+                const deltaX = e.clientX - lastTouchX;
+                player.targetX += deltaX;
+                lastTouchX = e.clientX;
             }
-        };
+        });
+
+        window.addEventListener('pointerdown', (e) => {
+            if (e.pointerType !== 'mouse') lastTouchX = e.clientX;
+        });
+
+        window.addEventListener('pointerup', () => {
+            lastTouchX = null;
+        });
+
+        // 키보드 조작
+        window.addEventListener('keydown', (e) => {
+            if (e.code in keys) {
+                keys[e.code] = true;
+                if (gameActive) e.preventDefault(); // 화면 스크롤 방지
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.code in keys) keys[e.code] = false;
+        });
 
         /** 게임 엔진 **/
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const overlay = document.getElementById('overlay');
-        const startBtn = document.getElementById('start-btn');
-        const shareBtn = document.getElementById('share-btn');
-        const bgmSlider = document.getElementById('bgm-slider');
-        const sfxSlider = document.getElementById('sfx-slider');
-
-        let heat = 100, items = [], particles = [];
-        const player = { x: 0, y: 0, targetX: 0 };
-        let isDragging = false, dragStartX = 0, playerStartX = 0;
-
-        bgmSlider.addEventListener('input', (e) => {
-            volBGM = e.target.value / 100;
-            document.getElementById('bgm-val').innerText = e.target.value + '%';
-            if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(e.target.value);
-        });
-        sfxSlider.addEventListener('input', (e) => {
-            volSFX = e.target.value / 100;
-            document.getElementById('sfx-val').innerText = e.target.value + '%';
-        });
-
-        // 상대적 이동 조작
-        const handleStart = (clientX) => { if (gameActive) { isDragging = true; dragStartX = clientX; playerStartX = player.x; } };
-        const handleMove = (clientX) => { if (gameActive && isDragging) { player.targetX = Math.max(20, Math.min(canvas.width - 20, playerStartX + (clientX - dragStartX))); } };
-        const handleEnd = () => { isDragging = false; };
-
-        window.addEventListener('mousedown', (e) => handleStart(e.clientX));
-        window.addEventListener('mousemove', (e) => handleMove(e.clientX));
-        window.addEventListener('mouseup', handleEnd);
-        window.addEventListener('touchstart', (e) => handleStart(e.touches[0].clientX));
-        window.addEventListener('touchmove', (e) => { handleMove(e.touches[0].clientX); if (gameActive) e.preventDefault(); }, { passive: false });
-        window.addEventListener('touchend', handleEnd);
-
-        shareBtn.addEventListener('click', () => {
-            const t = i18n[currentLang];
-            const shareData = { title: 'ASH.KR', text: t.scoreLabel + score, url: window.location.href };
-            if (navigator.share) navigator.share(shareData);
-            else { navigator.clipboard.writeText(window.location.href); alert(t.copyAlert); }
-        });
-
-        function resize() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            player.x = canvas.width / 2; player.targetX = player.x; player.y = canvas.height * 0.8;
-            if(!gameActive) overlay.style.display = 'block';
-        }
-
-        class Item {
-            constructor(type) {
-                this.type = type; this.x = Math.random() * canvas.width; this.y = -20;
-                this.size = type === 'ash' ? Math.random() * 3 + 2 : Math.random() * 2 + 4;
-                this.speed = type === 'ash' ? Math.random() * 2 + 1.5 : Math.random() * 4 + 3;
-            }
-            update() { this.y += this.speed; }
-            draw() { ctx.beginPath(); ctx.fillStyle = this.type === 'ash' ? '#888' : '#3b82f6'; ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-        }
-
         function initGame() {
-            if (ytPlayer && ytPlayer.playVideo) { ytPlayer.setVolume(volBGM * 100); ytPlayer.playVideo(); }
+            window.focus(); 
+            if (ytPlayer && ytPlayer.loadVideoById) { 
+                ytPlayer.loadVideoById(bgmList[Math.floor(Math.random() * bgmList.length)]);
+                ytPlayer.setVolume(volBGM * 100);
+            }
             gameActive = true; score = 0; heat = 100; items = [];
-            player.x = canvas.width / 2; player.targetX = player.x;
+            player.x = canvas.width / 2;
+            player.targetX = player.x;
             document.getElementById('score-display').innerText = "0";
-            overlay.style.display = 'none';
-            animate();
+            overlay.classList.add('hidden'); // 오버레이 완전 제거
         }
 
         function gameOver() {
             if(!gameActive) return;
-            if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
             gameActive = false;
-            overlay.style.display = 'block';
-            setLanguage(currentLang); // 결과 화면 텍스트 갱신
+            if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+            overlay.classList.remove('hidden');
+            setLanguage(currentLang);
         }
 
         function animate() {
-            if(!gameActive) return;
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            heat -= 0.12; document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
-            if(heat <= 0) { gameOver(); return; }
-            player.x += (player.targetX - player.x) * 0.2;
+            requestAnimationFrame(animate);
+            
+            // 반응형 리사이즈 상시 체크
+            if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                player.y = canvas.height * 0.8;
+            }
+
+            if (!gameActive) {
+                // 게임 대기 상태 배경 렌더링
+                ctx.fillStyle = '#050505';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                return;
+            }
+
+            // 키보드 이동 가중치 반영
+            if (keys.ArrowLeft) player.targetX -= 12;
+            if (keys.ArrowRight) player.targetX += 12;
+
+            player.targetX = Math.max(20, Math.min(canvas.width - 20, player.targetX));
+            player.x += (player.targetX - player.x) * 0.15;
+
+            // 온기 로직
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.4)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            heat -= 0.12;
+            document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
+            if (heat <= 0) { gameOver(); return; }
+
+            // 불씨 그리기
             const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 25);
             grad.addColorStop(0, '#fff'); grad.addColorStop(0.2, '#ff6a00'); grad.addColorStop(1, 'transparent');
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(player.x, player.y, 25, 0, Math.PI * 2); ctx.fill();
 
-            if(Math.random() < 0.08) items.push(new Item('ash'));
-            if(Math.random() < 0.03 + (score/8000)) items.push(new Item('rain'));
+            // 아이템 생성
+            if(Math.random() < 0.08) items.push({ x: Math.random()*canvas.width, y: -20, type: 'ash', speed: Math.random()*2+2 });
+            if(Math.random() < 0.03 + (score/20000)) items.push({ x: Math.random()*canvas.width, y: -20, type: 'rain', speed: Math.random()*4+4 });
 
             items.forEach((item, index) => {
-                item.update(); item.draw();
-                if(Math.hypot(player.x - item.x, player.y - item.y) < 25) {
-                    if(item.type === 'ash') {
-                        SFX.play('collect'); heat = Math.min(100, heat + 6); score += 10;
+                item.y += item.speed;
+                ctx.beginPath();
+                ctx.fillStyle = item.type === 'ash' ? '#888' : '#3b82f6';
+                ctx.arc(item.x, item.y, (item.type==='ash'?3:5), 0, Math.PI * 2);
+                ctx.fill();
+
+                if (Math.hypot(player.x - item.x, player.y - item.y) < 25) {
+                    if (item.type === 'ash') {
+                        heat = Math.min(100, heat + 7); score += 10;
                         document.getElementById('score-display').innerText = score;
-                    } else {
-                        SFX.play('hit'); heat -= 15;
-                    }
+                    } else { heat -= 15; }
+                    items.splice(index, 1);
+                } else if (item.y > canvas.height) {
                     items.splice(index, 1);
                 }
-                if(item.y > canvas.height) items.splice(index, 1);
             });
-            requestAnimationFrame(animate);
         }
 
-        startBtn.addEventListener('click', initGame);
-        window.addEventListener('resize', resize);
-        resize();
-        setLanguage('ko'); // 기본 언어 한글 설정
+        /** 기타 UI **/
+        document.getElementById('bgm-slider').addEventListener('input', (e) => {
+            volBGM = e.target.value / 100;
+            document.getElementById('bgm-val').innerText = e.target.value + '%';
+            if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(e.target.value);
+        });
+
+        document.getElementById('share-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const t = i18n[currentLang];
+            const data = { title: 'ASH.KR', text: t.scoreLabel + score, url: window.location.href };
+            if (navigator.share) navigator.share(data);
+            else { navigator.clipboard.writeText(window.location.href); alert(t.copyAlert); }
+        });
+
+        startBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            initGame();
+        });
+
+        setLanguage('ko');
+        animate();
     </script>
 </body>
 </html>

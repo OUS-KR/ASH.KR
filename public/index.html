@@ -14,6 +14,7 @@
         .btn-active { pointer-events: auto; cursor: pointer; }
         #yt-player-container { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
         
+        /* 슬라이더 스타일 */
         input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 99px; height: 6px; outline: none; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #f97316; cursor: pointer; border: 2px solid white; }
     </style>
@@ -26,36 +27,36 @@
         <div class="w-full max-w-md px-6 space-y-2">
             <div class="flex justify-between items-end">
                 <span class="font-game text-2xl tracking-tighter text-orange-500" id="score-display">0</span>
-                <span class="text-[10px] uppercase tracking-widest text-gray-500" id="label-heat">Heat Level</span>
+                <span class="text-[10px] uppercase tracking-widest text-gray-500" id="label-heat">온기 레벨</span>
             </div>
             <div class="h-1 w-full bg-gray-900 rounded-full overflow-hidden border border-white/5">
                 <div id="heat-bar" class="h-full bg-gradient-to-r from-orange-700 via-orange-500 to-yellow-400 shadow-[0_0_15px_#ff4d00] transition-all duration-100" style="width: 100%"></div>
             </div>
         </div>
 
-        <div id="overlay" class="text-center space-y-6 bg-black/85 backdrop-blur-2xl p-6 md:p-10 rounded-[2.5rem] border border-white/10 w-[92%] max-w-sm hidden shadow-2xl">
+        <div id="overlay" class="text-center space-y-6 bg-black/90 backdrop-blur-2xl p-6 md:p-10 rounded-[2.5rem] border border-white/10 w-[92%] max-w-sm hidden shadow-2xl">
             
-            <div class="flex justify-center gap-4 btn-active mb-2">
-                <button onclick="setLanguage('ko')" class="lang-btn text-[10px] tracking-widest uppercase font-bold opacity-40 hover:opacity-100 transition-opacity" id="btn-ko">KO</button>
-                <button onclick="setLanguage('en')" class="lang-btn text-[10px] tracking-widest uppercase font-bold opacity-40 hover:opacity-100 transition-opacity" id="btn-en">EN</button>
+            <div class="flex justify-center gap-6 btn-active mb-2">
+                <button onclick="setLanguage('ko')" class="lang-btn text-xs tracking-widest font-bold transition-all" id="btn-ko">한글</button>
+                <button onclick="setLanguage('en')" class="lang-btn text-xs tracking-widest font-bold transition-all" id="btn-en">ENG</button>
             </div>
 
-            <div class="space-y-2">
-                <h2 id="status-title" class="font-game text-3xl sm:text-5xl tracking-normal sm:tracking-widest text-white break-words leading-tight">ASH</h2>
+            <div class="space-y-3">
+                <h2 id="status-title" class="font-game text-3xl sm:text-5xl tracking-normal text-white leading-tight break-keep">ASH</h2>
                 <p id="status-desc" class="text-gray-400 text-xs sm:text-sm font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
             </div>
 
             <div class="space-y-5 py-5 border-y border-white/5 text-left btn-active">
                 <div class="space-y-2">
-                    <div class="flex justify-between items-center text-[9px] uppercase tracking-widest text-gray-400">
-                        <span id="label-bgm">Background Music</span>
+                    <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
+                        <span id="label-bgm">배경 음악</span>
                         <span id="bgm-val" class="font-bold text-orange-500">50%</span>
                     </div>
                     <input type="range" id="bgm-slider" min="0" max="100" value="50" class="w-full volume-slider">
                 </div>
                 <div class="space-y-2">
-                    <div class="flex justify-between items-center text-[9px] uppercase tracking-widest text-gray-400">
-                        <span id="label-sfx">Sound Effects</span>
+                    <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
+                        <span id="label-sfx">효과음</span>
                         <span id="sfx-val" class="font-bold text-orange-500">50%</span>
                     </div>
                     <input type="range" id="sfx-slider" min="0" max="100" value="50" class="w-full volume-slider">
@@ -63,11 +64,11 @@
             </div>
 
             <div class="flex flex-col gap-3 btn-active">
-                <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all active:scale-95 shadow-lg shadow-orange-900/20">
-                    IGNITE
+                <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all active:scale-95 shadow-lg">
+                    점화
                 </button>
                 <button id="share-btn" class="w-full py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-[10px] font-medium tracking-widest uppercase rounded-2xl transition-all border border-white/10">
-                    Share Journey
+                    여정 공유
                 </button>
             </div>
         </div>
@@ -78,12 +79,12 @@
     <canvas id="gameCanvas"></canvas>
 
     <script>
-        /** 다국어 사전 **/
+        /** 다국어 설정 **/
         const i18n = {
             ko: {
                 title: "ASH",
                 desc: "마지막 불씨가 꺼지지 않게 하세요.",
-                extinguished: "소멸됨",
+                extinguished: "불씨가 꺼졌습니다",
                 scoreLabel: "최종 기록: ",
                 heat: "온기 레벨",
                 bgm: "배경 음악",
@@ -109,31 +110,41 @@
         };
 
         let currentLang = 'ko';
+        let gameActive = false;
+        let score = 0;
 
         function setLanguage(lang) {
             currentLang = lang;
             const t = i18n[lang];
             
-            // UI 텍스트 업데이트
             document.getElementById('label-heat').innerText = t.heat;
             document.getElementById('label-bgm').innerText = t.bgm;
             document.getElementById('label-sfx').innerText = t.sfx;
             document.getElementById('share-btn').innerText = t.share;
-            
+
+            // 오버레이 텍스트 업데이트
+            const titleEl = document.getElementById('status-title');
+            const descEl = document.getElementById('status-desc');
+            const startBtnEl = document.getElementById('start-btn');
+
             if (!gameActive) {
-                document.getElementById('status-title').innerText = statusTitle.innerText === "ASH" ? t.title : t.extinguished;
-                document.getElementById('status-desc').innerText = t.desc;
-                startBtn.innerText = score === 0 ? t.ignite : t.rekindle;
+                if (score === 0) {
+                    titleEl.innerText = t.title;
+                    descEl.innerText = t.desc;
+                    startBtnEl.innerText = t.ignite;
+                } else {
+                    titleEl.innerText = t.extinguished;
+                    descEl.innerText = t.scoreLabel + score;
+                    startBtnEl.innerText = t.rekindle;
+                }
             }
 
-            // 버튼 하이라이트
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.add('opacity-40'));
-            document.getElementById('btn-' + lang).classList.remove('opacity-40');
-            document.getElementById('btn-' + lang).classList.add('opacity-100');
+            // 버튼 스타일 업데이트
+            document.getElementById('btn-ko').style.opacity = lang === 'ko' ? '1' : '0.3';
+            document.getElementById('btn-en').style.opacity = lang === 'en' ? '1' : '0.3';
         }
 
-        /** 사운드 설정 **/
-        let volBGM = 0.5, volSFX = 0.5;
+        /** 유튜브 API **/
         var ytPlayer;
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -143,11 +154,12 @@
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('player', {
                 height: '0', width: '0', videoId: 'DPxFVLI8gIA',
-                playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': 'DPxFVLI8gIA' },
-                events: { 'onReady': () => ytPlayer.setVolume(volBGM * 100) }
+                playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': 'DPxFVLI8gIA' }
             });
         }
 
+        /** 사운드 엔진 **/
+        let volBGM = 0.5, volSFX = 0.5;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const SFX = {
             play(type) {
@@ -173,7 +185,7 @@
             }
         };
 
-        /** 게임 로직 & 조작 **/
+        /** 게임 엔진 **/
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const overlay = document.getElementById('overlay');
@@ -182,7 +194,7 @@
         const bgmSlider = document.getElementById('bgm-slider');
         const sfxSlider = document.getElementById('sfx-slider');
 
-        let gameActive = false, score = 0, heat = 100, items = [], particles = [];
+        let heat = 100, items = [], particles = [];
         const player = { x: 0, y: 0, targetX: 0 };
         let isDragging = false, dragStartX = 0, playerStartX = 0;
 
@@ -191,19 +203,14 @@
             document.getElementById('bgm-val').innerText = e.target.value + '%';
             if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(e.target.value);
         });
-
         sfxSlider.addEventListener('input', (e) => {
             volSFX = e.target.value / 100;
             document.getElementById('sfx-val').innerText = e.target.value + '%';
         });
 
+        // 상대적 이동 조작
         const handleStart = (clientX) => { if (gameActive) { isDragging = true; dragStartX = clientX; playerStartX = player.x; } };
-        const handleMove = (clientX) => {
-            if (gameActive && isDragging) {
-                let tx = playerStartX + (clientX - dragStartX);
-                player.targetX = Math.max(20, Math.min(canvas.width - 20, tx));
-            }
-        };
+        const handleMove = (clientX) => { if (gameActive && isDragging) { player.targetX = Math.max(20, Math.min(canvas.width - 20, playerStartX + (clientX - dragStartX))); } };
         const handleEnd = () => { isDragging = false; };
 
         window.addEventListener('mousedown', (e) => handleStart(e.clientX));
@@ -221,35 +228,23 @@
         });
 
         function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            player.x = canvas.width / 2;
-            player.targetX = player.x;
-            player.y = canvas.height * 0.8;
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            player.x = canvas.width / 2; player.targetX = player.x; player.y = canvas.height * 0.8;
             if(!gameActive) overlay.style.display = 'block';
         }
 
         class Item {
             constructor(type) {
-                this.type = type;
-                this.x = Math.random() * canvas.width;
-                this.y = -20;
+                this.type = type; this.x = Math.random() * canvas.width; this.y = -20;
                 this.size = type === 'ash' ? Math.random() * 3 + 2 : Math.random() * 2 + 4;
                 this.speed = type === 'ash' ? Math.random() * 2 + 1.5 : Math.random() * 4 + 3;
             }
             update() { this.y += this.speed; }
-            draw() {
-                ctx.beginPath(); ctx.fillStyle = this.type === 'ash' ? '#888' : '#3b82f6';
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
-            }
-        }
-
-        function createExplosion(x, y, color) {
-            for(let i = 0; i < 8; i++) particles.push({ x, y, vx: Math.random()*4-2, vy: Math.random()*4-2, life: 1, color });
+            draw() { ctx.beginPath(); ctx.fillStyle = this.type === 'ash' ? '#888' : '#3b82f6'; ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
 
         function initGame() {
-            if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
+            if (ytPlayer && ytPlayer.playVideo) { ytPlayer.setVolume(volBGM * 100); ytPlayer.playVideo(); }
             gameActive = true; score = 0; heat = 100; items = [];
             player.x = canvas.width / 2; player.targetX = player.x;
             document.getElementById('score-display').innerText = "0";
@@ -261,19 +256,14 @@
             if(!gameActive) return;
             if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
             gameActive = false;
-            const t = i18n[currentLang];
             overlay.style.display = 'block';
-            document.getElementById('status-title').innerText = t.extinguished;
-            document.getElementById('status-desc').innerText = t.scoreLabel + score;
-            startBtn.innerText = t.rekindle;
+            setLanguage(currentLang); // 결과 화면 텍스트 갱신
         }
 
         function animate() {
             if(!gameActive) return;
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            heat -= 0.12;
-            document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            heat -= 0.12; document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
             if(heat <= 0) { gameOver(); return; }
             player.x += (player.targetX - player.x) * 0.2;
             const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 25);
@@ -289,29 +279,20 @@
                     if(item.type === 'ash') {
                         SFX.play('collect'); heat = Math.min(100, heat + 6); score += 10;
                         document.getElementById('score-display').innerText = score;
-                        createExplosion(item.x, item.y, '#ff4d00');
                     } else {
                         SFX.play('hit'); heat -= 15;
-                        createExplosion(item.x, item.y, '#3b82f6');
                     }
                     items.splice(index, 1);
                 }
                 if(item.y > canvas.height) items.splice(index, 1);
             });
-
-            particles.forEach((p, i) => {
-                p.x += p.vx; p.y += p.vy; p.life -= 0.03;
-                ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
-                ctx.fillRect(p.x, p.y, 2, 2);
-                if(p.life <= 0) particles.splice(i, 1);
-            });
-            ctx.globalAlpha = 1;
             requestAnimationFrame(animate);
         }
 
         startBtn.addEventListener('click', initGame);
+        window.addEventListener('resize', resize);
         resize();
-        setLanguage('ko'); // 초기 언어 설정
+        setLanguage('ko'); // 기본 언어 한글 설정
     </script>
 </body>
 </html>

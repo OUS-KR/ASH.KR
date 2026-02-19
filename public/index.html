@@ -2,133 +2,209 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASH.KR | The Remaining Embers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ASH.KR | The Last Ember</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --ash-black: #0c0c0c;
-            --ember-orange: #ff4d00;
-        }
-        body {
-            background-color: var(--ash-black);
-            font-family: 'Noto Sans KR', sans-serif;
-            overflow: hidden;
-            color: #d1d5db;
-        }
-        .font-cinzel { font-family: 'Cinzel', serif; }
-
-        /* 타오르는 불씨 애니메이션 */
-        .ember {
-            position: absolute;
-            background: radial-gradient(circle, var(--ember-orange) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0;
-            animation: rise 5s linear infinite;
-        }
-
-        @keyframes rise {
-            0% { transform: translateY(100vh) translateX(0) scale(1); opacity: 0; }
-            20% { opacity: 0.8; }
-            80% { opacity: 0.4; }
-            100% { transform: translateY(-10vh) translateX(100px) scale(0); opacity: 0; }
-        }
-
-        /* 텍스트 노이즈 효과 */
-        .glitch {
-            text-shadow: 0 0 10px rgba(255, 77, 0, 0.5);
-            animation: flicker 2s infinite;
-        }
-
-        @keyframes flicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
-            20%, 22%, 24%, 55% { opacity: 0.7; }
-        }
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Inter', sans-serif; touch-action: none; }
+        .font-game { font-family: 'Cinzel', serif; }
+        canvas { display: block; filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.3)); }
+        #ui-layer { pointer-events: none; }
+        .btn-active { pointer-events: auto; cursor: pointer; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body class="text-white select-none">
 
-    <div id="ember-container" class="fixed inset-0 z-0"></div>
-    
-    <div class="fixed inset-0 bg-[radial-gradient(circle,transparent_20%,rgba(0,0,0,0.8)_100%)] z-10 pointer-events-none"></div>
-
-    <main class="relative z-20 text-center space-y-12">
-        
-        <header class="space-y-2 group">
-            <h1 class="font-cinzel text-8xl md:text-9xl font-bold tracking-[0.2em] text-white glitch select-none transition-transform duration-700 group-hover:scale-105">
-                ASH
-            </h1>
-            <p class="font-cinzel text-sm md:text-base tracking-[0.5em] text-orange-500/80 uppercase">
-                The Remaining Embers
-            </p>
-        </header>
-
-        <nav class="flex flex-col items-center space-y-6">
-            <a href="#start" class="game-btn group">
-                <span class="text-xl tracking-widest uppercase transition-all group-hover:text-white group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]">New Journey</span>
-                <div class="w-0 h-[1px] bg-orange-600 transition-all duration-300 group-hover:w-full mt-1"></div>
-            </a>
-            
-            <a href="#archives" class="game-btn group">
-                <span class="text-xl tracking-widest uppercase transition-all group-hover:text-white">Archives</span>
-                <div class="w-0 h-[1px] bg-orange-600 transition-all duration-300 group-hover:w-full mt-1"></div>
-            </a>
-
-            <a href="#config" class="game-btn group">
-                <span class="text-xl tracking-widest uppercase transition-all group-hover:text-white">Configurations</span>
-                <div class="w-0 h-[1px] bg-orange-600 transition-all duration-300 group-hover:w-full mt-1"></div>
-            </a>
-
-            <a href="mailto:hello@ash.kr" class="game-btn group">
-                <span class="text-xl tracking-widest uppercase transition-all group-hover:text-white text-orange-700">Quit to Reality</span>
-                <div class="w-0 h-[1px] bg-red-900 transition-all duration-300 group-hover:w-full mt-1"></div>
-            </a>
-        </nav>
-
-        <footer class="pt-20 opacity-40 hover:opacity-100 transition-opacity duration-1000">
-            <div class="flex flex-col items-center gap-2">
-                <div class="w-48 h-1 bg-gray-900 rounded-full overflow-hidden border border-white/10">
-                    <div class="w-1/3 h-full bg-orange-600 shadow-[0_0_10px_#ff4d00]"></div>
-                </div>
-                <p class="text-[10px] font-cinzel tracking-widest uppercase">Server Status: Stable | LV. 2026</p>
+    <div id="ui-layer" class="fixed inset-0 z-10 flex flex-col items-center justify-between py-10">
+        <div class="w-full max-w-md px-6 space-y-2">
+            <div class="flex justify-between items-end">
+                <span class="font-game text-2xl tracking-tighter text-orange-500" id="score-display">0</span>
+                <span class="text-[10px] uppercase tracking-widest text-gray-500">Heat Level</span>
             </div>
-        </footer>
-    </main>
+            <div class="h-1 w-full bg-gray-900 rounded-full overflow-hidden border border-white/5">
+                <div id="heat-bar" class="h-full bg-gradient-to-r from-orange-700 via-orange-500 to-yellow-400 shadow-[0_0_15px_#ff4d00] transition-all duration-100" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <div id="overlay" class="text-center space-y-8 bg-black/40 backdrop-blur-sm p-12 rounded-3xl border border-white/10 hidden">
+            <h2 id="status-title" class="font-game text-6xl tracking-widest text-white">ASH</h2>
+            <p id="status-desc" class="text-gray-400 font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
+            <button id="start-btn" class="btn-active px-10 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-widest uppercase rounded-full transition-all hover:scale-110 active:scale-95 shadow-lg shadow-orange-900/20">
+                IGNITE
+            </button>
+        </div>
+
+        <div class="opacity-30 text-[10px] tracking-[0.3em] uppercase">Move to Survive</div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
 
     <script>
-        // 불씨 생성 스크립트
-        const container = document.getElementById('ember-container');
-        function createEmber() {
-            const ember = document.createElement('div');
-            ember.classList.add('ember');
-            
-            const size = Math.random() * 4 + 1 + 'px';
-            const left = Math.random() * 100 + 'vw';
-            const duration = Math.random() * 3 + 4 + 's';
-            const delay = Math.random() * 5 + 's';
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const heatBar = document.getElementById('heat-bar');
+        const scoreDisplay = document.getElementById('score-display');
+        const overlay = document.getElementById('overlay');
+        const startBtn = document.getElementById('start-btn');
+        const statusTitle = document.getElementById('status-title');
+        const statusDesc = document.getElementById('status-desc');
 
-            ember.style.width = size;
-            ember.style.height = size;
-            ember.style.left = left;
-            ember.style.animationDuration = duration;
-            ember.style.animationDelay = delay;
+        let gameActive = false;
+        let score = 0;
+        let heat = 100;
+        let particles = [];
+        let items = [];
+        let mouseX = 0;
 
-            container.appendChild(ember);
+        // 플레이어 객체
+        const player = {
+            x: 0,
+            y: 0,
+            size: 8,
+            targetX: 0,
+            trail: []
+        };
 
-            // 애니메이션 종료 후 요소 제거
-            setTimeout(() => {
-                ember.remove();
-            }, (parseFloat(duration) + parseFloat(delay)) * 1000);
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            player.x = canvas.width / 2;
+            player.y = canvas.height * 0.8;
+            if(!gameActive) overlay.style.display = 'block';
         }
 
-        // 초기 불씨 생성
-        for(let i = 0; i < 30; i++) {
-            createEmber();
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => player.targetX = e.clientX);
+        window.addEventListener('touchmove', (e) => {
+            player.targetX = e.touches[0].clientX;
+            e.preventDefault();
+        }, { passive: false });
+
+        class Item {
+            constructor(type) {
+                this.type = type; // 'ash' or 'rain'
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.size = type === 'ash' ? Math.random() * 4 + 2 : Math.random() * 3 + 5;
+                this.speed = type === 'ash' ? Math.random() * 2 + 2 : Math.random() * 4 + 4;
+                this.drift = Math.random() * 1 - 0.5;
+            }
+            update() {
+                this.y += this.speed;
+                this.x += this.drift;
+            }
+            draw() {
+                ctx.beginPath();
+                if(this.type === 'ash') {
+                    ctx.fillStyle = '#666';
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                } else {
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x - 2, this.y + 10);
+                    ctx.lineTo(this.x + 2, this.y + 10);
+                }
+                ctx.fill();
+            }
         }
-        // 주기적으로 불씨 추가
-        setInterval(createEmber, 300);
+
+        function createExplosion(x, y, color) {
+            for(let i = 0; i < 10; i++) {
+                particles.push({
+                    x, y,
+                    vx: Math.random() * 4 - 2,
+                    vy: Math.random() * 4 - 2,
+                    life: 1,
+                    color: color
+                });
+            }
+        }
+
+        function initGame() {
+            gameActive = true;
+            score = 0;
+            heat = 100;
+            items = [];
+            overlay.style.display = 'none';
+            animate();
+        }
+
+        function gameOver() {
+            gameActive = false;
+            overlay.style.display = 'block';
+            statusTitle.innerText = "EXTINGUISHED";
+            statusDesc.innerText = `당신의 온기는 ${score}점까지 타올랐습니다.`;
+            startBtn.innerText = "REKINDLE";
+        }
+
+        function animate() {
+            if(!gameActive) return;
+
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 온기 감소
+            heat -= 0.15;
+            heatBar.style.width = `${Math.max(0, heat)}%`;
+            if(heat <= 0) gameOver();
+
+            // 플레이어 이동 로직 (부드러운 추적)
+            player.x += (player.targetX - player.x) * 0.15;
+
+            // 플레이어 광원 효과
+            const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 20);
+            grad.addColorStop(0, '#fff');
+            grad.addColorStop(0.3, '#ff9d00');
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, 20, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 아이템 스폰
+            if(Math.random() < 0.08) items.push(new Item('ash'));
+            if(Math.random() < 0.03) items.push(new Item('rain'));
+
+            items.forEach((item, index) => {
+                item.update();
+                item.draw();
+
+                // 충돌 검사
+                const dist = Math.hypot(player.x - item.x, player.y - item.y);
+                if(dist < 20) {
+                    if(item.type === 'ash') {
+                        heat = Math.min(100, heat + 5);
+                        score += 10;
+                        scoreDisplay.innerText = score;
+                        createExplosion(item.x, item.y, '#ff4d00');
+                    } else {
+                        heat -= 20;
+                        createExplosion(item.x, item.y, '#3b82f6');
+                    }
+                    items.splice(index, 1);
+                }
+
+                if(item.y > canvas.height) items.splice(index, 1);
+            });
+
+            // 파티클 업데이트
+            particles.forEach((p, i) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.fillRect(p.x, p.y, 2, 2);
+                if(p.life <= 0) particles.splice(i, 1);
+            });
+            ctx.globalAlpha = 1;
+
+            requestAnimationFrame(animate);
+        }
+
+        startBtn.addEventListener('click', initGame);
+        resize();
     </script>
 </body>
 </html>

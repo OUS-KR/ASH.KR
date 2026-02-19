@@ -9,34 +9,10 @@
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: 'Inter', sans-serif; touch-action: none; }
         .font-game { font-family: 'Cinzel', serif; }
-        
-        /* 마우스 커서를 보이게 설정 (default 또는 crosshair 추천) */
-        canvas { 
-            display: block; 
-            filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.3)); 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            z-index: 1; 
-            cursor: crosshair; /* 게임 느낌을 주기 위해 십자선 커서 사용 */
-        }
-        
-        #ui-layer { 
-            position: relative; 
-            z-index: 10; 
-            pointer-events: none; 
-            width: 100vw; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 40px 0; 
-        }
-        
+        canvas { display: block; filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.3)); position: absolute; top: 0; left: 0; z-index: 1; cursor: crosshair; }
+        #ui-layer { position: relative; z-index: 10; pointer-events: none; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 0; }
         .btn-active { pointer-events: auto; cursor: pointer; }
         #yt-player-container { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-        
         input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 99px; height: 6px; outline: none; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #f97316; cursor: pointer; border: 2px solid white; }
     </style>
@@ -63,12 +39,10 @@
                 <button onclick="setLanguage('ko')" class="lang-btn text-xs tracking-widest font-bold transition-all" id="btn-ko">한글</button>
                 <button onclick="setLanguage('en')" class="lang-btn text-xs tracking-widest font-bold transition-all" id="btn-en">ENG</button>
             </div>
-
             <div class="space-y-3">
                 <h2 id="status-title" class="font-game text-3xl sm:text-4xl tracking-normal text-white leading-tight break-keep">ASH</h2>
                 <p id="status-desc" class="text-gray-400 text-xs sm:text-sm font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
             </div>
-
             <div class="space-y-5 py-5 border-y border-white/5 text-left">
                 <div class="space-y-2">
                     <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
@@ -85,29 +59,30 @@
                     <input type="range" id="sfx-slider" min="0" max="100" value="50" class="w-full">
                 </div>
             </div>
-
             <div class="flex flex-col gap-3">
-                <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all active:scale-95 shadow-lg">
-                    점화
-                </button>
-                <button id="share-btn" class="w-full py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-[10px] font-medium tracking-widest uppercase rounded-2xl transition-all border border-white/10">
-                    여정 공유
-                </button>
+                <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all active:scale-95 shadow-lg">점화</button>
+                <button id="share-btn" class="w-full py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-[10px] font-medium tracking-widest uppercase rounded-2xl transition-all border border-white/10">여정 공유</button>
             </div>
-            <p class="text-[9px] text-gray-600 uppercase tracking-widest mt-2">Mouse / Arrows / Touch</p>
         </div>
 
-        <div class="opacity-30 text-[10px] tracking-[0.3em] uppercase">ash.kr</div>
+        <div class="w-full px-8 flex justify-between items-center">
+            <div class="opacity-30 text-[10px] tracking-[0.3em] uppercase">ash.kr</div>
+            
+            <a id="yt-link" href="#" target="_blank" class="btn-active hidden group flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-full transition-all backdrop-blur-sm">
+                <span class="text-[9px] uppercase tracking-wider text-gray-400 group-hover:text-orange-500 transition-colors" id="label-nowplaying">Now Playing</span>
+                <svg class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+        </div>
     </div>
 
     <script>
         const bgmList = ['Q4SStm-yBPk', 'gqjoyl_vkz4', 'E4Wh5wsBWOc', 'uZv0Uk79fkQ', '5sh8LpjwRx8', '5b4S2kT7egY', 'iyK-vTg7t7I', 'LCbkt71v_XY', 'P4OShWBVhag', 'ASUAbRudPpM', 'TAFJdIwS_1g', 'BOVxiaIjd0A', 'AcvXo4EsFTI', 'cTn8g7IBRjE', 'o4NAUDlm9w8', 'xUx3FMDzKPA', 'j6HWJsBZM_s', 'OLQy_0yD4M8', 'DPxFVLI8gIA'];
         const i18n = {
-            ko: { title: "ASH", desc: "마지막 불씨가 꺼지지 않게 하세요.", extinguished: "불씨가 꺼졌습니다", scoreLabel: "최종 기록: ", heat: "온기 레벨", bgm: "배경 음악", sfx: "효과음", ignite: "점화", rekindle: "다시 태우기", share: "여정 공유", copyAlert: "주소가 복사되었습니다." },
-            en: { title: "ASH", desc: "Keep the last ember alive.", extinguished: "EXTINGUISHED", scoreLabel: "Final Score: ", heat: "Heat Level", bgm: "Background Music", sfx: "Sound Effects", ignite: "IGNITE", rekindle: "REKINDLE", share: "Share Journey", copyAlert: "URL copied to clipboard." }
+            ko: { title: "ASH", desc: "마지막 불씨가 꺼지지 않게 하세요.", extinguished: "불씨가 꺼졌습니다", scoreLabel: "최종 기록: ", heat: "온기 레벨", bgm: "배경 음악", sfx: "효과음", ignite: "점화", rekindle: "다시 태우기", share: "여정 공유", nowPlaying: "유튜브에서 듣기", copyAlert: "주소가 복사되었습니다." },
+            en: { title: "ASH", desc: "Keep the last ember alive.", extinguished: "EXTINGUISHED", scoreLabel: "Final Score: ", heat: "Heat Level", bgm: "Background Music", sfx: "Sound Effects", ignite: "IGNITE", rekindle: "REKINDLE", share: "Share Journey", nowPlaying: "Now Playing", copyAlert: "URL copied to clipboard." }
         };
 
-        let currentLang = 'ko', gameActive = false, score = 0, volBGM = 0.5, volSFX = 0.5;
+        let currentLang = 'ko', gameActive = false, score = 0, volBGM = 0.5, volSFX = 0.5, currentVideoId = '';
         let heat = 100, items = [], particles = [];
         const player = { x: window.innerWidth/2, y: window.innerHeight*0.8, targetX: window.innerWidth/2 };
         const keys = { ArrowLeft: false, ArrowRight: false };
@@ -117,6 +92,7 @@
         const ctx = canvas.getContext('2d');
         const overlay = document.getElementById('overlay');
         const startBtn = document.getElementById('start-btn');
+        const ytLink = document.getElementById('yt-link');
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -125,6 +101,7 @@
             document.getElementById('label-bgm').innerText = t.bgm;
             document.getElementById('label-sfx').innerText = t.sfx;
             document.getElementById('share-btn').innerText = t.share;
+            document.getElementById('label-nowplaying').innerText = t.nowPlaying;
             document.getElementById('status-title').innerText = score === 0 ? t.title : t.extinguished;
             document.getElementById('status-desc').innerText = score === 0 ? t.desc : t.scoreLabel + score;
             startBtn.innerText = score === 0 ? t.ignite : t.rekindle;
@@ -141,32 +118,24 @@
 
         window.addEventListener('pointermove', (e) => {
             if (!gameActive) return;
-            if (e.pointerType === 'mouse') {
-                player.targetX = e.clientX;
-            } else if (lastTouchX !== null) {
-                const deltaX = e.clientX - lastTouchX;
-                player.targetX += deltaX;
-                lastTouchX = e.clientX;
-            }
+            if (e.pointerType === 'mouse') { player.targetX = e.clientX; }
+            else if (lastTouchX !== null) { player.targetX += (e.clientX - lastTouchX); lastTouchX = e.clientX; }
         });
-
         window.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') lastTouchX = e.clientX; });
         window.addEventListener('pointerup', () => { lastTouchX = null; });
-
-        window.addEventListener('keydown', (e) => {
-            if (e.code in keys) { keys[e.code] = true; if (gameActive) e.preventDefault(); }
-        });
+        window.addEventListener('keydown', (e) => { if (e.code in keys) { keys[e.code] = true; if (gameActive) e.preventDefault(); } });
         window.addEventListener('keyup', (e) => { if (e.code in keys) keys[e.code] = false; });
 
         function initGame() {
-            window.focus(); 
             if (ytPlayer && ytPlayer.loadVideoById) { 
-                ytPlayer.loadVideoById(bgmList[Math.floor(Math.random() * bgmList.length)]);
+                currentVideoId = bgmList[Math.floor(Math.random() * bgmList.length)];
+                ytPlayer.loadVideoById(currentVideoId);
                 ytPlayer.setVolume(volBGM * 100);
+                ytLink.href = `https://www.youtube.com/watch?v=${currentVideoId}`;
+                ytLink.classList.remove('hidden'); // 게임 시작 시 버튼 노출
             }
             gameActive = true; score = 0; heat = 100; items = [];
-            player.x = canvas.width / 2;
-            player.targetX = player.x;
+            player.x = canvas.width / 2; player.targetX = player.x;
             document.getElementById('score-display').innerText = "0";
             overlay.classList.add('hidden');
         }
@@ -185,34 +154,23 @@
                 canvas.width = window.innerWidth; canvas.height = window.innerHeight;
                 player.y = canvas.height * 0.8;
             }
-
-            if (!gameActive) {
-                ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                return;
-            }
-
+            if (!gameActive) { ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvas.width, canvas.height); return; }
             if (keys.ArrowLeft) player.targetX -= 12;
             if (keys.ArrowRight) player.targetX += 12;
-
             player.targetX = Math.max(20, Math.min(canvas.width - 20, player.targetX));
             player.x += (player.targetX - player.x) * 0.15;
-
             ctx.fillStyle = 'rgba(5, 5, 5, 0.4)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             heat -= 0.12; document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
             if (heat <= 0) { gameOver(); return; }
-
             const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 25);
             grad.addColorStop(0, '#fff'); grad.addColorStop(0.2, '#ff6a00'); grad.addColorStop(1, 'transparent');
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(player.x, player.y, 25, 0, Math.PI * 2); ctx.fill();
-
             if(Math.random() < 0.08) items.push({ x: Math.random()*canvas.width, y: -20, type: 'ash', speed: Math.random()*2+2 });
             if(Math.random() < 0.03 + (score/20000)) items.push({ x: Math.random()*canvas.width, y: -20, type: 'rain', speed: Math.random()*4+4 });
-
             items.forEach((item, index) => {
                 item.y += item.speed;
                 ctx.beginPath(); ctx.fillStyle = item.type === 'ash' ? '#888' : '#3b82f6';
                 ctx.arc(item.x, item.y, (item.type==='ash'?3:5), 0, Math.PI * 2); ctx.fill();
-
                 if (Math.hypot(player.x - item.x, player.y - item.y) < 25) {
                     if (item.type === 'ash') { heat = Math.min(100, heat + 7); score += 10; document.getElementById('score-display').innerText = score; }
                     else { heat -= 15; }
@@ -226,14 +184,12 @@
             document.getElementById('bgm-val').innerText = e.target.value + '%';
             if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(e.target.value);
         });
-
         document.getElementById('share-btn').addEventListener('click', (e) => {
             e.stopPropagation(); const t = i18n[currentLang];
             const data = { title: 'ASH.KR', text: t.scoreLabel + score, url: window.location.href };
             if (navigator.share) navigator.share(data);
             else { navigator.clipboard.writeText(window.location.href); alert(t.copyAlert); }
         });
-
         startBtn.addEventListener('click', (e) => { e.stopPropagation(); initGame(); });
         setLanguage('ko');
         animate();

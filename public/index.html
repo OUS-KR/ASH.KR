@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASH.KR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: radial-gradient(circle at top left, #1a1a1a, #000000);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 배경 장식용 애니메이션 */
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(100, 100, 100, 0.2) 0%, rgba(50, 50, 50, 0.1) 100%);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
+            animation: move 20s infinite alternate;
+        }
+
+        @keyframes move {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(10%, 10%); }
+        }
+    </style>
+</head>
+<body class="bg-black text-slate-200 antialiased">
+
+    <div class="blob"></div>
+
+    <main class="relative z-10 w-full max-w-md px-6 text-center">
+        <div class="mb-8 flex flex-col items-center">
+            <div class="w-24 h-24 bg-gradient-to-tr from-gray-500 to-slate-800 rounded-3xl mb-6 shadow-2xl flex items-center justify-center border border-white/10 ring-1 ring-white/20">
+                <span class="text-3xl font-light tracking-tighter text-white">ASH</span>
+            </div>
+            <h1 class="text-4xl font-semibold tracking-tight text-white mb-2">
+                ash.kr
+            </h1>
+            <p class="text-slate-400 font-light leading-relaxed">
+                Personal Digital Space
+            </p>
+        </div>
+
+        <nav class="space-y-4">
+            <a href="#" class="group block w-full p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 backdrop-blur-md">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium tracking-wide">Writing & Blog</span>
+                    <span class="opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">→</span>
+                </div>
+            </a>
+
+            <a href="#" class="group block w-full p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 backdrop-blur-md">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium tracking-wide">Projects</span>
+                    <span class="opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">→</span>
+                </div>
+            </a>
+
+            <a href="mailto:hello@ash.kr" class="group block w-full p-4 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 backdrop-blur-md">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium tracking-wide text-white">Contact Me</span>
+                    <span class="text-white">📧</span>
+                </div>
+            </a>
+        </nav>
+
+        <footer class="mt-16">
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="#" class="text-slate-500 hover:text-white transition-colors">GitHub</a>
+                <a href="#" class="text-slate-500 hover:text-white transition-colors">Twitter</a>
+                <a href="#" class="text-slate-500 hover:text-white transition-colors">Instagram</a>
+            </div>
+            <p class="text-[10px] uppercase tracking-[0.2em] text-slate-600">
+                &copy; 2026 ASH. All rights reserved.
+            </p>
+        </footer>
+    </main>
+
+</body>
+</html>
 

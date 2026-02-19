@@ -79,8 +79,14 @@
     <canvas id="gameCanvas"></canvas>
 
     <script>
-        /** 데이터 및 설정 **/
-        const bgmList = ['DPxFVLI8gIA', 'FCO5TSf6y3Q', '1Umt8gkI6lU', 'mCc6ocwSghQ', 'XA5h-gWLl1s'];
+        /** 배경 음악 플레이리스트 (제시해주신 19곡 반영) **/
+        const bgmList = [
+            'Q4SStm-yBPk', 'gqjoyl_vkz4', 'E4Wh5wsBWOc', 'uZv0Uk79fkQ', '5sh8LpjwRx8',
+            '5b4S2kT7egY', 'iyK-vTg7t7I', 'LCbkt71v_XY', 'P4OShWBVhag', 'ASUAbRudPpM',
+            'TAFJdIwS_1g', 'BOVxiaIjd0A', 'AcvXo4EsFTI', 'cTn8g7IBRjE', 'o4NAUDlm9w8',
+            'xUx3FMDzKPA', 'j6HWJsBZM_s', 'OLQy_0yD4M8', 'DPxFVLI8gIA'
+        ];
+
         const i18n = {
             ko: { title: "ASH", desc: "마지막 불씨가 꺼지지 않게 하세요.", extinguished: "불씨가 꺼졌습니다", scoreLabel: "최종 기록: ", heat: "온기 레벨", bgm: "배경 음악", sfx: "효과음", ignite: "점화", rekindle: "다시 태우기", share: "여정 공유", copyAlert: "주소가 복사되었습니다." },
             en: { title: "ASH", desc: "Keep the last ember alive.", extinguished: "EXTINGUISHED", scoreLabel: "Final Score: ", heat: "Heat Level", bgm: "Background Music", sfx: "Sound Effects", ignite: "IGNITE", rekindle: "REKINDLE", share: "Share Journey", copyAlert: "URL copied to clipboard." }
@@ -89,11 +95,8 @@
         let currentLang = 'ko', gameActive = false, score = 0, volBGM = 0.5, volSFX = 0.5;
         const player = { x: 0, y: 0, targetX: 0 };
         let isTouch = false, dragStartX = 0, playerStartX = 0;
-        
-        // 키보드 상태 추적
         const keys = { left: false, right: false };
 
-        /** 다국어 적용 **/
         function setLanguage(lang) {
             currentLang = lang;
             const t = i18n[lang];
@@ -110,7 +113,7 @@
             document.getElementById('btn-en').style.opacity = lang === 'en' ? '1' : '0.3';
         }
 
-        /** 유튜브 BGM 엔진 **/
+        /** 유튜브 플레이어 **/
         var ytPlayer;
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('player', { height: '0', width: '0', playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1 } });
@@ -118,7 +121,7 @@
         var tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
         document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
 
-        /** 효과음 엔진 **/
+        /** 효과음 **/
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const SFX = {
             play(type) {
@@ -143,41 +146,24 @@
             }
         };
 
-        /** 입력 조작 리스너 **/
-        // 마우스 (호버)
-        window.addEventListener('mousemove', (e) => {
-            if (gameActive && !isTouch) player.targetX = e.clientX;
-        });
+        /** 입력 감지 **/
+        window.addEventListener('mousemove', (e) => { if (gameActive && !isTouch) player.targetX = e.clientX; });
+        window.addEventListener('touchstart', (e) => { isTouch = true; if (gameActive) { dragStartX = e.touches[0].clientX; playerStartX = player.x; } });
+        window.addEventListener('touchmove', (e) => { if (gameActive) { player.targetX = Math.max(20, Math.min(canvas.width - 20, playerStartX + (e.touches[0].clientX - dragStartX))); e.preventDefault(); } }, { passive: false });
+        window.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') keys.left = true; if (e.key === 'ArrowRight') keys.right = true; });
+        window.addEventListener('keyup', (e) => { if (e.key === 'ArrowLeft') keys.left = false; if (e.key === 'ArrowRight') keys.right = false; });
 
-        // 터치 (상대적 드래그)
-        window.addEventListener('touchstart', (e) => {
-            isTouch = true;
-            if (gameActive) { dragStartX = e.touches[0].clientX; playerStartX = player.x; }
-        });
-        window.addEventListener('touchmove', (e) => {
-            if (gameActive) {
-                player.targetX = Math.max(20, Math.min(canvas.width - 20, playerStartX + (e.touches[0].clientX - dragStartX)));
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        // 키보드 (좌우 화살표)
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') keys.left = true;
-            if (e.key === 'ArrowRight') keys.right = true;
-        });
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft') keys.left = false;
-            if (e.key === 'ArrowRight') keys.right = false;
-        });
-
-        /** 게임 엔진 **/
+        /** 게임 구동 **/
         const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d');
         const overlay = document.getElementById('overlay'), startBtn = document.getElementById('start-btn');
         let heat = 100, items = [], particles = [];
 
         function initGame() {
-            if (ytPlayer && ytPlayer.loadVideoById) { ytPlayer.loadVideoById(bgmList[Math.floor(Math.random() * bgmList.length)]); ytPlayer.setVolume(volBGM * 100); }
+            if (ytPlayer && ytPlayer.loadVideoById) { 
+                const randomID = bgmList[Math.floor(Math.random() * bgmList.length)];
+                ytPlayer.loadVideoById(randomID); 
+                ytPlayer.setVolume(volBGM * 100); 
+            }
             gameActive = true; score = 0; heat = 100; items = [];
             player.x = canvas.width / 2; player.targetX = player.x;
             document.getElementById('score-display').innerText = "0";
@@ -193,19 +179,14 @@
 
         function animate() {
             if(!gameActive) return;
-
-            // 키보드 입력 업데이트 (매 프레임 12px 이동 가중치)
-            const kbSpeed = 12;
-            if (keys.left) player.targetX = Math.max(20, player.targetX - kbSpeed);
-            if (keys.right) player.targetX = Math.min(canvas.width - 20, player.targetX + kbSpeed);
+            if (keys.left) player.targetX = Math.max(20, player.targetX - 12);
+            if (keys.right) player.targetX = Math.min(canvas.width - 20, player.targetX + 12);
 
             ctx.fillStyle = 'rgba(5, 5, 5, 0.3)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             heat -= 0.12; document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
             if(heat <= 0) { gameOver(); return; }
 
-            // 부드러운 위치 추적 로직 (보간법)
             player.x += (player.targetX - player.x) * 0.15;
-
             const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 25);
             grad.addColorStop(0, '#fff'); grad.addColorStop(0.2, '#ff6a00'); grad.addColorStop(1, 'transparent');
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(player.x, player.y, 25, 0, Math.PI * 2); ctx.fill();
@@ -235,11 +216,8 @@
             }
         }
 
-        // 볼륨 슬라이더
         document.getElementById('bgm-slider').addEventListener('input', (e) => { volBGM = e.target.value / 100; document.getElementById('bgm-val').innerText = e.target.value + '%'; if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(e.target.value); });
         document.getElementById('sfx-slider').addEventListener('input', (e) => { volSFX = e.target.value / 100; document.getElementById('sfx-val').innerText = e.target.value + '%'; });
-
-        // 공유
         document.getElementById('share-btn').addEventListener('click', () => {
             const t = i18n[currentLang];
             const data = { title: 'ASH.KR', text: t.scoreLabel + score, url: window.location.href };
@@ -247,7 +225,6 @@
             else { navigator.clipboard.writeText(window.location.href); alert(t.copyAlert); }
         });
 
-        // 리사이즈 및 초기화
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; player.y = canvas.height * 0.8; });
         canvas.width = window.innerWidth; canvas.height = window.innerHeight; player.y = canvas.height * 0.8;
         startBtn.addEventListener('click', initGame);

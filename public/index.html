@@ -14,8 +14,8 @@
         .btn-active { pointer-events: auto; cursor: pointer; }
         #yt-player-container { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
         
-        input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 99px; height: 8px; outline: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #f97316; cursor: pointer; border: 2px solid white; }
+        input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 99px; height: 6px; outline: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #f97316; cursor: pointer; border: 2px solid white; }
     </style>
 </head>
 <body class="text-white select-none">
@@ -26,30 +26,36 @@
         <div class="w-full max-w-md px-6 space-y-2">
             <div class="flex justify-between items-end">
                 <span class="font-game text-2xl tracking-tighter text-orange-500" id="score-display">0</span>
-                <span class="text-[10px] uppercase tracking-widest text-gray-500">Heat Level</span>
+                <span class="text-[10px] uppercase tracking-widest text-gray-500" id="label-heat">Heat Level</span>
             </div>
             <div class="h-1 w-full bg-gray-900 rounded-full overflow-hidden border border-white/5">
                 <div id="heat-bar" class="h-full bg-gradient-to-r from-orange-700 via-orange-500 to-yellow-400 shadow-[0_0_15px_#ff4d00] transition-all duration-100" style="width: 100%"></div>
             </div>
         </div>
 
-        <div id="overlay" class="text-center space-y-8 bg-black/80 backdrop-blur-2xl p-8 md:p-12 rounded-[2.5rem] border border-white/10 w-[92%] max-w-sm hidden shadow-2xl">
-            <div class="space-y-2">
-                <h2 id="status-title" class="font-game text-5xl tracking-widest text-white">ASH</h2>
-                <p id="status-desc" class="text-gray-400 text-sm font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
+        <div id="overlay" class="text-center space-y-6 bg-black/85 backdrop-blur-2xl p-6 md:p-10 rounded-[2.5rem] border border-white/10 w-[92%] max-w-sm hidden shadow-2xl">
+            
+            <div class="flex justify-center gap-4 btn-active mb-2">
+                <button onclick="setLanguage('ko')" class="lang-btn text-[10px] tracking-widest uppercase font-bold opacity-40 hover:opacity-100 transition-opacity" id="btn-ko">KO</button>
+                <button onclick="setLanguage('en')" class="lang-btn text-[10px] tracking-widest uppercase font-bold opacity-40 hover:opacity-100 transition-opacity" id="btn-en">EN</button>
             </div>
 
-            <div class="space-y-6 py-6 border-y border-white/5 text-left btn-active">
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
-                        <span>Background Music</span>
+            <div class="space-y-2">
+                <h2 id="status-title" class="font-game text-3xl sm:text-5xl tracking-normal sm:tracking-widest text-white break-words leading-tight">ASH</h2>
+                <p id="status-desc" class="text-gray-400 text-xs sm:text-sm font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
+            </div>
+
+            <div class="space-y-5 py-5 border-y border-white/5 text-left btn-active">
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-[9px] uppercase tracking-widest text-gray-400">
+                        <span id="label-bgm">Background Music</span>
                         <span id="bgm-val" class="font-bold text-orange-500">50%</span>
                     </div>
                     <input type="range" id="bgm-slider" min="0" max="100" value="50" class="w-full volume-slider">
                 </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
-                        <span>Sound Effects</span>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-[9px] uppercase tracking-widest text-gray-400">
+                        <span id="label-sfx">Sound Effects</span>
                         <span id="sfx-val" class="font-bold text-orange-500">50%</span>
                     </div>
                     <input type="range" id="sfx-slider" min="0" max="100" value="50" class="w-full volume-slider">
@@ -57,10 +63,10 @@
             </div>
 
             <div class="flex flex-col gap-3 btn-active">
-                <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all shadow-lg active:scale-95">
+                <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all active:scale-95 shadow-lg shadow-orange-900/20">
                     IGNITE
                 </button>
-                <button id="share-btn" class="w-full py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium tracking-widest uppercase rounded-2xl transition-all border border-white/10 active:scale-95">
+                <button id="share-btn" class="w-full py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-[10px] font-medium tracking-widest uppercase rounded-2xl transition-all border border-white/10">
                     Share Journey
                 </button>
             </div>
@@ -72,6 +78,60 @@
     <canvas id="gameCanvas"></canvas>
 
     <script>
+        /** 다국어 사전 **/
+        const i18n = {
+            ko: {
+                title: "ASH",
+                desc: "마지막 불씨가 꺼지지 않게 하세요.",
+                extinguished: "소멸됨",
+                scoreLabel: "최종 기록: ",
+                heat: "온기 레벨",
+                bgm: "배경 음악",
+                sfx: "효과음",
+                ignite: "점화",
+                rekindle: "다시 태우기",
+                share: "여정 공유",
+                copyAlert: "주소가 복사되었습니다."
+            },
+            en: {
+                title: "ASH",
+                desc: "Keep the last ember alive.",
+                extinguished: "EXTINGUISHED",
+                scoreLabel: "Final Score: ",
+                heat: "Heat Level",
+                bgm: "Background Music",
+                sfx: "Sound Effects",
+                ignite: "IGNITE",
+                rekindle: "REKINDLE",
+                share: "Share Journey",
+                copyAlert: "URL copied to clipboard."
+            }
+        };
+
+        let currentLang = 'ko';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = i18n[lang];
+            
+            // UI 텍스트 업데이트
+            document.getElementById('label-heat').innerText = t.heat;
+            document.getElementById('label-bgm').innerText = t.bgm;
+            document.getElementById('label-sfx').innerText = t.sfx;
+            document.getElementById('share-btn').innerText = t.share;
+            
+            if (!gameActive) {
+                document.getElementById('status-title').innerText = statusTitle.innerText === "ASH" ? t.title : t.extinguished;
+                document.getElementById('status-desc').innerText = t.desc;
+                startBtn.innerText = score === 0 ? t.ignite : t.rekindle;
+            }
+
+            // 버튼 하이라이트
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.add('opacity-40'));
+            document.getElementById('btn-' + lang).classList.remove('opacity-40');
+            document.getElementById('btn-' + lang).classList.add('opacity-100');
+        }
+
         /** 사운드 설정 **/
         let volBGM = 0.5, volSFX = 0.5;
         var ytPlayer;
@@ -113,7 +173,7 @@
             }
         };
 
-        /** 게임 로직 & 상대 이동 컨트롤 **/
+        /** 게임 로직 & 조작 **/
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const overlay = document.getElementById('overlay');
@@ -123,19 +183,8 @@
         const sfxSlider = document.getElementById('sfx-slider');
 
         let gameActive = false, score = 0, heat = 100, items = [], particles = [];
-        
-        // 조작 관련 변수
         const player = { x: 0, y: 0, targetX: 0 };
-        let isDragging = false;
-        let dragStartX = 0;
-        let playerStartX = 0;
-
-        // 슬라이더 조작 시 게임 드래그 무시
-        const volumeSliders = document.querySelectorAll('.volume-slider');
-        volumeSliders.forEach(s => {
-            s.addEventListener('pointerdown', (e) => e.stopPropagation());
-            s.addEventListener('touchstart', (e) => e.stopPropagation());
-        });
+        let isDragging = false, dragStartX = 0, playerStartX = 0;
 
         bgmSlider.addEventListener('input', (e) => {
             volBGM = e.target.value / 100;
@@ -148,51 +197,34 @@
             document.getElementById('sfx-val').innerText = e.target.value + '%';
         });
 
-        // 상대적 이동 핵심 리스너
-        const handleStart = (clientX) => {
-            if (!gameActive) return;
-            isDragging = true;
-            dragStartX = clientX;
-            playerStartX = player.x;
-        };
-
+        const handleStart = (clientX) => { if (gameActive) { isDragging = true; dragStartX = clientX; playerStartX = player.x; } };
         const handleMove = (clientX) => {
-            if (!gameActive || !isDragging) return;
-            const deltaX = clientX - dragStartX;
-            // 현재 위치를 기준으로 이동량만큼 targetX 설정
-            player.targetX = playerStartX + deltaX;
-            
-            // 화면 밖으로 나가지 않게 제한
-            if (player.targetX < 20) player.targetX = 20;
-            if (player.targetX > canvas.width - 20) player.targetX = canvas.width - 20;
+            if (gameActive && isDragging) {
+                let tx = playerStartX + (clientX - dragStartX);
+                player.targetX = Math.max(20, Math.min(canvas.width - 20, tx));
+            }
         };
-
         const handleEnd = () => { isDragging = false; };
 
-        // 마우스 이벤트
         window.addEventListener('mousedown', (e) => handleStart(e.clientX));
         window.addEventListener('mousemove', (e) => handleMove(e.clientX));
         window.addEventListener('mouseup', handleEnd);
-
-        // 터치 이벤트
         window.addEventListener('touchstart', (e) => handleStart(e.touches[0].clientX));
-        window.addEventListener('touchmove', (e) => {
-            handleMove(e.touches[0].clientX);
-            if (gameActive) e.preventDefault();
-        }, { passive: false });
+        window.addEventListener('touchmove', (e) => { handleMove(e.touches[0].clientX); if (gameActive) e.preventDefault(); }, { passive: false });
         window.addEventListener('touchend', handleEnd);
 
         shareBtn.addEventListener('click', () => {
-            const shareData = { title: 'ASH.KR | The Last Ember', text: `최종 기록: ${score}점! 당신도 불씨를 살려보세요.`, url: window.location.href };
+            const t = i18n[currentLang];
+            const shareData = { title: 'ASH.KR', text: t.scoreLabel + score, url: window.location.href };
             if (navigator.share) navigator.share(shareData);
-            else { navigator.clipboard.writeText(window.location.href); alert('주소가 복사되었습니다.'); }
+            else { navigator.clipboard.writeText(window.location.href); alert(t.copyAlert); }
         });
 
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             player.x = canvas.width / 2;
-            player.targetX = player.x; // 초기 위치 고정
+            player.targetX = player.x;
             player.y = canvas.height * 0.8;
             if(!gameActive) overlay.style.display = 'block';
         }
@@ -217,10 +249,9 @@
         }
 
         function initGame() {
-            if (ytPlayer && ytPlayer.playVideo) { ytPlayer.playVideo(); ytPlayer.setVolume(volBGM * 100); }
+            if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
             gameActive = true; score = 0; heat = 100; items = [];
-            player.x = canvas.width / 2;
-            player.targetX = player.x;
+            player.x = canvas.width / 2; player.targetX = player.x;
             document.getElementById('score-display').innerText = "0";
             overlay.style.display = 'none';
             animate();
@@ -229,25 +260,22 @@
         function gameOver() {
             if(!gameActive) return;
             if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
-            gameActive = false; isDragging = false;
+            gameActive = false;
+            const t = i18n[currentLang];
             overlay.style.display = 'block';
-            document.getElementById('status-title').innerText = "EXTINGUISHED";
-            document.getElementById('status-desc').innerText = `최종 기록: ${score}점`;
-            startBtn.innerText = "REKINDLE";
+            document.getElementById('status-title').innerText = t.extinguished;
+            document.getElementById('status-desc').innerText = t.scoreLabel + score;
+            startBtn.innerText = t.rekindle;
         }
 
         function animate() {
             if(!gameActive) return;
             ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             heat -= 0.12;
             document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
             if(heat <= 0) { gameOver(); return; }
-
-            // 부드러운 위치 추적 로직 유지
             player.x += (player.targetX - player.x) * 0.2;
-
             const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 25);
             grad.addColorStop(0, '#fff'); grad.addColorStop(0.2, '#ff6a00'); grad.addColorStop(1, 'transparent');
             ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(player.x, player.y, 25, 0, Math.PI * 2); ctx.fill();
@@ -283,6 +311,7 @@
 
         startBtn.addEventListener('click', initGame);
         resize();
+        setLanguage('ko'); // 초기 언어 설정
     </script>
 </body>
 </html>

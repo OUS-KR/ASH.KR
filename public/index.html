@@ -12,8 +12,11 @@
         canvas { display: block; filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.3)); }
         #ui-layer { pointer-events: none; }
         .btn-active { pointer-events: auto; cursor: pointer; }
-        /* 유튜브 플레이어 숨김 처리 */
         #yt-player-container { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        
+        /* 볼륨 슬라이더 커스텀 스타일 */
+        input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 5px; height: 4px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #ea580c; cursor: pointer; }
     </style>
 </head>
 <body class="text-white select-none">
@@ -31,21 +34,50 @@
             </div>
         </div>
 
-        <div id="overlay" class="text-center space-y-8 bg-black/60 backdrop-blur-md p-12 rounded-3xl border border-white/10 hidden">
-            <h2 id="status-title" class="font-game text-6xl tracking-widest text-white">ASH</h2>
-            <p id="status-desc" class="text-gray-400 font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
-            <button id="start-btn" class="btn-active px-10 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-widest uppercase rounded-full transition-all hover:scale-110 active:scale-95 shadow-lg shadow-orange-900/20">
-                IGNITE
-            </button>
+        <div id="overlay" class="text-center space-y-8 bg-black/70 backdrop-blur-xl p-8 md:p-12 rounded-[2rem] border border-white/10 w-[90%] max-w-sm hidden">
+            <div class="space-y-2">
+                <h2 id="status-title" class="font-game text-5xl tracking-widest text-white">ASH</h2>
+                <p id="status-desc" class="text-gray-400 text-sm font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
+            </div>
+
+            <div class="space-y-4 py-4 border-y border-white/5 text-left btn-active">
+                <div class="space-y-1">
+                    <div class="flex justify-between text-[10px] uppercase tracking-tighter text-gray-500">
+                        <span>Background Music</span>
+                        <span id="bgm-val">50%</span>
+                    </div>
+                    <input type="range" id="bgm-slider" min="0" max="100" value="50" class="w-full">
+                </div>
+                <div class="space-y-1">
+                    <div class="flex justify-between text-[10px] uppercase tracking-tighter text-gray-500">
+                        <span>Sound Effects</span>
+                        <span id="sfx-val">50%</span>
+                    </div>
+                    <input type="range" id="sfx-slider" min="0" max="100" value="50" class="w-full">
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 btn-active">
+                <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all shadow-lg">
+                    IGNITE
+                </button>
+                <button id="share-btn" class="w-full py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium tracking-widest uppercase rounded-2xl transition-all border border-white/10">
+                    Share Journey
+                </button>
+            </div>
         </div>
 
-        <div class="opacity-30 text-[10px] tracking-[0.3em] uppercase">Move to Survive</div>
+        <div class="opacity-30 text-[10px] tracking-[0.3em] uppercase">ash.kr</div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
 
     <script>
-        /** 유튜브 API 설정 **/
+        /** 전역 볼륨 상태 **/
+        let volBGM = 0.5;
+        let volSFX = 0.5;
+
+        /** 유튜브 API **/
         var ytPlayer;
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -54,33 +86,28 @@
 
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('player', {
-                height: '0',
-                width: '0',
-                videoId: 'DPxFVLI8gIA', // 요청하신 배경음악 영상 ID
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 0,
-                    'loop': 1,
-                    'playlist': 'DPxFVLI8gIA'
-                }
+                height: '0', width: '0', videoId: 'DPxFVLI8gIA',
+                playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': 'DPxFVLI8gIA' },
+                events: { 'onReady': () => ytPlayer.setVolume(volBGM * 100) }
             });
         }
 
-        /** 사운드 엔진 (기존 효과음 유지) **/
+        /** 사운드 엔진 **/
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const SFX = {
             play(type) {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                osc.connect(gain); gain.connect(audioCtx.destination);
                 const now = audioCtx.currentTime;
+
+                const masterGain = volSFX * 0.1; // 볼륨 조절 반영
 
                 if (type === 'collect') {
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(880, now);
-                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.setValueAtTime(masterGain, now);
                     gain.gain.linearRampToValueAtTime(0, now + 0.1);
                     osc.start(); osc.stop(now + 0.1);
                 } else if (type === 'hit') {
@@ -90,33 +117,52 @@
                     for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
-                    const noiseGain = audioCtx.createGain();
-                    noiseGain.gain.setValueAtTime(0.05, now);
-                    noise.connect(noiseGain);
-                    noiseGain.connect(audioCtx.destination);
+                    const nGain = audioCtx.createGain();
+                    nGain.gain.setValueAtTime(masterGain, now);
+                    noise.connect(nGain); nGain.connect(audioCtx.destination);
                     noise.start();
                 }
             }
         };
 
-        /** 게임 로직 **/
+        /** 게임 컨트롤 및 UI **/
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const heatBar = document.getElementById('heat-bar');
-        const scoreDisplay = document.getElementById('score-display');
         const overlay = document.getElementById('overlay');
         const startBtn = document.getElementById('start-btn');
-        const statusTitle = document.getElementById('status-title');
-        const statusDesc = document.getElementById('status-desc');
+        const shareBtn = document.getElementById('share-btn');
+        const bgmSlider = document.getElementById('bgm-slider');
+        const sfxSlider = document.getElementById('sfx-slider');
 
-        let gameActive = false;
-        let score = 0;
-        let heat = 100;
-        let items = [];
-        let particles = [];
-        let mouseX = window.innerWidth / 2;
-
+        let gameActive = false, score = 0, heat = 100, items = [], particles = [];
         const player = { x: window.innerWidth / 2, y: 0, targetX: window.innerWidth / 2 };
+
+        // 볼륨 업데이트 로직
+        bgmSlider.addEventListener('input', (e) => {
+            volBGM = e.target.value / 100;
+            document.getElementById('bgm-val').innerText = e.target.value + '%';
+            if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(e.target.value);
+        });
+
+        sfxSlider.addEventListener('input', (e) => {
+            volSFX = e.target.value / 100;
+            document.getElementById('sfx-val').innerText = e.target.value + '%';
+        });
+
+        // 공유 기능
+        shareBtn.addEventListener('click', () => {
+            const shareData = {
+                title: 'ASH.KR | The Last Ember',
+                text: '꺼져가는 불씨를 살려보세요. 제 기록은 ' + score + '점입니다!',
+                url: window.location.href
+            };
+            if (navigator.share) {
+                navigator.share(shareData);
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('주소가 복사되었습니다.');
+            }
+        });
 
         function resize() {
             canvas.width = window.innerWidth;
@@ -152,86 +198,57 @@
 
         function createExplosion(x, y, color) {
             for(let i = 0; i < 8; i++) {
-                particles.push({
-                    x, y,
-                    vx: Math.random() * 4 - 2,
-                    vy: Math.random() * 4 - 2,
-                    life: 1,
-                    color: color
-                });
+                particles.push({ x, y, vx: Math.random()*4-2, vy: Math.random()*4-2, life: 1, color });
             }
         }
 
         function initGame() {
-            // 유튜브 배경음악 재생
             if (ytPlayer && ytPlayer.playVideo) {
                 ytPlayer.playVideo();
-                ytPlayer.unMute();
-                ytPlayer.setVolume(50);
+                ytPlayer.setVolume(volBGM * 100);
             }
-            
-            gameActive = true;
-            score = 0;
-            heat = 100;
-            items = [];
-            scoreDisplay.innerText = "0";
+            gameActive = true; score = 0; heat = 100; items = [];
+            document.getElementById('score-display').innerText = "0";
             overlay.style.display = 'none';
             animate();
         }
 
         function gameOver() {
             if(!gameActive) return;
-            
-            // 유튜브 배경음악 중지 (또는 볼륨 감소)
-            if (ytPlayer && ytPlayer.pauseVideo) {
-                ytPlayer.pauseVideo();
-            }
-
+            if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
             gameActive = false;
             overlay.style.display = 'block';
-            statusTitle.innerText = "EXTINGUISHED";
-            statusDesc.innerText = `기록: ${score}점`;
+            document.getElementById('status-title').innerText = "EXTINGUISHED";
+            document.getElementById('status-desc').innerText = `최종 기록: ${score}점`;
             startBtn.innerText = "REKINDLE";
         }
 
         function animate() {
             if(!gameActive) return;
-
             ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             heat -= 0.12;
-            heatBar.style.width = `${Math.max(0, heat)}%`;
+            document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
             if(heat <= 0) { gameOver(); return; }
 
             player.x += (player.targetX - player.x) * 0.15;
-
             const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 25);
-            grad.addColorStop(0, '#fff');
-            grad.addColorStop(0.2, '#ff6a00');
-            grad.addColorStop(1, 'transparent');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, 25, 0, Math.PI * 2);
-            ctx.fill();
+            grad.addColorStop(0, '#fff'); grad.addColorStop(0.2, '#ff6a00'); grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(player.x, player.y, 25, 0, Math.PI * 2); ctx.fill();
 
             if(Math.random() < 0.08) items.push(new Item('ash'));
-            if(Math.random() < 0.03 + (score/5000)) items.push(new Item('rain'));
+            if(Math.random() < 0.03 + (score/8000)) items.push(new Item('rain'));
 
             items.forEach((item, index) => {
-                item.update();
-                item.draw();
-                const dist = Math.hypot(player.x - item.x, player.y - item.y);
-                if(dist < 25) {
+                item.update(); item.draw();
+                if(Math.hypot(player.x - item.x, player.y - item.y) < 25) {
                     if(item.type === 'ash') {
-                        SFX.play('collect');
-                        heat = Math.min(100, heat + 6);
-                        score += 10;
-                        scoreDisplay.innerText = score;
+                        SFX.play('collect'); heat = Math.min(100, heat + 6); score += 10;
+                        document.getElementById('score-display').innerText = score;
                         createExplosion(item.x, item.y, '#ff4d00');
                     } else {
-                        SFX.play('hit');
-                        heat -= 15;
+                        SFX.play('hit'); heat -= 15;
                         createExplosion(item.x, item.y, '#3b82f6');
                     }
                     items.splice(index, 1);
@@ -241,13 +258,11 @@
 
             particles.forEach((p, i) => {
                 p.x += p.vx; p.y += p.vy; p.life -= 0.03;
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
                 ctx.fillRect(p.x, p.y, 2, 2);
                 if(p.life <= 0) particles.splice(i, 1);
             });
             ctx.globalAlpha = 1;
-
             requestAnimationFrame(animate);
         }
 

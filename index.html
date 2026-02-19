@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ash - Links</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .link-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .link-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon-bg {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-16">
+                <div class="mb-6 flex justify-center">
+                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-2xl">
+                        <span class="text-5xl">🌟</span>
+                    </div>
+                </div>
+                <h1 class="text-5xl sm:text-6xl font-bold text-white mb-4">ash</h1>
+                <p class="text-xl text-white/80">나의 즐겨찾기 링크 모음</p>
+            </div>
+
+            <!-- Links Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
+                <!-- Link Card 1 -->
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+                    <div class="link-card glass-effect rounded-2xl p-6 group cursor-pointer h-full">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-bg bg-gradient-to-br from-gray-700 to-gray-900">
+                                🐙
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition">GitHub</h3>
+                                <p class="text-white/70 text-sm">코드 저장소 및 프로젝트 관리</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Link Card 2 -->
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                    <div class="link-card glass-effect rounded-2xl p-6 group cursor-pointer h-full">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-bg bg-gradient-to-br from-blue-400 to-blue-600">
+                                𝕏
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition">Twitter / X</h3>
+                                <p class="text-white/70 text-sm">일상 공유 및 뉴스 구독</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Link Card 3 -->
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
+                    <div class="link-card glass-effect rounded-2xl p-6 group cursor-pointer h-full">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-bg bg-gradient-to-br from-red-500 to-red-700">
+                                ▶️
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-red-300 transition">YouTube</h3>
+                                <p class="text-white/70 text-sm">동영상 콘텐츠 및 튜토리얼</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Link Card 4 -->
+                <a href="https://www.notion.so" target="_blank" rel="noopener noreferrer">
+                    <div class="link-card glass-effect rounded-2xl p-6 group cursor-pointer h-full">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-bg bg-gradient-to-br from-gray-300 to-gray-500">
+                                📝
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-gray-300 transition">Notion</h3>
+                                <p class="text-white/70 text-sm">노트 작성 및 생산성 도구</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Link Card 5 -->
+                <a href="https://www.figma.com" target="_blank" rel="noopener noreferrer">
+                    <div class="link-card glass-effect rounded-2xl p-6 group cursor-pointer h-full">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-bg bg-gradient-to-br from-purple-400 to-pink-500">
+                                🎨
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-pink-300 transition">Figma</h3>
+                                <p class="text-white/70 text-sm">디자인 및 프로토타이핑</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Link Card 6 -->
+                <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer">
+                    <div class="link-card glass-effect rounded-2xl p-6 group cursor-pointer h-full">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-bg bg-gradient-to-br from-green-400 to-green-600">
+                                🎵
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-green-300 transition">Spotify</h3>
+                                <p class="text-white/70 text-sm">음악 스트리밍 및 플레이리스트</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Link Card 7 -->
+                <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">
+                    <div class="link-card glass-effect rounded-2xl p-6 group cursor-pointer h-full">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-bg bg-gradient-to-br from-red-400 to-yellow-500">
+                                ✉️
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-yellow-300 transition">Gmail</h3>
+                                <p class="text-white/70 text-sm">이메일 관리 및 소통</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Link Card 8 -->
+                <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+                    <div class="link-card glass-effect rounded-2xl p-6 group cursor-pointer h-full">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-bg bg-gradient-to-br from-blue-500 to-blue-700">
+                                💼
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition">LinkedIn</h3>
+                                <p class="text-white/70 text-sm">전문가 네트워킹 및 경력</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center">
+                <p class="text-white/60 text-sm">© 2026 ash. All links in one place.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>리틀리 스타일 프로필</title>
+    <title>리틀리 프로필 - 최종본</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -20,173 +20,117 @@
         </div>
 
         <div class="px-5 pt-8 flex flex-col items-center">
-            <div class="w-full flex justify-between mb-4">
+            <div class="w-full flex justify-between mb-4 px-1">
                 <button class="p-2 bg-white rounded-full shadow-sm">📤</button>
                 <button class="p-2 bg-white rounded-full shadow-sm">🔔</button>
             </div>
-            
-            <div class="w-28 h-28 bg-[#ffcc00] rounded-[40px] p-4 mb-6 shadow-md">
+            <div class="w-28 h-28 bg-[#ffcc00] rounded-[40px] p-4 mb-6 shadow-md overflow-hidden">
                 <img src="https://api.iconify.design/twemoji:badger.svg" class="w-full h-full object-contain">
             </div>
-
             <h1 class="text-[22px] font-bold flex items-center gap-1 mb-2">
-                올인원 프로필 링크, 리틀리
-                <span class="text-blue-500 text-[18px]">✔</span>
+                올인원 프로필 링크, 리틀리 <span class="text-blue-500 text-[18px]">✔</span>
             </h1>
-            
-            <div class="text-[15px] text-gray-700 space-y-1 text-center mb-8">
-                <p>📌 쉬운 페이지 제작</p>
-                <p>📌 빠른 컨텐츠 판매</p>
-            </div>
-
-            <div class="w-full space-y-3 mb-12">
-                <a href="#" class="flex items-center justify-center gap-2 w-full py-4 bg-white rounded-[20px] shadow-sm font-semibold hover:bg-gray-50 transition-colors">
-                    👋 로그인 바로가기
-                </a>
-                <a href="#" class="flex items-center justify-center gap-2 w-full py-4 bg-white rounded-[20px] shadow-sm font-semibold hover:bg-gray-50 transition-colors">
-                    🚀 리틀리 무료 가입
-                </a>
-                <a href="#" class="flex items-center justify-center gap-2 w-full py-4 bg-white rounded-[20px] shadow-sm font-semibold hover:bg-gray-50 transition-colors">
-                    🔥 32만명 회원 보기
-                </a>
+            <div class="text-[14px] text-gray-700 text-center mb-8">
+                <p>📌 쉬운 페이지 제작 / 📌 빠른 컨텐츠 판매</p>
             </div>
         </div>
 
         <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4">😘 광고 수익까지 얻으세요 !</h2>
-            <p class="text-center text-[13px] text-gray-500 mb-4">크리에이터, 수익 자동화</p>
-            <div class="bg-white p-5 rounded-[24px] shadow-sm space-y-4">
-                <div class="border-b pb-4">
-                    <p class="font-bold text-[15px]">가전디지털, New Year New Digital #2026년 신년 세일</p>
-                    <span class="inline-block mt-2 text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded">해당 광고는 쿠팡 파트너스 활동의 일환으로 소정의 커미션을 지급받음</span>
+            <h2 class="text-center font-bold mb-4">📺 영상으로 확인해보세요 !</h2>
+            <div class="relative w-full aspect-video rounded-[24px] overflow-hidden shadow-sm">
+                <iframe class="absolute inset-0 w-full h-full" 
+                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                        title="YouTube video" frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <div class="mb-12">
+            <h2 class="text-center font-bold mb-4 px-5">🎠 가로로 넘겨보는 이미지</h2>
+            <div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-3 px-5">
+                <div class="flex-none w-[85%] snap-center">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop" class="w-full h-48 object-cover rounded-[24px] shadow-sm">
+                    <p class="mt-2 text-[13px] text-center font-medium">디자인 템플릿 01</p>
                 </div>
-                <div class="flex gap-4 items-start">
-                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=100&h=100&auto=format&fit=crop" class="w-20 h-20 rounded-xl object-cover">
-                    <div>
-                        <p class="font-bold text-[14px]">[박정민 출판사 무제] 화제의 소설 첫 여름 완주</p>
-                        <span class="inline-block mt-1 text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded">쿠팡 파트너스 광고</span>
-                    </div>
+                <div class="flex-none w-[85%] snap-center">
+                    <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=500&auto=format&fit=crop" class="w-full h-48 object-cover rounded-[24px] shadow-sm">
+                    <p class="mt-2 text-[13px] text-center font-medium">디자인 템플릿 02</p>
+                </div>
+                <div class="flex-none w-[85%] snap-center">
+                    <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=500&auto=format&fit=crop" class="w-full h-48 object-cover rounded-[24px] shadow-sm">
+                    <p class="mt-2 text-[13px] text-center font-medium">디자인 템플릿 03</p>
                 </div>
             </div>
         </div>
 
         <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4">📅 일정 표시 · 알림 까지 !</h2>
-            <div class="bg-white rounded-[28px] p-6 shadow-sm">
+            <h2 class="text-center font-bold mb-4">🖼️ 와이드 이미지 배너</h2>
+            <div class="bg-white rounded-[28px] overflow-hidden shadow-sm">
+                <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=500&auto=format&fit=crop" class="w-full h-56 object-cover">
+                <div class="p-5 text-center">
+                    <p class="font-bold text-[15px]">전국의 모든 크리에이터를 위해</p>
+                    <p class="text-[12px] text-gray-400 mt-1">리틀리가 함께 성장합니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-5 mb-12">
+            <h2 class="text-center font-bold mb-4">📅 일정 표시 기능</h2>
+            <div class="bg-white rounded-[28px] p-6 shadow-sm text-center">
                 <div class="flex justify-between items-center mb-6 px-2">
-                    <button class="text-gray-400 font-bold">&lt;</button>
                     <span class="font-bold text-[17px]">2026.02</span>
-                    <button class="text-gray-400 font-bold">&gt;</button>
                 </div>
-                <div class="grid grid-cols-7 gap-y-4 text-center text-[13px] mb-6 text-gray-400">
+                <div class="grid grid-cols-7 gap-y-3 text-[12px] mb-4 text-gray-400">
                     <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
                     <span class="text-red-400">1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
                     <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
-                    <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span class="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto">20</span><span>21</span>
-                    <span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span>
-                </div>
-                <div class="space-y-3 pt-4 border-t border-gray-50">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[10px] px-2 py-1 border rounded-full text-gray-400">종료</span>
-                        <span class="text-[13px] font-medium">❤️ 2026 설날 ❤️</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-[10px] px-2 py-1 border rounded-full text-gray-400">종료</span>
-                        <span class="text-[13px] font-medium">⭐ 크리스마스 ⭐</span>
-                    </div>
+                    <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span class="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center mx-auto">20</span><span>21</span>
                 </div>
             </div>
         </div>
 
         <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4">💰 쿠팡/오늘의집 제휴 판매상품도 힙하게!</h2>
+            <h2 class="text-center font-bold mb-4">💰 판매 상품 리스트</h2>
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-white p-2 rounded-2xl shadow-sm">
                     <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=150&auto=format&fit=crop" class="w-full aspect-square object-cover rounded-xl mb-2">
-                    <p class="text-[11px] leading-tight line-clamp-2 mb-1">닌자 블렌더 초고속</p>
-                    <p class="text-[11px] font-bold text-red-500">8% <span class="text-[#222]">249,000원</span></p>
+                    <p class="text-[11px] font-bold">249,000원</p>
                 </div>
                 <div class="bg-white p-2 rounded-2xl shadow-sm">
                     <img src="https://images.unsplash.com/photo-1558317374-067fb5f30001?q=80&w=150&auto=format&fit=crop" class="w-full aspect-square object-cover rounded-xl mb-2">
-                    <p class="text-[11px] leading-tight line-clamp-2 mb-1">샤크 에보파워 시스템</p>
-                    <p class="text-[11px] font-bold text-red-500">33% <span class="text-[#222]">459,900원</span></p>
+                    <p class="text-[11px] font-bold">459,900원</p>
                 </div>
                 <div class="bg-white p-2 rounded-2xl shadow-sm">
                     <img src="https://images.unsplash.com/photo-1550524514-9636ed826116?q=80&w=150&auto=format&fit=crop" class="w-full aspect-square object-cover rounded-xl mb-2">
-                    <p class="text-[11px] leading-tight line-clamp-2 mb-1">미드센추리 체어</p>
-                    <p class="text-[11px] font-bold text-red-500">40% <span class="text-[#222]">54,900원</span></p>
+                    <p class="text-[11px] font-bold">54,900원</p>
                 </div>
             </div>
         </div>
 
-        <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4">📝 문의도 쉽게 받을 수 있어요 !</h2>
+        <div class="px-5 mb-12 space-y-4">
             <div class="bg-white p-6 rounded-[28px] shadow-sm">
-                <p class="text-center font-bold text-[14px] mb-6">리틀리 운영팀 전달</p>
-                <div class="space-y-4 mb-6">
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="radio" name="q" class="w-4 h-4 accent-[#ffcc00]" checked>
-                        <span class="text-[14px]">서비스 이용 문의</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="radio" name="q" class="w-4 h-4 accent-[#ffcc00]">
-                        <span class="text-[14px]">제휴 및 비즈니스 문의</span>
-                    </label>
-                </div>
-                <button class="w-full py-3 bg-[#ffcc00] rounded-xl font-bold shadow-sm mb-4">문의하기</button>
-                <button class="w-full py-3 border border-gray-100 bg-gray-50 rounded-xl font-bold text-[13px]">🤓 FAQ 자주묻는 질문</button>
+                <p class="text-center font-bold text-[14px] mb-4">📝 문의하기</p>
+                <button class="w-full py-3 bg-[#ffcc00] rounded-xl font-bold shadow-sm">문의하기</button>
             </div>
-        </div>
-
-        <div class="px-5 mb-12 text-center">
-            <h2 class="font-bold mb-4">📚 고객 DB도 모을 수 있어요 !</h2>
-            <div class="bg-white p-6 rounded-[28px] shadow-sm">
-                <p class="font-medium text-[13px] mb-4">📧 리틀리 소식 받기</p>
-                <input type="email" placeholder="이메일을 적어주세요" class="w-full p-4 bg-gray-50 rounded-xl text-[14px] border border-gray-100 outline-none mb-3">
-                <button class="w-full py-4 bg-[#a0a5b1] text-white rounded-xl font-bold mb-3">제출하기</button>
-                <label class="flex items-center justify-center gap-2 text-[10px] text-gray-400">
-                    <input type="checkbox"> [필수] 개인정보 수집 및 이용과 광고성 정보 수신 동의
-                </label>
-            </div>
-        </div>
-
-        <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4">🗺️ 주소만 입력하면, 지도 생성 !</h2>
             <div class="bg-white rounded-[28px] overflow-hidden shadow-sm">
-                <div class="h-48 bg-gray-200 relative">
+                <div class="h-40 bg-gray-200">
                     <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f6dfc0f?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/5"></div>
-                    <div class="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-md max-w-[200px]">
-                        <p class="text-[12px] font-bold leading-tight">서울특별시 용산구 남산공원길...</p>
-                        <a href="#" class="text-[10px] text-blue-500 underline">큰 지도 보기</a>
-                    </div>
                 </div>
-                <div class="p-4 flex justify-between items-center">
-                    <span class="text-[12px] text-gray-500">대한민국 서울 용산구 남산공원길 105</span>
-                    <button class="bg-black text-white px-4 py-2 rounded-full text-[12px] flex items-center gap-1">📍 길찾기</button>
+                <div class="p-4 flex justify-between items-center bg-white">
+                    <span class="text-[12px]">서울 용산구 남산공원길 105</span>
+                    <button class="bg-black text-white px-3 py-1.5 rounded-full text-[11px]">📍 길찾기</button>
                 </div>
             </div>
         </div>
 
-        <footer class="px-5 text-center flex flex-col items-center">
-            <div class="flex gap-6 mb-10">
-                <span class="text-xl grayscale hover:grayscale-0 cursor-pointer">📸</span>
-                <span class="text-xl grayscale hover:grayscale-0 cursor-pointer">🌐</span>
-                <span class="text-xl grayscale hover:grayscale-0 cursor-pointer">✉️</span>
-            </div>
-            <div class="text-[11px] text-gray-400 leading-relaxed space-y-1 mb-8">
-                <p>모두업(주) 대표 임주일, 이창형</p>
-                <p>사업자등록번호 116-87-02100</p>
-                <p>통신판매업 신고번호 2022-서울마포-0166호</p>
-                <a href="mailto:ratel@litt.ly" class="text-blue-400">ratel@litt.ly</a>
-            </div>
-            <div class="w-full space-y-3">
-                <button class="w-full py-4 bg-white rounded-2xl shadow-sm font-bold text-[14px]">이용약관</button>
-            </div>
+        <footer class="px-5 text-center flex flex-col items-center opacity-50 pb-20">
+            <div class="flex gap-6 mb-8 text-xl">📸 🌐 ✉️</div>
+            <p class="text-[10px]">© 2026 모두업(주) | ratel@litt.ly</p>
         </footer>
 
-        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[440px] px-4">
-            <button class="w-full py-4 bg-[#ffcc00] rounded-2xl shadow-xl font-bold flex items-center justify-center gap-2 text-[15px] border-2 border-white/50">
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[440px] px-4 z-[100]">
+            <button class="w-full py-4 bg-[#ffcc00] rounded-2xl shadow-2xl font-bold text-[15px] border-2 border-white/30 active:scale-95 transition-transform">
                 🚀 리틀리 무료 가입
             </button>
         </div>

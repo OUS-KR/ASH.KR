@@ -1,216 +1,201 @@
 <!DOCTYPE html>
-<html lang="ko" class="scroll-smooth">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glassmorphism Profile with Theme Switcher</title>
+    <title>LITTLY Pro | Component Style Guide</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    
     <style>
-        /* 폰트 적용 */
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
-        /* CSS 변수 정의 (테마 및 배경용) */
         :root {
-            --primary: #FFCC00; /* 기본 강조색 (노랑) */
-            --accent: #3B82F6;  /* 보조 강조색 (파랑) */
-            --bg-grad-start: #f6d365;
-            --bg-grad-end: #fda085;
+            --primary: #FFCC00;
+            --accent: #3B82F6;
+            --bg-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
         }
 
         body { 
             font-family: 'Pretendard', sans-serif; 
-            /* 화려한 배경 그라데이션 적용 (글래스 효과 극대화) */
-            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
-            background-attachment: fixed; /* 스크롤 시 배경 고정 */
+            background: var(--bg-gradient);
+            background-attachment: fixed;
         }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* Tailwind @apply를 활용한 커스텀 글래스모피즘 클래스 정의 */
-        @layer components {
-            .glass {
-                @apply bg-white/30 backdrop-blur-xl border border-white/40 shadow-lg;
-            }
-            .glass-dark {
-                 @apply bg-black/20 backdrop-blur-md border border-white/20 shadow-lg;
-            }
-            /* 포인트 컬러 버튼 */
-            .btn-primary {
-                background-color: var(--primary);
-                @apply text-[#222] font-bold shadow-md border-2 border-white/30 transition-transform active:scale-95;
-            }
-        }
+        .glass { @apply bg-white/40 backdrop-blur-xl border border-white/50 shadow-xl; }
+        .glass-dark { @apply bg-black/10 backdrop-blur-md border border-white/20; }
+        .section-label { @apply text-[10px] font-bold uppercase tracking-widest text-white/70 mb-4 block; }
+        .component-box { @apply mb-16 p-6 glass rounded-[32px] relative; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
     <script>
-        // 테마 변경 자바스크립트 함수
-        function setTheme(themeName) {
-            const root = document.documentElement;
-            switch (themeName) {
-                case 'yellow':
-                    root.style.setProperty('--primary', '#FFCC00');
-                    root.style.setProperty('--accent', '#3B82F6');
-                    root.style.setProperty('--bg-grad-start', '#f6d365');
-                    root.style.setProperty('--bg-grad-end', '#fda085');
-                    break;
-                case 'pink':
-                    root.style.setProperty('--primary', '#FF9A9E');
-                    root.style.setProperty('--accent', '#FF6B6B');
-                    root.style.setProperty('--bg-grad-start', '#fad0c4');
-                    root.style.setProperty('--bg-grad-end', '#ffd1ff');
-                    break;
-                case 'blue':
-                    root.style.setProperty('--primary', '#4FACFE');
-                    root.style.setProperty('--accent', '#00F260');
-                    root.style.setProperty('--bg-grad-start', '#43e97b');
-                    root.style.setProperty('--bg-grad-end', '#38f9d7');
-                    break;
-                 case 'purple':
-                    root.style.setProperty('--primary', '#a18cd1');
-                    root.style.setProperty('--accent', '#fbc2eb');
-                    root.style.setProperty('--bg-grad-start', '#a18cd1');
-                    root.style.setProperty('--bg-grad-end', '#fbc2eb');
-                    break;
-            }
+        function changeTheme(p, a, g1, g2) {
+            const r = document.documentElement;
+            r.style.setProperty('--primary', p);
+            r.style.setProperty('--accent', a);
+            r.style.setProperty('--bg-gradient', `linear-gradient(135deg, ${g1} 0%, ${g2} 100%)`);
         }
     </script>
 </head>
-<body class="flex justify-center min-h-screen antialiased text-[#222] p-4">
+<body class="p-4 md:p-10 flex flex-col items-center">
 
-    <div class="fixed top-4 right-4 z-[110] flex flex-col gap-2 glass p-2 rounded-full">
-        <button onclick="setTheme('yellow')" class="w-8 h-8 rounded-full bg-[#FFCC00] border-2 border-white shadow-sm transform hover:scale-110 transition-transform" title="Yellow Theme"></button>
-        <button onclick="setTheme('pink')" class="w-8 h-8 rounded-full bg-[#FF9A9E] border-2 border-white shadow-sm transform hover:scale-110 transition-transform" title="Pink Theme"></button>
-        <button onclick="setTheme('blue')" class="w-8 h-8 rounded-full bg-[#4FACFE] border-2 border-white shadow-sm transform hover:scale-110 transition-transform" title="Blue/Green Theme"></button>
-        <button onclick="setTheme('purple')" class="w-8 h-8 rounded-full bg-[#a18cd1] border-2 border-white shadow-sm transform hover:scale-110 transition-transform" title="Purple Theme"></button>
+    <div class="fixed top-6 right-6 z-[200] flex gap-2 p-2 glass rounded-full">
+        <button onclick="changeTheme('#FFCC00', '#3B82F6', '#f6d365', '#fda085')" class="w-6 h-6 rounded-full bg-[#FFCC00] border-2 border-white"></button>
+        <button onclick="changeTheme('#FF9A9E', '#FF6B6B', '#fad0c4', '#ffd1ff')" class="w-6 h-6 rounded-full bg-[#FF9A9E] border-2 border-white"></button>
+        <button onclick="changeTheme('#4FACFE', '#00F260', '#4FACFE', '#00F260')" class="w-6 h-6 rounded-full bg-[#4FACFE] border-2 border-white"></button>
+        <button onclick="changeTheme('#A18CD1', '#FBC2EB', '#A18CD1', '#FBC2EB')" class="w-6 h-6 rounded-full bg-[#A18CD1] border-2 border-white"></button>
     </div>
 
-
-    <div class="max-w-[480px] w-full pb-32 relative glass rounded-[32px] overflow-hidden">
+    <div class="max-w-2xl w-full">
         
-        <div class="glass-dark py-3 text-center text-[13px] font-bold text-white sticky top-0 z-50">
-            ✨ 디자인이 마음에 드시나요? ( 테마를 바꿔보세요! ) ✨
-        </div>
+        <header class="text-white mb-12 text-center">
+            <h1 class="text-3xl font-black mb-2 tracking-tighter">LITTLY PRO MANUAL</h1>
+            <p class="opacity-80 text-sm">리틀리 캡처본의 모든 요소를 글래스모피즘으로 재구성한 가이드입니다.</p>
+        </header>
 
-        <div class="px-5 pt-8 flex flex-col items-center">
-            <div class="w-full flex justify-between mb-4 px-1">
-                <button class="p-2 glass rounded-full">📤</button>
-                <button class="p-2 glass rounded-full">🔔</button>
+        <span class="section-label">01. Header & Hero Components</span>
+        <div class="component-box">
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-[90%] py-2 rounded-full text-center text-[12px] font-bold shadow-lg transition-colors" style="background-color: var(--primary);">
+                🚀 리틀리 무료 가입하기 ( 클릭 )
             </div>
-            <div class="w-28 h-28 rounded-[40px] p-4 mb-6 shadow-md overflow-hidden border-4 border-white/50" style="background-color: var(--primary);">
-                <img src="https://api.iconify.design/twemoji:unicorn.svg" class="w-full h-full object-contain drop-shadow-lg">
-            </div>
-            <h1 class="text-[22px] font-bold flex items-center gap-1 mb-2 text-gray-800">
-                글래스모피즘 프로필 <span class="text-[18px]" style="color: var(--accent);">✔</span>
-            </h1>
-            <div class="text-[14px] text-gray-600 font-medium text-center mb-8 glass px-4 py-2 rounded-2xl">
-                <p>📌 투명하고 아름다운 디자인</p>
-                <p>📌 클릭으로 테마 변경 가능</p>
-            </div>
-        </div>
-
-        <div class="px-5 w-full space-y-3 mb-12">
-            <a href="#" class="flex items-center justify-center gap-2 w-full py-4 glass rounded-[20px] font-semibold hover:bg-white/50 transition-colors">
-                👋 로그인 바로가기
-            </a>
-            <a href="#" class="flex items-center justify-center gap-2 w-full py-4 btn-primary rounded-[20px]">
-                🚀 리틀리 무료 가입
-            </a>
-        </div>
-
-        <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4 text-gray-800">📺 영상으로 확인해보세요 !</h2>
-            <div class="relative w-full aspect-video rounded-[24px] overflow-hidden glass p-1">
-                <iframe class="rounded-[20px] w-full h-full" 
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        title="YouTube video" frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen></iframe>
-            </div>
-        </div>
-
-        <div class="mb-12">
-            <h2 class="text-center font-bold mb-4 px-5 text-gray-800">🎠 가로로 넘겨보는 이미지</h2>
-            <div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-3 px-5 py-2">
-                <div class="flex-none w-[85%] snap-center glass p-2 rounded-[28px]">
-                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop" class="w-full h-48 object-cover rounded-[20px]">
-                    <p class="mt-3 text-[13px] text-center font-bold text-gray-700">몽환적인 그래디언트 01</p>
+            
+            <div class="mt-6 flex flex-col items-center">
+                <div class="w-full flex justify-between px-2 mb-6">
+                    <button class="w-10 h-10 glass rounded-full flex items-center justify-center">📤</button>
+                    <button class="w-10 h-10 glass rounded-full flex items-center justify-center">🔔</button>
                 </div>
-                <div class="flex-none w-[85%] snap-center glass p-2 rounded-[28px]">
-                    <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=500&auto=format&fit=crop" class="w-full h-48 object-cover rounded-[20px]">
-                    <p class="mt-3 text-[13px] text-center font-bold text-gray-700">몽환적인 그래디언트 02</p>
+                <div class="w-24 h-24 rounded-[32px] p-4 shadow-inner border-4 border-white/30 mb-4" style="background-color: var(--primary);">
+                    <img src="https://api.iconify.design/twemoji:badger.svg" class="w-full h-full object-contain drop-shadow-md">
+                </div>
+                <h2 class="text-xl font-bold flex items-center gap-1">올인원 프로필 링크 <span style="color: var(--accent);">✔</span></h2>
+                <div class="mt-4 text-center text-sm font-medium text-black/60 space-y-1">
+                    <p>📌 쉬운 페이지 제작 / 📌 빠른 컨텐츠 판매</p>
                 </div>
             </div>
         </div>
 
-        <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4 text-gray-800">🖼️ 와이드 이미지 배너</h2>
-            <div class="glass rounded-[28px] overflow-hidden p-1">
-                <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=500&auto=format&fit=crop" class="w-full h-56 object-cover rounded-[24px]">
-                <div class="p-5 text-center">
-                    <p class="font-bold text-[15px] text-gray-800">모든 크리에이터를 위해</p>
-                    <p class="text-[12px] text-gray-500 mt-1">더 아름다운 프로필을 만듭니다.</p>
+        <span class="section-label">02. Interactive Buttons</span>
+        <div class="component-box space-y-4">
+            <button class="w-full py-4 glass rounded-2xl font-bold hover:bg-white/60 transition-all">👋 로그인 바로가기</button>
+            <button class="w-full py-4 rounded-2xl font-bold shadow-lg text-white transition-all transform hover:scale-[1.02]" style="background-color: var(--accent);">🚀 리틀리 무료 가입</button>
+            <button class="w-full py-4 glass rounded-2xl font-bold border-dashed border-2 border-white/50">🔥 32만명 회원 보기</button>
+        </div>
+
+        <span class="section-label">03. Content & Ad Cards</span>
+        <div class="component-box">
+            <div class="text-center mb-6">
+                <p class="font-bold">😘 광고 수익까지 얻으세요!</p>
+                <p class="text-[11px] opacity-50 uppercase mt-1">Monetization Block</p>
+            </div>
+            <div class="glass-dark p-5 rounded-3xl text-white mb-4">
+                <h4 class="font-bold text-sm mb-2">가전디지털, New Year Digital #2026</h4>
+                <span class="text-[9px] bg-white/20 px-2 py-1 rounded">쿠팡 파트너스 활동 포함</span>
+            </div>
+            <div class="glass p-4 rounded-3xl flex gap-4 items-center">
+                <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=100" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-grow">
+                    <p class="text-[13px] font-bold">[무제] 화제의 소설 첫 여름</p>
+                    <p class="text-[11px] opacity-60">수익 자동화 솔루션</p>
                 </div>
             </div>
         </div>
 
-        <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4 text-gray-800">📅 일정 표시 기능</h2>
-            <div class="glass rounded-[28px] p-6 text-center">
-                <div class="flex justify-between items-center mb-6 px-2">
-                    <span class="font-bold text-[17px] text-gray-800">2026.02</span>
-                </div>
-                <div class="grid grid-cols-7 gap-y-3 text-[12px] mb-4 text-gray-500 font-medium">
-                    <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
-                    <span class="text-red-400">1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
-                    <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
-                    <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
-                    <span class="rounded-full w-6 h-6 flex items-center justify-center mx-auto text-[#222] font-bold shadow-sm" style="background-color: var(--primary);">20</span>
-                    <span>21</span>
+        <span class="section-label">04. Scheduler (Feb 2026)</span>
+        <div class="component-box">
+            <div class="flex justify-between items-center mb-6">
+                <button class="opacity-30">◀</button>
+                <span class="font-black text-lg">2026.02</span>
+                <button class="opacity-30">▶</button>
+            </div>
+            <div class="grid grid-cols-7 gap-y-4 text-center text-[12px] mb-8 font-medium">
+                <span class="opacity-40">일</span><span class="opacity-40">월</span><span class="opacity-40">화</span><span class="opacity-40">수</span><span class="opacity-40">목</span><span class="opacity-40">금</span><span class="opacity-40">토</span>
+                <span class="text-red-500">1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+                <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+                <span class="text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto shadow-md" style="background-color: var(--primary);">20</span>
+                <span>21</span>
+            </div>
+            <div class="space-y-2 border-t border-white/30 pt-4">
+                <div class="flex items-center gap-3 text-sm">
+                    <span class="text-[9px] px-2 py-0.5 glass rounded-full uppercase">Closed</span>
+                    <span class="font-semibold">❤️ 2026 설날 ❤️</span>
                 </div>
             </div>
         </div>
 
-        <div class="px-5 mb-12">
-            <h2 class="text-center font-bold mb-4 text-gray-800">💰 판매 상품 리스트</h2>
+        <span class="section-label">05. Commerce & Product Grid</span>
+        <div class="component-box">
             <div class="grid grid-cols-3 gap-3">
-                <div class="glass p-2 rounded-2xl">
-                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=150&auto=format&fit=crop" class="w-full aspect-square object-cover rounded-xl mb-2 border border-white/30">
-                    <p class="text-[11px] font-bold text-center" style="color: var(--accent);">249,000원</p>
+                <div class="glass p-2 rounded-2xl group">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=150" class="rounded-xl mb-2 group-hover:scale-105 transition-transform">
+                    <p class="text-[10px] font-bold text-red-500">8% <span class="text-black/80">24.9만</span></p>
                 </div>
-                <div class="glass p-2 rounded-2xl">
-                    <img src="https://images.unsplash.com/photo-1558317374-067fb5f30001?q=80&w=150&auto=format&fit=crop" class="w-full aspect-square object-cover rounded-xl mb-2 border border-white/30">
-                    <p class="text-[11px] font-bold text-center" style="color: var(--accent);">459,900원</p>
+                <div class="glass p-2 rounded-2xl group">
+                    <img src="https://images.unsplash.com/photo-1558317374-067fb5f30001?q=80&w=150" class="rounded-xl mb-2 group-hover:scale-105 transition-transform">
+                    <p class="text-[10px] font-bold text-red-500">33% <span class="text-black/80">45.9만</span></p>
                 </div>
-                <div class="glass p-2 rounded-2xl">
-                    <img src="https://images.unsplash.com/photo-1550524514-9636ed826116?q=80&w=150&auto=format&fit=crop" class="w-full aspect-square object-cover rounded-xl mb-2 border border-white/30">
-                    <p class="text-[11px] font-bold text-center" style="color: var(--accent);">54,900원</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="px-5 mb-12 space-y-4">
-            <div class="glass p-6 rounded-[28px]">
-                <p class="text-center font-bold text-[14px] mb-4 text-gray-800">📝 문의하기</p>
-                <button class="w-full py-3 btn-primary rounded-xl">문의하기</button>
-            </div>
-            <div class="glass rounded-[28px] overflow-hidden p-1">
-                <div class="h-40 relative">
-                    <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f6dfc0f?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover rounded-[24px]">
-                </div>
-                <div class="p-4 flex justify-between items-center">
-                    <span class="text-[12px] text-gray-600 font-medium">서울 용산구 남산공원길 105</span>
-                    <button class="text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm" style="background-color: var(--accent);">📍 길찾기</button>
+                <div class="glass p-2 rounded-2xl group">
+                    <img src="https://images.unsplash.com/photo-1550524514-9636ed826116?q=80&w=150" class="rounded-xl mb-2 group-hover:scale-105 transition-transform">
+                    <p class="text-[10px] font-bold text-red-500">40% <span class="text-black/80">5.4만</span></p>
                 </div>
             </div>
         </div>
 
-        <footer class="px-5 text-center flex flex-col items-center opacity-60 pb-10 text-gray-800 font-medium">
-            <div class="flex gap-6 mb-8 text-xl glass p-3 rounded-full">📸 🌐 ✉️</div>
-            <p class="text-[10px]">© 2026 Glassmorphism Design | 테마를 변경해보세요!</p>
-        </footer>
+        <span class="section-label">06. Multimedia Blocks</span>
+        <div class="component-box space-y-8">
+            <div class="aspect-video glass p-1 rounded-3xl overflow-hidden">
+                <iframe class="w-full h-full rounded-[20px]" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="flex overflow-x-auto snap-x no-scrollbar gap-4 py-2">
+                <div class="flex-none w-4/5 snap-center glass rounded-3xl p-2">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400" class="h-40 w-full object-cover rounded-2xl">
+                </div>
+                <div class="flex-none w-4/5 snap-center glass rounded-3xl p-2">
+                    <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=400" class="h-40 w-full object-cover rounded-2xl">
+                </div>
+            </div>
+        </div>
 
-        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[440px] px-4 z-[100]">
-            <button class="w-full py-4 btn-primary rounded-2xl text-[15px] backdrop-blur-md">
+        <span class="section-label">07. Data Collection Forms</span>
+        <div class="component-box">
+            <div class="space-y-6">
+                <div class="text-center">
+                    <p class="font-bold text-sm">✉️ 리틀리 소식 받기</p>
+                </div>
+                <input type="email" placeholder="이메일을 적어주세요" class="w-full p-4 glass rounded-2xl text-sm outline-none border-none placeholder:text-black/30">
+                <button class="w-full py-4 glass-dark text-white rounded-2xl font-bold opacity-50">제출하기</button>
+                <div class="flex gap-4 p-4 glass rounded-2xl">
+                    <label class="flex items-center gap-2 text-xs font-bold cursor-pointer">
+                        <input type="radio" name="q" class="accent-black" checked> 서비스 문의
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold cursor-pointer">
+                        <input type="radio" name="q" class="accent-black"> 제휴 문의
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <span class="section-label">08. Map & Business Info</span>
+        <div class="component-box !pb-10">
+            <div class="rounded-3xl overflow-hidden h-40 mb-4 border border-white/40">
+                <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f6dfc0f?q=80&w=500" class="w-full h-full object-cover">
+            </div>
+            <div class="flex justify-between items-center px-2">
+                <p class="text-[11px] font-medium opacity-70">서울 용산구 남산공원길 105</p>
+                <button class="px-4 py-2 glass-dark text-white text-[10px] rounded-full font-bold">📍 길찾기</button>
+            </div>
+            
+            <div class="mt-12 border-t border-white/20 pt-10 text-center opacity-40">
+                <div class="flex justify-center gap-6 mb-8 grayscale">📸 🌐 ✉️</div>
+                <div class="text-[9px] leading-relaxed">
+                    모두업(주) 대표 임주일, 이창형 | 사업자 116-87-02100<br>
+                    서울 마포구 어딘가 | ratel@litt.ly
+                </div>
+            </div>
+        </div>
+
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-[210]">
+            <button class="w-full py-4 rounded-3xl font-black text-[16px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] border-t-2 border-white/40 transition-transform active:scale-95" style="background-color: var(--primary);">
                 🚀 리틀리 무료 가입
             </button>
         </div>

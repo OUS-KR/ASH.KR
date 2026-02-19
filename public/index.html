@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div id="overlay" class="text-center space-y-8 bg-black/40 backdrop-blur-sm p-12 rounded-3xl border border-white/10 hidden">
+        <div id="overlay" class="text-center space-y-8 bg-black/60 backdrop-blur-md p-12 rounded-3xl border border-white/10 hidden">
             <h2 id="status-title" class="font-game text-6xl tracking-widest text-white">ASH</h2>
             <p id="status-desc" class="text-gray-400 font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
             <button id="start-btn" class="btn-active px-10 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-widest uppercase rounded-full transition-all hover:scale-110 active:scale-95 shadow-lg shadow-orange-900/20">
@@ -41,6 +41,65 @@
     <canvas id="gameCanvas"></canvas>
 
     <script>
+        /** 사운드 엔진 (Web Audio API) **/
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        const SFX = {
+            play(type) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'ignite') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.exponentialRampToValueAtTime(440, now + 0.5);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                    osc.start();
+                    osc.stop(now + 0.5);
+                } 
+                else if (type === 'collect') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(880, now);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                    osc.start();
+                    osc.stop(now + 0.1);
+                } 
+                else if (type === 'hit') {
+                    // 치익- 노이즈 사운드
+                    const bufferSize = audioCtx.sampleRate * 0.2;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+                    const noiseGain = audioCtx.createGain();
+                    noiseGain.gain.setValueAtTime(0.1, now);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    noise.connect(noiseGain);
+                    noiseGain.connect(audioCtx.destination);
+                    noise.start();
+                }
+                else if (type === 'gameOver') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(20, now + 1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 1);
+                    osc.start();
+                    osc.stop(now + 1);
+                }
+            }
+        };
+
+        /** 게임 로직 **/
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const heatBar = document.getElementById('heat-bar');
@@ -53,18 +112,11 @@
         let gameActive = false;
         let score = 0;
         let heat = 100;
-        let particles = [];
         let items = [];
-        let mouseX = 0;
+        let particles = [];
+        let mouseX = window.innerWidth / 2;
 
-        // 플레이어 객체
-        const player = {
-            x: 0,
-            y: 0,
-            size: 8,
-            targetX: 0,
-            trail: []
-        };
+        const player = { x: window.innerWidth / 2, y: 0, targetX: window.innerWidth / 2 };
 
         function resize() {
             canvas.width = window.innerWidth;
@@ -83,34 +135,23 @@
 
         class Item {
             constructor(type) {
-                this.type = type; // 'ash' or 'rain'
+                this.type = type;
                 this.x = Math.random() * canvas.width;
                 this.y = -20;
-                this.size = type === 'ash' ? Math.random() * 4 + 2 : Math.random() * 3 + 5;
-                this.speed = type === 'ash' ? Math.random() * 2 + 2 : Math.random() * 4 + 4;
-                this.drift = Math.random() * 1 - 0.5;
+                this.size = type === 'ash' ? Math.random() * 3 + 2 : Math.random() * 2 + 4;
+                this.speed = type === 'ash' ? Math.random() * 2 + 1.5 : Math.random() * 4 + 3;
             }
-            update() {
-                this.y += this.speed;
-                this.x += this.drift;
-            }
+            update() { this.y += this.speed; }
             draw() {
                 ctx.beginPath();
-                if(this.type === 'ash') {
-                    ctx.fillStyle = '#666';
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                } else {
-                    ctx.fillStyle = '#3b82f6';
-                    ctx.moveTo(this.x, this.y);
-                    ctx.lineTo(this.x - 2, this.y + 10);
-                    ctx.lineTo(this.x + 2, this.y + 10);
-                }
+                ctx.fillStyle = this.type === 'ash' ? '#888' : '#3b82f6';
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
         function createExplosion(x, y, color) {
-            for(let i = 0; i < 10; i++) {
+            for(let i = 0; i < 8; i++) {
                 particles.push({
                     x, y,
                     vx: Math.random() * 4 - 2,
@@ -122,77 +163,74 @@
         }
 
         function initGame() {
+            SFX.play('ignite');
             gameActive = true;
             score = 0;
             heat = 100;
             items = [];
+            scoreDisplay.innerText = "0";
             overlay.style.display = 'none';
             animate();
         }
 
         function gameOver() {
+            if(!gameActive) return;
+            SFX.play('gameOver');
             gameActive = false;
             overlay.style.display = 'block';
             statusTitle.innerText = "EXTINGUISHED";
-            statusDesc.innerText = `당신의 온기는 ${score}점까지 타올랐습니다.`;
+            statusDesc.innerText = `기록: ${score}점`;
             startBtn.innerText = "REKINDLE";
         }
 
         function animate() {
             if(!gameActive) return;
 
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 온기 감소
-            heat -= 0.15;
+            heat -= 0.12;
             heatBar.style.width = `${Math.max(0, heat)}%`;
-            if(heat <= 0) gameOver();
+            if(heat <= 0) { gameOver(); return; }
 
-            // 플레이어 이동 로직 (부드러운 추적)
             player.x += (player.targetX - player.x) * 0.15;
 
-            // 플레이어 광원 효과
-            const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 20);
+            // 플레이어 그리기
+            const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 25);
             grad.addColorStop(0, '#fff');
-            grad.addColorStop(0.3, '#ff9d00');
+            grad.addColorStop(0.2, '#ff6a00');
             grad.addColorStop(1, 'transparent');
             ctx.fillStyle = grad;
             ctx.beginPath();
-            ctx.arc(player.x, player.y, 20, 0, Math.PI * 2);
+            ctx.arc(player.x, player.y, 25, 0, Math.PI * 2);
             ctx.fill();
 
-            // 아이템 스폰
             if(Math.random() < 0.08) items.push(new Item('ash'));
-            if(Math.random() < 0.03) items.push(new Item('rain'));
+            if(Math.random() < 0.03 + (score/5000)) items.push(new Item('rain'));
 
             items.forEach((item, index) => {
                 item.update();
                 item.draw();
-
-                // 충돌 검사
                 const dist = Math.hypot(player.x - item.x, player.y - item.y);
-                if(dist < 20) {
+                if(dist < 25) {
                     if(item.type === 'ash') {
-                        heat = Math.min(100, heat + 5);
+                        SFX.play('collect');
+                        heat = Math.min(100, heat + 6);
                         score += 10;
                         scoreDisplay.innerText = score;
                         createExplosion(item.x, item.y, '#ff4d00');
                     } else {
-                        heat -= 20;
+                        SFX.play('hit');
+                        heat -= 15;
                         createExplosion(item.x, item.y, '#3b82f6');
                     }
                     items.splice(index, 1);
                 }
-
                 if(item.y > canvas.height) items.splice(index, 1);
             });
 
-            // 파티클 업데이트
             particles.forEach((p, i) => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life -= 0.02;
+                p.x += p.vx; p.y += p.vy; p.life -= 0.03;
                 ctx.fillStyle = p.color;
                 ctx.globalAlpha = p.life;
                 ctx.fillRect(p.x, p.y, 2, 2);

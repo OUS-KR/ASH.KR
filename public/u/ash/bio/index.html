@@ -3,109 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link in Bio | My Space</title>
+    <title>Link in Bio | Multi-Theme</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <style>
-        /* 배경 애니메이션 및 커스텀 스타일 */
+        /* 테마별 변수 정의 */
+        :root[data-theme="aurora"] {
+            --bg-1: #4f46e5; --bg-2: #db2777; --bg-main: #0f172a;
+            --accent: #818cf8; --glass: rgba(255, 255, 255, 0.05);
+        }
+        :root[data-theme="sunset"] {
+            --bg-1: #f59e0b; --bg-2: #ef4444; --bg-main: #450a0a;
+            --accent: #fcd34d; --glass: rgba(255, 255, 255, 0.07);
+        }
+        :root[data-theme="ocean"] {
+            --bg-1: #0ea5e9; --bg-2: #2dd4bf; --bg-main: #082f49;
+            --accent: #7dd3fc; --glass: rgba(255, 255, 255, 0.05);
+        }
+        :root[data-theme="forest"] {
+            --bg-1: #22c55e; --bg-2: #15803d; --bg-main: #052e16;
+            --accent: #86efac; --glass: rgba(255, 255, 255, 0.06);
+        }
+        :root[data-theme="cyber"] {
+            --bg-1: #ff00ff; --bg-2: #00ffff; --bg-main: #000000;
+            --accent: #ff00ff; --glass: rgba(255, 255, 255, 0.1);
+        }
+
         @layer base {
             body {
-                @apply bg-neutral-900 text-white antialiased;
-                background: radial-gradient(circle at top left, #4f46e5 0%, transparent 40%),
-                            radial-gradient(circle at bottom right, #db2777 0%, transparent 40%),
-                            #0f172a;
+                @apply text-white antialiased transition-colors duration-700;
+                background: radial-gradient(circle at top left, var(--bg-1) 0%, transparent 45%),
+                            radial-gradient(circle at bottom right, var(--bg-2) 0%, transparent 45%),
+                            var(--bg-main);
                 min-height: 100vh;
+                margin: 0;
             }
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--glass);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         .glass-hover:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-color: var(--accent);
         }
-    }
+
+        /* 메뉴 애니메이션 */
+        #themeMenu.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
     </style>
 </head>
-<body class="flex items-center justify-center p-6">
+<body class="flex flex-col items-center justify-center p-6" data-theme="aurora">
 
-    <div class="max-w-md w-full space-y-8">
+    <div class="fixed top-6 right-6 z-50">
+        <button onclick="toggleMenu()" class="glass p-3 rounded-full hover:scale-110 transition-transform shadow-lg">
+            🎨
+        </button>
+        <div id="themeMenu" class="absolute right-0 mt-3 w-32 glass rounded-2xl p-2 opacity-0 pointer-events-none transform -translate-y-2 transition-all duration-300 shadow-2xl">
+            <button onclick="setTheme('aurora')" class="w-full text-left px-3 py-2 hover:bg-white/10 rounded-xl text-sm mb-1">🌌 Aurora</button>
+            <button onclick="setTheme('sunset')" class="w-full text-left px-3 py-2 hover:bg-white/10 rounded-xl text-sm mb-1">🌅 Sunset</button>
+            <button onclick="setTheme('ocean')" class="w-full text-left px-3 py-2 hover:bg-white/10 rounded-xl text-sm mb-1">🌊 Ocean</button>
+            <button onclick="setTheme('forest')" class="w-full text-left px-3 py-2 hover:bg-white/10 rounded-xl text-sm mb-1">🌿 Forest</button>
+            <button onclick="setTheme('cyber')" class="w-full text-left px-3 py-2 hover:bg-white/10 rounded-xl text-sm">📟 Cyber</button>
+        </div>
+    </div>
+
+    <div class="max-w-md w-full space-y-6 pt-12">
         
-        <div class="glass rounded-3xl p-8 text-center space-y-4">
+        <div class="glass rounded-[2rem] p-8 text-center space-y-4">
             <div class="relative w-28 h-28 mx-auto">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" 
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80" 
                      alt="Profile" 
-                     class="rounded-full w-full h-full object-cover border-2 border-white/20">
-                <div class="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-4 border-slate-900 rounded-full"></div>
+                     class="rounded-3xl w-full h-full object-cover border-2 border-white/20 shadow-inner">
             </div>
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">Your Name</h1>
-                <p class="text-white/60 text-sm mt-1">Digital Nomad & Creative Designer</p>
+                <h1 class="text-3xl font-extrabold tracking-tight">Alex Kim</h1>
+                <p class="text-white/70 text-sm mt-2 font-light">Creating digital experiences</p>
             </div>
         </div>
 
         <div class="grid grid-cols-3 gap-3">
-            <div class="glass rounded-2xl p-4 text-center">
-                <span class="block text-[10px] uppercase tracking-widest text-white/40 mb-1">별자리</span>
-                <span class="text-lg">♌</span>
-                <p class="text-xs font-medium">사자자리</p>
+            <div class="glass rounded-2xl py-4 flex flex-col items-center justify-center">
+                <span class="text-[10px] text-white/40 uppercase tracking-tighter mb-1">Zodiac</span>
+                <span class="text-xl">♌</span>
+                <p class="text-[11px] font-semibold">Leo</p>
             </div>
-            <div class="glass rounded-2xl p-4 text-center">
-                <span class="block text-[10px] uppercase tracking-widest text-white/40 mb-1">탄생색</span>
-                <div class="w-4 h-4 rounded-full mx-auto my-1.5 shadow-sm" style="background-color: #FFD700;"></div>
-                <p class="text-xs font-medium">골드</p>
+            <div class="glass rounded-2xl py-4 flex flex-col items-center justify-center">
+                <span class="text-[10px] text-white/40 uppercase tracking-tighter mb-1">Color</span>
+                <div class="w-3 h-3 rounded-full my-1.5 shadow-[0_0_8px_var(--accent)] bg-white"></div>
+                <p class="text-[11px] font-semibold">Sky Blue</p>
             </div>
-            <div class="glass rounded-2xl p-4 text-center">
-                <span class="block text-[10px] uppercase tracking-widest text-white/40 mb-1">탄생화</span>
-                <span class="text-lg">🌻</span>
-                <p class="text-xs font-medium">해바라기</p>
+            <div class="glass rounded-2xl py-4 flex flex-col items-center justify-center">
+                <span class="text-[10px] text-white/40 uppercase tracking-tighter mb-1">Flower</span>
+                <span class="text-xl">🌸</span>
+                <p class="text-[11px] font-semibold">Cherry Blossom</p>
             </div>
         </div>
 
-        <div class="space-y-4">
-            <a href="#" class="glass glass-hover block w-full p-4 rounded-2xl flex items-center group">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white/20">
-                    📸
-                </div>
-                <span class="font-medium">Instagram</span>
-                <svg class="ml-auto w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path></svg>
+        <div class="space-y-3">
+            <a href="#" class="glass glass-hover flex items-center p-4 rounded-2xl group transition-all">
+                <div class="w-10 h-10 glass rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">📸</div>
+                <span class="font-medium tracking-wide">Instagram</span>
+                <span class="ml-auto opacity-30 group-hover:opacity-100 transition-opacity">→</span>
             </a>
-
-            <a href="#" class="glass glass-hover block w-full p-4 rounded-2xl flex items-center group">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white/20">
-                    💼
-                </div>
-                <span class="font-medium">Portfolio</span>
-                <svg class="ml-auto w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path></svg>
+            <a href="#" class="glass glass-hover flex items-center p-4 rounded-2xl group transition-all">
+                <div class="w-10 h-10 glass rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">📂</div>
+                <span class="font-medium tracking-wide">Portfolio</span>
+                <span class="ml-auto opacity-30 group-hover:opacity-100 transition-opacity">→</span>
             </a>
-
-            <a href="#" class="glass glass-hover block w-full p-4 rounded-2xl flex items-center group">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white/20">
-                    📝
-                </div>
-                <span class="font-medium">Blog</span>
-                <svg class="ml-auto w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path></svg>
-            </a>
-
-            <a href="#" class="glass glass-hover block w-full p-4 rounded-2xl flex items-center group">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white/20">
-                    ✉️
-                </div>
-                <span class="font-medium">Contact Me</span>
-                <svg class="ml-auto w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path></svg>
+            <a href="#" class="glass glass-hover flex items-center p-4 rounded-2xl group transition-all">
+                <div class="w-10 h-10 glass rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">✍️</div>
+                <span class="font-medium tracking-wide">Blog</span>
+                <span class="ml-auto opacity-30 group-hover:opacity-100 transition-opacity">→</span>
             </a>
         </div>
 
-        <p class="text-center text-white/20 text-[11px] uppercase tracking-[0.2em]">
-            © 2026 Your Name Space
+        <p class="text-center text-white/20 text-[10px] font-bold uppercase tracking-[0.3em]">
+            Powered by Tailwind 4.0
         </p>
     </div>
 
+    <script>
+        // 테마 변경 함수
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('selected-theme', themeName);
+            toggleMenu();
+        }
+
+        // 메뉴 토글 함수
+        function toggleMenu() {
+            const menu = document.getElementById('themeMenu');
+            menu.classList.toggle('show');
+        }
+
+        // 초기 테마 설정 (로컬 스토리지 확인)
+        const savedTheme = localStorage.getItem('selected-theme') || 'aurora';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // 메뉴 바깥 클릭 시 닫기
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.fixed')) {
+                document.getElementById('themeMenu').classList.remove('show');
+            }
+        });
+    </script>
 </body>
 </html>

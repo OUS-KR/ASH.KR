@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link in Bio | My Space</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        /* 배경 애니메이션 및 커스텀 스타일 */
+        @layer base {
+            body {
+                @apply bg-neutral-900 text-white antialiased;
+                background: radial-gradient(circle at top left, #4f46e5 0%, transparent 40%),
+                            radial-gradient(circle at bottom right, #db2777 0%, transparent 40%),
+                            #0f172a;
+                min-height: 100vh;
+            }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-hover:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+    }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6">
+
+    <div class="max-w-md w-full space-y-8">
+        
+        <div class="glass rounded-3xl p-8 text-center space-y-4">
+            <div class="relative w-28 h-28 mx-auto">
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" 
+                     alt="Profile" 
+                     class="rounded-full w-full h-full object-cover border-2 border-white/20">
+                <div class="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-4 border-slate-900 rounded-full"></div>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Your Name</h1>
+                <p class="text-white/60 text-sm mt-1">Digital Nomad & Creative Designer</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+            <div class="glass rounded-2xl p-4 text-center">
+                <span class="block text-[10px] uppercase tracking-widest text-white/40 mb-1">별자리</span>
+                <span class="text-lg">♌</span>
+                <p class="text-xs font-medium">사자자리</p>
+            </div>
+            <div class="glass rounded-2xl p-4 text-center">
+                <span class="block text-[10px] uppercase tracking-widest text-white/40 mb-1">탄생색</span>
+                <div class="w-4 h-4 rounded-full mx-auto my-1.5 shadow-sm" style="background-color: #FFD700;"></div>
+                <p class="text-xs font-medium">골드</p>
+            </div>
+            <div class="glass rounded-2xl p-4 text-center">
+                <span class="block text-[10px] uppercase tracking-widest text-white/40 mb-1">탄생화</span>
+                <span class="text-lg">🌻</span>
+                <p class="text-xs font-medium">해바라기</p>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <a href="#" class="glass glass-hover block w-full p-4 rounded-2xl flex items-center group">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white/20">
+                    📸
+                </div>
+                <span class="font-medium">Instagram</span>
+                <svg class="ml-auto w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="#" class="glass glass-hover block w-full p-4 rounded-2xl flex items-center group">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white/20">
+                    💼
+                </div>
+                <span class="font-medium">Portfolio</span>
+                <svg class="ml-auto w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="#" class="glass glass-hover block w-full p-4 rounded-2xl flex items-center group">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white/20">
+                    📝
+                </div>
+                <span class="font-medium">Blog</span>
+                <svg class="ml-auto w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="#" class="glass glass-hover block w-full p-4 rounded-2xl flex items-center group">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white/20">
+                    ✉️
+                </div>
+                <span class="font-medium">Contact Me</span>
+                <svg class="ml-auto w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path></svg>
+            </a>
+        </div>
+
+        <p class="text-center text-white/20 text-[11px] uppercase tracking-[0.2em]">
+            © 2026 Your Name Space
+        </p>
+    </div>
+
+</body>
+</html>

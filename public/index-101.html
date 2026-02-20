@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <title>ash.kr — 조용하지만 선명한 디지털 작업실</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="ash.kr — 조용하지만 선명한 디지털 작업실. 재처럼 가볍지만 선명한 흔적을 남기는 공간." />
+
+  <!-- Tailwind CSS 4.0 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&family=Noto+Serif+KR:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ash: {
+              50: '#f8fafc',
+              100: '#f1f5f9', 
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#020617'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Noto Serif KR', 'serif']
+          },
+          animation: {
+            'drift': 'drift 6s ease-in-out infinite',
+            'glow': 'glow 4s ease-in-out infinite alternate'
+          },
+          keyframes: {
+            drift: {
+              '0%': { transform: 'translateY(100px)', opacity: '0' },
+              '50%': { opacity: '0.6' },
+              '100%': { transform: 'translateY(-20px)', opacity: '0' }
+            },
+            glow: {
+              '0%': { opacity: '0.1' },
+              '100%': { opacity: '0.3' }
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* 노이즈 텍스처 */
+    .bg-noise {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    }
+    
+    /* 그레인 효과 */
+    .grain-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.7'/%3E%3C/svg%3E");
+    }
+  </style>
+</head>
+
+<body class="h-full bg-ash-950 text-ash-300 font-sans antialiased selection:bg-ash-700 selection:text-ash-100">
+  <!-- 그레인 오버레이 -->
+  <div class="grain-overlay"></div>
+  
+  <!-- 배경 노이즈 -->
+  <div class="fixed inset-0 bg-noise pointer-events-none"></div>
+
+  <!-- 앰비언트 글로우 -->
+  <div class="fixed top-1/4 left-1/4 w-96 h-96 bg-ash-700 rounded-full blur-[120px] opacity-20 animate-glow"></div>
+  <div class="fixed bottom-1/3 right-1/3 w-64 h-64 bg-ash-600 rounded-full blur-[100px] opacity-15 animate-glow" style="animation-delay: 2s;"></div>
+
+  <!-- 떠다니는 재 입자들 -->
+  <div class="fixed top-20 left-10 w-1 h-1 bg-ash-400 rounded-full animate-drift"></div>
+  <div class="fixed top-32 right-20 w-1.5 h-1.5 bg-ash-500 rounded-full animate-drift" style="animation-delay: 2s;"></div>
+  <div class="fixed top-40 left-1/2 w-1 h-1 bg-ash-300 rounded-full animate-drift" style="animation-delay: 4s;"></div>
+  <div class="fixed top-16 right-1/3 w-0.5 h-0.5 bg-ash-400 rounded-full animate-drift" style="animation-delay: 1s;"></div>
+
+  <main class="relative min-h-screen">
+    <!-- 헤더 네비게이션 -->
+    <header class="sticky top-0 z-30 border-b border-ash-800/30 bg-ash-950/80 backdrop-blur-md">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a href="#top" class="group flex items-center gap-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-full border border-ash-700 bg-ash-900/80 text-xs font-serif text-ash-400 transition group-hover:border-ash-500 group-hover:text-ash-200">
+            灰
+          </div>
+          <span class="text-lg font-serif font-light tracking-wider text-ash-200 group-hover:text-ash-50 transition">
+            ash.kr
+          </span>
+        </a>
+
+        <nav class="hidden items-center gap-8 text-sm font-light text-ash-400 md:flex">
+          <a href="#work" class="hover:text-ash-200 transition-colors">work</a>
+          <a href="#notes" class="hover:text-ash-200 transition-colors">notes</a>
+          <a href="#about" class="hover:text-ash-200 transition-colors">about</a>
+        </nav>
+
+        <a href="mailto:hello@ash.kr" class="hidden text-sm font-light text-ash-500 hover:text-ash-200 transition-colors sm:block">
+          hello@ash.kr
+        </a>
+      </div>
+    </header>
+
+    <!-- 히어로 섹션 -->
+    <section id="top" class="relative px-6 py-20 lg:py-32">
+      <div class="mx-auto max-w-6xl">
+        <div class="grid gap-16 lg:grid-cols-2 lg:items-center">
+          <!-- 메인 콘텐츠 -->
+          <div class="space-y-8">
+            <div class="inline-flex items-center gap-2 rounded-full border border-ash-800 bg-ash-900/50 px-4 py-2 text-xs font-light uppercase tracking-wider text-ash-500 backdrop-blur-sm">
+              <span class="inline-flex h-2 w-2 rounded-full bg-ash-400 animate-pulse"></span>
+              quietly building
+            </div>
+
+            <div class="space-y-6">
+              <h1 class="text-4xl font-serif font-light leading-tight text-ash-50 sm:text-5xl lg:text-6xl">
+                조용하지만
+                <span class="block bg-gradient-to-r from-ash-300 to-ash-500 bg-clip-text text-transparent">
+                  선명한 흔적
+                </span>
+              </h1>
+              
+              <p class="max-w-lg text-base leading-relaxed text-ash-400 sm:text-lg">
+                재처럼 가볍지만 선명한 흔적을 남기는 디지털 작업실. 
+                과하지 않은 것들, 오래 남을 것들을 만듭니다.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4">
+              <a href="#work" class="inline-flex items-center gap-2 rounded-full bg-ash-200 px-6 py-3 text-sm font-medium text-ash-950 transition hover:bg-ash-100">
+                작업 보기
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
+              
+              <a href="#notes" class="inline-flex items-center gap-2 rounded-full border border-ash-700 bg-ash-900/50 px-6 py-3 text-sm font-light text-ash-300 backdrop-blur-sm transition hover:border-ash-600 hover:text-ash-200">
+                노트
+                <span class="text-xs text-ash-500">fragments</span>
+              </a>
+            </div>
+
+            <div class="flex items-center gap-4 pt-4 text-xs text-ash-600">
+              <div class="h-px w-8 bg-ash-700"></div>
+              <span class="font-light uppercase tracking-wider">stack</span>
+              <span class="text-ash-500">next.js • tailwind • vercel</span>
+            </div>
+          </div>
+
+          <!-- 상태 카드 -->
+          <div class="lg:justify-self-end">
+            <div class="relative max-w-sm rounded-3xl border border-ash-800/50 bg-ash-900/30 p-6 backdrop-blur-sm">
+              <div class="mb-6 flex items-center justify-between text-xs text-ash-500">
+                <span class="font-light">ash.kr/status</span>
+                <span class="rounded-full border border-ash-700 px-2 py-1 text-[10px] uppercase tracking-wider">
+                  live
+                </span>
+              </div>
+
+              <div class="space-y-5">
+                <div>
+                  <p class="mb-2 text-xs uppercase tracking-wider text-ash-600">current focus</p>
+                  <p class="text-sm leading-relaxed text-ash-200">
+                    미니멀하지만 기억에 남는 
+                    <span class="rounded bg-ash-800 px-2 py-1 text-xs text-ash-300">
+                      마이크로 인터랙션
+                    </span>
+                    연구 중
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                  <div class="rounded-2xl border border-ash-800/60 bg-ash-900/60 p-3">
+                    <p class="mb-1 text-[10px] uppercase tracking-wider text-ash-600">mode</p>
+                    <p class="font-light text-ash-300">deep work</p>
+                  </div>
+                  <div class="rounded-2xl border border-ash-800/60 bg-ash-900/60 p-3">
+                    <p class="mb-1 text-[10px] uppercase tracking-wider text-ash-600">status</p>
+                    <p class="font-light text-ash-300">available</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 text-xs text-ash-600">
+                  <span>last update: 2024.02</span>
+                  <span class="font-serif italic">burning quietly</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 작업 섹션 -->
+    <section id="work" class="border-t border-ash-800/30 bg-ash-900/20 px-6 py-16">
+      <div class="mx-auto max-w-6xl">
+        <div class="mb-12 flex items-end justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-wider text-ash-600">selected work</p>
+            <h2 class="mt-2 text-2xl font-serif font-light text-ash-100">고르고, 다시 다듬은 것들</h2>
+          </div>
+          <span class="hidden text-xs text-ash-600 sm:block">더 많은 작업들은 곧 공개 예정</span>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <!-- 프로젝트 카드들 -->
+          <article class="group rounded-2xl border border-ash-800/50 bg-ash-900/30 p-6 backdrop-blur-sm transition hover:border-ash-700 hover:bg-ash-900/50">
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="text-lg font-light text-ash-100">ash-notes</h3>
+              <span class="rounded-full border border-ash-700 bg-ash-800/50 px-3 py-1 text-xs text-ash-400">
+                micro blog
+              </span>
+            </div>
+            <p class="mb-4 text-sm leading-relaxed text-ash-400">
+              긴 글보다 짧은 생각을 좋아하는 사람을 위한 노트 시스템. 
+              마크다운과 git을 기반으로, 생각의 파편들을 차곡차곡 쌓아갑니다.
+            </p>
+            <div class="text-xs text-ash-500">
+              <span class="font-light">astro • mdx • cloudflare</span>
+            </div>
+          </article>
+
+          <article class="group rounded-2xl border border-ash-800/50 bg-ash-900/30 p-6 backdrop-blur-sm transition hover:border-ash-700 hover:bg-ash-900/50">
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="text-lg font-light text-ash-100">ash-ui</h3>
+              <span class="rounded-full border border-ash-700 bg-ash-800/50 px-3 py-1 text-xs text-ash-400">
+                components
+              </span>
+            </div>
+            <p class="mb-4 text-sm leading-relaxed text-ash-400">
+              개인 프로젝트에 공통으로 사용하는 컴포넌트 라이브러리. 
+              과한 장식 없이, 명료한 상태와 적당한 여백을 우선합니다.
+            </p>
+            <div class="text-xs text-ash-500">
+              <span class="font-light">react • tailwind • radix</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 노트 섹션 -->
+    <section id="notes" class="border-t border-ash-800/30 px-6 py-16">
+      <div class="mx-auto max-w-6xl">
+        <div class="mb-8">
+          <p class="text-xs uppercase tracking-wider text-ash-600">recent notes</p>
+          <h2 class="mt-2 text-2xl font-serif font-light text-ash-100">조각들, 메모들</h2>
+        </div>
+
+        <div class="space-y-4">
+          <article class="flex gap-6 rounded-2xl border border-ash-800/50 bg-ash-900/20 p-5 backdrop-blur-sm">
+            <div class="w-20 shrink-0 text-xs font-light text-ash-600">
+              2024.02.20
+            </div>
+            <div>
+              <h3 class="mb-2 font-light text-ash-200">"조용하지만 선명한"에 대해</h3>
+              <p class="text-sm leading-relaxed text-ash-400">
+                화려하게 만들 수도 있지만, 시간이 지나도 어색하지 않을 온도를 좋아합니다. 
+                당장은 심심해 보여도, 오래 봐도 피로하지 않은 것들.
+              </p>
+            </div>
+          </article>
+
+          <article class="flex gap-6 rounded-2xl border border-ash-800/50 bg-ash-900/20 p-5 backdrop-blur-sm">
+            <div class="w-20 shrink-0 text-xs font-light text-ash-600">
+              2024.02.15
+            </div>
+            <div>
+              <h3 class="mb-2 font-light text-ash-200">ash.kr 리뉴얼 노트</h3>
+              <p class="text-sm leading-relaxed text-ash-400">
+                이 페이지는 정식 버전 전의 스케치입니다. 전체 구조와 톤앤매너를 먼저 잡고, 
+                이후 실제 프로젝트들과 연동할 예정입니다.
+              </p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 어바웃/푸터 -->
+    <section id="about" class="border-t border-ash-800/30 bg-ash-900/30 px-6 py-16">
+      <div class="mx-auto max-w-6xl">
+        <div class="grid gap-12 md:grid-cols-3">
+          <div class="md:col-span-2 space-y-6">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-ash-600">about</p>
+              <h2 class="mt-2 text-2xl font-serif font-light text-ash-100">ash.kr, 그리고 이 공간</h2>
+            </div>
+            
+            <div class="space-y-4 text-sm leading-relaxed text-ash-400">
+              <p>
+                이름을 크게 내세우기보다는, 작업의 결을 남기고 싶은 사람의 사이트입니다. 
+                화려한 포트폴리오보다는, 작업 과정과 작은 도구들을 정리하는 쪽에 가까운 곳.
+              </p>
+              <p>
+                이 페이지는 Tailwind CSS 4.0을 기반으로 제작되었고, 
+                어두운 화면에서 오래 있어도 눈에 거슬리지 않도록 톤을 맞췄습니다. 
+                여백, 리듬, 텍스트 위주의 구성을 선호합니다.
+              </p>
+            </div>
+
+            <a href="mailto:hello@ash.kr" class="inline-flex items-center gap-2 rounded-full border border-ash-700 bg-ash-900/50 px-4 py-2 text-sm font-light text-ash-300 backdrop-blur-sm transition hover:border-ash-600 hover:text-ash-200">
+              연락하기
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          </div>
+
+          <div class="space-y-6 text-sm text-ash-500">
+            <div>
+              <p class="mb-3 text-xs uppercase tracking-wider text-ash-600">links</p>
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span>GitHub</span>
+                  <span class="font-light text-ash-400">@ash</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Twitter</span>
+                  <span class="font-light text-ash-400">@ash_kr</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>RSS</span>
+                  <span class="font-light text-ash-400">/feed.xml</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="mb-3 text-xs uppercase tracking-wider text-ash-600">meta</p>
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span>built with</span>
+                  <span class="font-light text-ash-400">tailwind css</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>hosted on</span>
+                  <span class="font-light text-ash-400">vercel</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>updated</span>
+                  <span class="font-light text-ash-400">2024.02</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="mt-12 flex flex-col items-start justify-between gap-4 border-t border-ash-800/30 pt-8 text-xs text-ash-600 sm:flex-row sm:items-center">
+          <span>© 2024 ash.kr — all rights reserved</span>
+          <span class="font-serif italic">from dust to ash, burning quietly</span>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // 부드러운 스크롤
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // 스크롤 애니메이션
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('section').forEach(section => {
+      section.style.opacity = '0';
+      section.style.transform = 'translateY(20px)';
+      section.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+      observer.observe(section);
+    });
+  </script>
+</body>
+</html>

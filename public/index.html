@@ -1,198 +1,659 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ASH.KR | The Last Ember</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Inter', sans-serif; touch-action: none; }
-        .font-game { font-family: 'Cinzel', serif; }
-        canvas { display: block; filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.3)); position: absolute; top: 0; left: 0; z-index: 1; cursor: crosshair; }
-        #ui-layer { position: relative; z-index: 10; pointer-events: none; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 0; }
-        .btn-active { pointer-events: auto; cursor: pointer; }
-        #yt-player-container { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-        input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 99px; height: 6px; outline: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #f97316; cursor: pointer; border: 2px solid white; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASH — ash.kr</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style type="text/tailwindcss">
+      @theme {
+        --color-ash-50:  #f7f7f6;
+        --color-ash-100: #ededeb;
+        --color-ash-200: #d9d9d5;
+        --color-ash-300: #bdbdb8;
+        --color-ash-400: #9c9c96;
+        --color-ash-500: #7e7e78;
+        --color-ash-600: #636360;
+        --color-ash-700: #4e4e4c;
+        --color-ash-800: #3a3a38;
+        --color-ash-900: #262624;
+        --color-ash-950: #141412;
+
+        --color-ember-400: #c0714a;
+        --color-ember-500: #a85c37;
+        --color-ember-600: #8a4725;
+
+        --font-serif: "Cormorant Garamond", Georgia, serif;
+        --font-sans:  "Inter", system-ui, sans-serif;
+      }
+
+      @layer base {
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html {
+          scroll-behavior: smooth;
+          background-color: var(--color-ash-950);
+          color: var(--color-ash-200);
+        }
+
+        body {
+          font-family: var(--font-sans);
+          font-weight: 300;
+          letter-spacing: 0.01em;
+          overflow-x: hidden;
+        }
+
+        ::selection {
+          background-color: var(--color-ember-500);
+          color: #fff;
+        }
+      }
+
+      /* ─── Particle canvas ─── */
+      #particle-canvas {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.55;
+      }
+
+      /* ─── Noise overlay ─── */
+      .noise-overlay {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+        background-size: 200px 200px;
+        opacity: 0.4;
+      }
+
+      /* ─── Main layout ─── */
+      .site-wrapper {
+        position: relative;
+        z-index: 2;
+        min-height: 100dvh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      /* ─── Logo ─── */
+      .logo-ash {
+        font-family: var(--font-serif);
+        font-weight: 300;
+        letter-spacing: 0.35em;
+        font-size: clamp(3.5rem, 10vw, 7.5rem);
+        line-height: 1;
+        color: transparent;
+        background: linear-gradient(
+          135deg,
+          var(--color-ash-200) 0%,
+          var(--color-ash-400) 40%,
+          var(--color-ash-600) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        transition: background 0.6s ease;
+      }
+
+      .logo-ash:hover {
+        background: linear-gradient(
+          135deg,
+          var(--color-ash-100) 0%,
+          var(--color-ember-400) 50%,
+          var(--color-ash-400) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+
+      /* ─── Tagline ─── */
+      .tagline {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-weight: 300;
+        color: var(--color-ash-400);
+        letter-spacing: 0.05em;
+        font-size: clamp(1rem, 2.5vw, 1.35rem);
+      }
+
+      /* ─── Divider line ─── */
+      .ash-line {
+        width: 1px;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          var(--color-ash-600) 30%,
+          var(--color-ember-500) 60%,
+          transparent
+        );
+        animation: line-glow 3s ease-in-out infinite alternate;
+      }
+
+      @keyframes line-glow {
+        from { opacity: 0.4; transform: scaleY(0.95); }
+        to   { opacity: 1;   transform: scaleY(1.05); }
+      }
+
+      /* ─── Nav links ─── */
+      .nav-link {
+        font-family: var(--font-sans);
+        font-weight: 400;
+        font-size: 0.72rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--color-ash-500);
+        position: relative;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--color-ember-500);
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .nav-link:hover {
+        color: var(--color-ash-200);
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      /* ─── Feature cards ─── */
+      .feature-card {
+        background: linear-gradient(
+          135deg,
+          rgba(38, 38, 36, 0.7) 0%,
+          rgba(20, 20, 18, 0.5) 100%
+        );
+        border: 1px solid rgba(255,255,255,0.06);
+        backdrop-filter: blur(12px);
+        transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
+        cursor: default;
+      }
+
+      .feature-card:hover {
+        border-color: rgba(168, 92, 55, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 40px rgba(168,92,55,0.06);
+      }
+
+      .feature-icon {
+        font-size: 1.5rem;
+        line-height: 1;
+        filter: grayscale(0.4);
+        transition: filter 0.3s ease, transform 0.3s ease;
+      }
+
+      .feature-card:hover .feature-icon {
+        filter: grayscale(0);
+        transform: scale(1.15);
+      }
+
+      .feature-title {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        color: var(--color-ash-200);
+      }
+
+      .feature-body {
+        font-size: 0.82rem;
+        line-height: 1.75;
+        color: var(--color-ash-500);
+        font-weight: 300;
+      }
+
+      /* ─── Central ember glow ─── */
+      .ember-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(600px, 90vw);
+        height: min(600px, 90vw);
+        background: radial-gradient(
+          ellipse at center,
+          rgba(168, 92, 55, 0.08) 0%,
+          rgba(140, 71, 37, 0.04) 40%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+        animation: ember-pulse 5s ease-in-out infinite;
+      }
+
+      @keyframes ember-pulse {
+        0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1);    }
+        50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.12); }
+      }
+
+      /* ─── Hero section ─── */
+      .hero-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: clamp(4rem, 12vw, 10rem) 1.5rem clamp(3rem, 8vw, 7rem);
+        text-align: center;
+        min-height: 80dvh;
+      }
+
+      /* ─── Scroll indicator ─── */
+      .scroll-indicator {
+        position: absolute;
+        bottom: 2.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        opacity: 0.35;
+        animation: fade-bob 2.5s ease-in-out infinite;
+      }
+
+      @keyframes fade-bob {
+        0%, 100% { opacity: 0.25; transform: translateX(-50%) translateY(0);    }
+        50%       { opacity: 0.55; transform: translateX(-50%) translateY(6px);  }
+      }
+
+      /* ─── Quote block ─── */
+      .ash-quote {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: clamp(1.1rem, 2.8vw, 1.6rem);
+        line-height: 1.7;
+        color: var(--color-ash-400);
+        position: relative;
+        padding: 0 2rem;
+      }
+
+      .ash-quote::before,
+      .ash-quote::after {
+        content: '"';
+        font-family: var(--font-serif);
+        font-size: 3rem;
+        line-height: 0;
+        position: absolute;
+        opacity: 0.2;
+        color: var(--color-ember-500);
+      }
+
+      .ash-quote::before { top: 0.4em;  left: 0; }
+      .ash-quote::after  { bottom: -0.2em; right: 0; content: '"'; }
+
+      /* ─── Footer ─── */
+      .site-footer {
+        border-top: 1px solid rgba(255,255,255,0.05);
+        padding: 2rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .footer-copy {
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--color-ash-700);
+      }
+
+      /* ─── Fade-in animation ─── */
+      .fade-up {
+        opacity: 0;
+        transform: translateY(24px);
+        animation: fade-up-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes fade-up-in {
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .delay-1 { animation-delay: 0.15s; }
+      .delay-2 { animation-delay: 0.3s;  }
+      .delay-3 { animation-delay: 0.45s; }
+      .delay-4 { animation-delay: 0.6s;  }
+      .delay-5 { animation-delay: 0.75s; }
+      .delay-6 { animation-delay: 0.9s;  }
+
+      /* ─── Horizontal rule ─── */
+      .ash-hr {
+        border: none;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        margin: 0;
+      }
+
+      /* ─── CTA button ─── */
+      .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.75rem 2rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        font-weight: 400;
+        color: var(--color-ash-200);
+        border: 1px solid rgba(255,255,255,0.12);
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+      }
+
+      .cta-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(168, 92, 55, 0.15),
+          rgba(100, 60, 30, 0.08)
+        );
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+
+      .cta-btn:hover {
+        border-color: rgba(168, 92, 55, 0.5);
+        color: #fff;
+        box-shadow: 0 0 30px rgba(168, 92, 55, 0.15);
+      }
+
+      .cta-btn:hover::before { opacity: 1; }
+
+      /* ─── Section label ─── */
+      .section-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--color-ember-500);
+        font-weight: 400;
+      }
+
+      /* ─── Responsive grid ─── */
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+        gap: 1.25rem;
+      }
     </style>
-</head>
-<body class="text-white select-none">
+  </head>
 
-    <div id="yt-player-container"><div id="player"></div></div>
+  <body>
+    <!-- Particle canvas (ash embers floating up) -->
+    <canvas id="particle-canvas"></canvas>
+    <!-- Film-grain noise -->
+    <div class="noise-overlay" aria-hidden="true"></div>
 
-    <canvas id="gameCanvas"></canvas>
+    <div class="site-wrapper">
 
-    <div id="ui-layer">
-        <div class="w-full max-w-md px-6 space-y-2">
-            <div class="flex justify-between items-end">
-                <span class="font-game text-2xl tracking-tighter text-orange-500" id="score-display">0</span>
-                <span class="text-[10px] uppercase tracking-widest text-gray-500" id="label-heat">온기 레벨</span>
-            </div>
-            <div class="h-1 w-full bg-gray-900 rounded-full overflow-hidden border border-white/5">
-                <div id="heat-bar" class="h-full bg-gradient-to-r from-orange-700 via-orange-500 to-yellow-400 shadow-[0_0_15px_#ff4d00] transition-all duration-100" style="width: 100%"></div>
-            </div>
-        </div>
+      <!-- ══════════════════ HEADER ══════════════════ -->
+      <header class="relative z-10 flex items-center justify-between px-8 py-7
+                     border-b border-white/5">
+        <!-- Wordmark -->
+        <a href="/" class="logo-ash select-none" style="font-size:1.4rem;
+           letter-spacing:0.3em;">ASH</a>
 
-        <div id="overlay" class="text-center space-y-6 bg-black/90 backdrop-blur-2xl p-6 md:p-10 rounded-[2.5rem] border border-white/10 w-[92%] max-w-sm shadow-2xl btn-active">
-            <div class="flex justify-center gap-6 mb-2">
-                <button onclick="setLanguage('ko')" class="lang-btn text-xs tracking-widest font-bold transition-all" id="btn-ko">한글</button>
-                <button onclick="setLanguage('en')" class="lang-btn text-xs tracking-widest font-bold transition-all" id="btn-en">ENG</button>
-            </div>
-            <div class="space-y-3">
-                <h2 id="status-title" class="font-game text-3xl sm:text-4xl tracking-normal text-white leading-tight break-keep">ASH</h2>
-                <p id="status-desc" class="text-gray-400 text-xs sm:text-sm font-light">마지막 불씨가 꺼지지 않게 하세요.</p>
-            </div>
-            <div class="space-y-5 py-5 border-y border-white/5 text-left">
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
-                        <span id="label-bgm">배경 음악</span>
-                        <span id="bgm-val" class="font-bold text-orange-500">50%</span>
-                    </div>
-                    <input type="range" id="bgm-slider" min="0" max="100" value="50" class="w-full">
-                </div>
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center text-[10px] uppercase tracking-widest text-gray-400">
-                        <span id="label-sfx">효과음</span>
-                        <span id="sfx-val" class="font-bold text-orange-500">50%</span>
-                    </div>
-                    <input type="range" id="sfx-slider" min="0" max="100" value="50" class="w-full">
-                </div>
-            </div>
-            <div class="flex flex-col gap-3">
-                <button id="start-btn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold tracking-[0.2em] uppercase rounded-2xl transition-all active:scale-95 shadow-lg">점화</button>
-                <button id="share-btn" class="w-full py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-[10px] font-medium tracking-widest uppercase rounded-2xl transition-all border border-white/10">여정 공유</button>
-            </div>
-        </div>
+        <!-- Nav -->
+        <nav class="hidden sm:flex items-center gap-8" aria-label="Primary">
+          <a href="#meaning"  class="nav-link">Meaning</a>
+          <a href="#origin"   class="nav-link">Origin</a>
+          <a href="#contact"  class="nav-link">Contact</a>
+        </nav>
 
-        <div class="w-full px-8 flex justify-between items-center">
-            <div class="opacity-30 text-[10px] tracking-[0.3em] uppercase">ash.kr</div>
-            
-            <a id="yt-link" href="#" target="_blank" class="btn-active hidden group flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-full transition-all backdrop-blur-sm">
-                <span class="text-[9px] uppercase tracking-wider text-gray-400 group-hover:text-orange-500 transition-colors" id="label-nowplaying">Now Playing</span>
-                <svg class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        <!-- Domain badge -->
+        <span class="text-xs tracking-widest uppercase text-ash-700
+                     hidden sm:block select-none">ash.kr</span>
+      </header>
+
+      <!-- ══════════════════ HERO ══════════════════ -->
+      <main>
+        <section class="hero-section">
+          <!-- Central glow -->
+          <div class="ember-glow" aria-hidden="true"></div>
+
+          <!-- Section label -->
+          <p class="section-label fade-up mb-6">ash · 애쉬</p>
+
+          <!-- Main logotype -->
+          <h1 class="logo-ash fade-up delay-1 select-none">ASH</h1>
+
+          <!-- Tagline -->
+          <p class="tagline fade-up delay-2 mt-5 max-w-md">
+            From ember to existence — beauty born in between.
+          </p>
+
+          <!-- Thin line spacer -->
+          <div class="ash-line h-16 mx-auto my-10 fade-up delay-3"
+               aria-hidden="true"></div>
+
+          <!-- Quote -->
+          <blockquote class="ash-quote fade-up delay-4 max-w-xl">
+            무언가 타고 남은 것.<br/>
+            그 순수함 속에서 다시 시작되는 것.
+          </blockquote>
+
+          <!-- CTA -->
+          <div class="mt-12 fade-up delay-5">
+            <a href="#meaning" class="cta-btn">
+              <span>탐색하기</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                   aria-hidden="true">
+                <path d="M7 1v12M7 13l-4-4M7 13l4-4"
+                      stroke="currentColor" stroke-width="1.2"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </a>
-        </div>
-    </div>
+          </div>
 
+          <!-- Scroll hint -->
+          <div class="scroll-indicator" aria-hidden="true">
+            <span style="font-size:0.6rem;letter-spacing:0.2em;
+                         text-transform:uppercase;color:var(--color-ash-700)">
+              scroll
+            </span>
+            <svg width="1" height="32" viewBox="0 0 1 32">
+              <line x1="0.5" y1="0" x2="0.5" y2="32"
+                    stroke="var(--color-ash-700)" stroke-width="1"/>
+            </svg>
+          </div>
+        </section>
+
+        <hr class="ash-hr" />
+
+        <!-- ══════════════════ MEANING CARDS ══════════════════ -->
+        <section id="meaning" class="px-8 py-20 max-w-5xl mx-auto">
+          <div class="mb-12 text-center">
+            <p class="section-label mb-3">세 가지 얼굴</p>
+            <h2 style="font-family:var(--font-serif);
+                       font-size:clamp(1.8rem,4vw,2.8rem);
+                       font-weight:300;
+                       letter-spacing:0.04em;
+                       color:var(--color-ash-200);">
+              ASH, 무엇을 의미하는가
+            </h2>
+          </div>
+
+          <div class="cards-grid">
+
+            <!-- Card 1: Ash Tree -->
+            <div class="feature-card rounded-sm p-8">
+              <div class="feature-icon mb-5">🌿</div>
+              <h3 class="feature-title mb-3">물푸레나무</h3>
+              <p class="feature-body">
+                북유럽 신화의 세계수 <em>Yggdrasil</em>은 물푸레나무다.
+                하늘과 땅을 잇는 축, 아홉 세계를 품은 뿌리.
+                ASH는 연결과 확장, 깊은 지혜의 이름이다.
+              </p>
+            </div>
+
+            <!-- Card 2: Ash (remains) -->
+            <div class="feature-card rounded-sm p-8">
+              <div class="feature-icon mb-5">🔥</div>
+              <h3 class="feature-title mb-3">재 (灰)</h3>
+              <p class="feature-body">
+                불이 지나간 자리에 남는 것. 소멸이 아니라 정화.
+                피닉스는 재 속에서 다시 태어나고,
+                씨앗은 산불 후 대지에서 더 빠르게 싹튼다.
+                재는 끝이 아닌 가장 순수한 시작이다.
+              </p>
+            </div>
+
+            <!-- Card 3: Ash (color) -->
+            <div class="feature-card rounded-sm p-8">
+              <div class="feature-icon mb-5">🩶</div>
+              <h3 class="feature-title mb-3">애쉬 그레이</h3>
+              <p class="feature-body">
+                흑도 백도 아닌 사이의 색. 선택을 강요하지 않고
+                모든 것을 담아내는 침묵의 팔레트.
+                ASH 톤은 본질만 남긴 절제된 아름다움이다.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        <hr class="ash-hr" />
+
+        <!-- ══════════════════ ORIGIN SECTION ══════════════════ -->
+        <section id="origin" class="px-8 py-20 max-w-3xl mx-auto text-center">
+          <p class="section-label mb-4">origin</p>
+
+          <p style="font-family:var(--font-serif);
+                    font-size:clamp(1rem,2.5vw,1.4rem);
+                    font-weight:300;
+                    line-height:2;
+                    color:var(--color-ash-400);">
+            고대 영어 <strong style="color:var(--color-ash-300);
+                                     font-weight:400;">æsc</strong>에서 왔다.
+            나무이자, 불꽃이 남긴 흔적이자, 새벽빛을 닮은 색조.
+            <br/>
+            ash.kr — 이 도메인은 그 이름의 가장 순수한 형태를 담는다.
+          </p>
+
+          <div class="ash-line h-20 mx-auto mt-12" aria-hidden="true"></div>
+        </section>
+
+        <hr class="ash-hr" />
+
+        <!-- ══════════════════ CONTACT ══════════════════ -->
+        <section id="contact" class="px-8 py-20 max-w-xl mx-auto text-center">
+          <p class="section-label mb-4">contact</p>
+          <h2 style="font-family:var(--font-serif);
+                     font-size:clamp(1.6rem,3.5vw,2.4rem);
+                     font-weight:300;
+                     letter-spacing:0.05em;
+                     color:var(--color-ash-200);">
+            연락하기
+          </h2>
+          <p class="mt-4 mb-10"
+             style="font-size:0.85rem;line-height:1.8;
+                    color:var(--color-ash-500);">
+            협업 제안, 문의, 혹은 그냥 안녕이라도.
+          </p>
+          <a href="mailto:hello@ash.kr" class="cta-btn">
+            hello@ash.kr
+          </a>
+        </section>
+      </main>
+
+      <!-- ══════════════════ FOOTER ══════════════════ -->
+      <footer class="site-footer">
+        <span class="footer-copy">© 2026 ash.kr — All rights reserved.</span>
+        <span class="footer-copy" style="color:var(--color-ash-800);">
+          from ember, to existence.
+        </span>
+      </footer>
+
+    </div><!-- /site-wrapper -->
+
+    <!-- ══════════════════ PARTICLE SCRIPT ══════════════════ -->
     <script>
-        const bgmList = ['Q4SStm-yBPk', 'gqjoyl_vkz4', 'E4Wh5wsBWOc', 'uZv0Uk79fkQ', '5sh8LpjwRx8', '5b4S2kT7egY', 'iyK-vTg7t7I', 'LCbkt71v_XY', 'P4OShWBVhag', 'ASUAbRudPpM', 'TAFJdIwS_1g', 'BOVxiaIjd0A', 'AcvXo4EsFTI', 'cTn8g7IBRjE', 'o4NAUDlm9w8', 'xUx3FMDzKPA', 'j6HWJsBZM_s', 'OLQy_0yD4M8', 'DPxFVLI8gIA'];
-        const i18n = {
-            ko: { title: "ASH", desc: "마지막 불씨가 꺼지지 않게 하세요.", extinguished: "불씨가 꺼졌습니다", scoreLabel: "최종 기록: ", heat: "온기 레벨", bgm: "배경 음악", sfx: "효과음", ignite: "점화", rekindle: "다시 태우기", share: "여정 공유", nowPlaying: "유튜브에서 듣기", copyAlert: "주소가 복사되었습니다." },
-            en: { title: "ASH", desc: "Keep the last ember alive.", extinguished: "EXTINGUISHED", scoreLabel: "Final Score: ", heat: "Heat Level", bgm: "Background Music", sfx: "Sound Effects", ignite: "IGNITE", rekindle: "REKINDLE", share: "Share Journey", nowPlaying: "Now Playing", copyAlert: "URL copied to clipboard." }
-        };
+    (() => {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx    = canvas.getContext('2d');
 
-        let currentLang = 'ko', gameActive = false, score = 0, volBGM = 0.5, volSFX = 0.5, currentVideoId = '';
-        let heat = 100, items = [], particles = [];
-        const player = { x: window.innerWidth/2, y: window.innerHeight*0.8, targetX: window.innerWidth/2 };
-        const keys = { ArrowLeft: false, ArrowRight: false };
-        let lastTouchX = null;
+      let W, H, particles = [];
+      const COUNT = 55;
 
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const overlay = document.getElementById('overlay');
-        const startBtn = document.getElementById('start-btn');
-        const ytLink = document.getElementById('yt-link');
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', () => { resize(); init(); });
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            const t = i18n[lang];
-            document.getElementById('label-heat').innerText = t.heat;
-            document.getElementById('label-bgm').innerText = t.bgm;
-            document.getElementById('label-sfx').innerText = t.sfx;
-            document.getElementById('share-btn').innerText = t.share;
-            document.getElementById('label-nowplaying').innerText = t.nowPlaying;
-            document.getElementById('status-title').innerText = score === 0 ? t.title : t.extinguished;
-            document.getElementById('status-desc').innerText = score === 0 ? t.desc : t.scoreLabel + score;
-            startBtn.innerText = score === 0 ? t.ignite : t.rekindle;
-            document.getElementById('btn-ko').style.opacity = lang === 'ko' ? '1' : '0.3';
-            document.getElementById('btn-en').style.opacity = lang === 'en' ? '1' : '0.3';
+      class Particle {
+        constructor(fromBottom = false) {
+          this.reset(fromBottom);
         }
-
-        var ytPlayer;
-        function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('player', { height: '0', width: '0', playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1 } });
+        reset(fromBottom = false) {
+          this.x  = Math.random() * W;
+          this.y  = fromBottom ? H + Math.random() * 40 : Math.random() * H;
+          this.r  = Math.random() * 1.6 + 0.4;
+          // speed: mostly upward with gentle horizontal drift
+          this.vx = (Math.random() - 0.5) * 0.4;
+          this.vy = -(Math.random() * 0.5 + 0.2);
+          this.life    = 0;
+          this.maxLife = Math.random() * 200 + 120;
+          // colour: ash white → ember orange
+          const t = Math.random();
+          this.color = t < 0.6
+            ? `rgba(${180 + Math.random()*50|0},${175 + Math.random()*40|0},${165 + Math.random()*30|0},`
+            : `rgba(${200 + Math.random()*40|0},${80 + Math.random()*50|0},${30 + Math.random()*30|0},`;
         }
-        var tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
-        document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
-
-        window.addEventListener('pointermove', (e) => {
-            if (!gameActive) return;
-            if (e.pointerType === 'mouse') { player.targetX = e.clientX; }
-            else if (lastTouchX !== null) { player.targetX += (e.clientX - lastTouchX); lastTouchX = e.clientX; }
-        });
-        window.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') lastTouchX = e.clientX; });
-        window.addEventListener('pointerup', () => { lastTouchX = null; });
-        window.addEventListener('keydown', (e) => { if (e.code in keys) { keys[e.code] = true; if (gameActive) e.preventDefault(); } });
-        window.addEventListener('keyup', (e) => { if (e.code in keys) keys[e.code] = false; });
-
-        function initGame() {
-            if (ytPlayer && ytPlayer.loadVideoById) { 
-                currentVideoId = bgmList[Math.floor(Math.random() * bgmList.length)];
-                ytPlayer.loadVideoById(currentVideoId);
-                ytPlayer.setVolume(volBGM * 100);
-                ytLink.href = `https://www.youtube.com/watch?v=${currentVideoId}`;
-                ytLink.classList.remove('hidden'); // 게임 시작 시 버튼 노출
-            }
-            gameActive = true; score = 0; heat = 100; items = [];
-            player.x = canvas.width / 2; player.targetX = player.x;
-            document.getElementById('score-display').innerText = "0";
-            overlay.classList.add('hidden');
+        step() {
+          this.x  += this.vx + Math.sin(this.life * 0.04) * 0.18;
+          this.y  += this.vy;
+          this.life++;
+          if (this.y < -10 || this.life > this.maxLife) this.reset(true);
         }
-
-        function gameOver() {
-            if(!gameActive) return;
-            gameActive = false;
-            if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
-            overlay.classList.remove('hidden');
-            setLanguage(currentLang);
+        draw() {
+          const alpha = Math.sin((this.life / this.maxLife) * Math.PI) * 0.7;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+          ctx.fillStyle = this.color + alpha.toFixed(2) + ')';
+          ctx.fill();
         }
+      }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-                canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-                player.y = canvas.height * 0.8;
-            }
-            if (!gameActive) { ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, canvas.width, canvas.height); return; }
-            if (keys.ArrowLeft) player.targetX -= 12;
-            if (keys.ArrowRight) player.targetX += 12;
-            player.targetX = Math.max(20, Math.min(canvas.width - 20, player.targetX));
-            player.x += (player.targetX - player.x) * 0.15;
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.4)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            heat -= 0.12; document.getElementById('heat-bar').style.width = `${Math.max(0, heat)}%`;
-            if (heat <= 0) { gameOver(); return; }
-            const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 25);
-            grad.addColorStop(0, '#fff'); grad.addColorStop(0.2, '#ff6a00'); grad.addColorStop(1, 'transparent');
-            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(player.x, player.y, 25, 0, Math.PI * 2); ctx.fill();
-            if(Math.random() < 0.08) items.push({ x: Math.random()*canvas.width, y: -20, type: 'ash', speed: Math.random()*2+2 });
-            if(Math.random() < 0.03 + (score/20000)) items.push({ x: Math.random()*canvas.width, y: -20, type: 'rain', speed: Math.random()*4+4 });
-            items.forEach((item, index) => {
-                item.y += item.speed;
-                ctx.beginPath(); ctx.fillStyle = item.type === 'ash' ? '#888' : '#3b82f6';
-                ctx.arc(item.x, item.y, (item.type==='ash'?3:5), 0, Math.PI * 2); ctx.fill();
-                if (Math.hypot(player.x - item.x, player.y - item.y) < 25) {
-                    if (item.type === 'ash') { heat = Math.min(100, heat + 7); score += 10; document.getElementById('score-display').innerText = score; }
-                    else { heat -= 15; }
-                    items.splice(index, 1);
-                } else if (item.y > canvas.height) { items.splice(index, 1); }
-            });
-        }
+      function init() {
+        particles = Array.from({ length: COUNT }, () => new Particle(false));
+      }
 
-        document.getElementById('bgm-slider').addEventListener('input', (e) => {
-            volBGM = e.target.value / 100;
-            document.getElementById('bgm-val').innerText = e.target.value + '%';
-            if(ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(e.target.value);
-        });
-        document.getElementById('share-btn').addEventListener('click', (e) => {
-            e.stopPropagation(); const t = i18n[currentLang];
-            const data = { title: 'ASH.KR', text: t.scoreLabel + score, url: window.location.href };
-            if (navigator.share) navigator.share(data);
-            else { navigator.clipboard.writeText(window.location.href); alert(t.copyAlert); }
-        });
-        startBtn.addEventListener('click', (e) => { e.stopPropagation(); initGame(); });
-        setLanguage('ko');
-        animate();
+      function loop() {
+        ctx.clearRect(0, 0, W, H);
+        particles.forEach(p => { p.step(); p.draw(); });
+        requestAnimationFrame(loop);
+      }
+
+      init();
+      loop();
+    })();
     </script>
-</body>
+
+  </body>
 </html>

@@ -1,7 +1,7 @@
 name: 사용자 등록 신청
 description: "{도메인}/u/{사용자_아이디} 주소 사용을 위한 사용자 등록 신청"
 title: "[USER REGISTER APPLICATION] 사용자 등록 신청"
-labels: user-register-application
+labels: user-register
 assignees: OUS-KR
 body:
   - type: input

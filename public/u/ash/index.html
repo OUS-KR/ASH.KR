@@ -1,1135 +1,954 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ASH — ash.kr</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style type="text/tailwindcss">
-      @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASH — ash.kr</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-      @theme {
-        --color-ash-50:  #f8f8f7;
-        --color-ash-100: #f0efed;
-        --color-ash-200: #dddbd7;
-        --color-ash-300: #c5c2bc;
-        --color-ash-400: #a8a49c;
-        --color-ash-500: #8c877e;
-        --color-ash-600: #706b63;
-        --color-ash-700: #57534c;
-        --color-ash-800: #3d3a35;
-        --color-ash-900: #242220;
-        --color-ash-950: #111110;
+  <style type="text/tailwindcss">
+    @theme {
+      --color-ash-50:  #f8f8f7;
+      --color-ash-100: #f0efed;
+      --color-ash-200: #dddbd7;
+      --color-ash-300: #c5c2bc;
+      --color-ash-400: #a8a49c;
+      --color-ash-500: #8c877e;
+      --color-ash-600: #706b63;
+      --color-ash-700: #57534c;
+      --color-ash-800: #3d3a35;
+      --color-ash-900: #242220;
+      --color-ash-950: #111110;
+      --color-ember-400: #fb923c;
+      --color-ember-500: #f97316;
+      --color-ember-600: #ea580c;
+      --color-sage-500: #4ade80;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-serif: 'Noto Serif KR', Georgia, serif;
+    }
+  </style>
 
-        --color-ember-400: #f97316;
-        --color-ember-500: #ea580c;
-        --color-ember-600: #c2410c;
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
-        --color-sage-400: #86efac;
-        --color-sage-500: #4ade80;
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #111110;
+      color: #dddbd7;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        --font-serif: 'Noto Serif KR', Georgia, serif;
-        --font-sans:  'Inter', system-ui, sans-serif;
-      }
+    /* grain */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+    }
 
-      * {
-        box-sizing: border-box;
-      }
+    /* shimmer */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .shimmer-text {
+      background: linear-gradient(90deg, #a8a49c 0%, #ffffff 40%, #c5c2bc 60%, #8c877e 100%);
+      background-size: 1200px auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: shimmer 5s ease-in-out infinite;
+    }
 
-      html {
-        scroll-behavior: smooth;
-      }
+    /* ember particle */
+    @keyframes float-up {
+      0%   { transform: translateY(0)    scale(1);   opacity: .7; }
+      60%  { transform: translateY(-80px) scale(.6); opacity: .4; }
+      100% { transform: translateY(-160px) scale(.1); opacity: 0; }
+    }
+    @keyframes ash-fall {
+      0%   { transform: translateY(-10px) rotate(0deg);   opacity: 0; }
+      15%  { opacity: .5; }
+      85%  { opacity: .25; }
+      100% { transform: translateY(100px) rotate(120deg); opacity: 0; }
+    }
 
-      body {
-        font-family: var(--font-sans);
-        background-color: var(--color-ash-950);
-        color: var(--color-ash-200);
-        min-height: 100vh;
-        overflow-x: hidden;
-      }
+    /* reveal */
+    @keyframes reveal-up {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: reveal-up .55s ease forwards; }
 
-      /* ── Grain overlay ── */
-      body::before {
-        content: '';
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 0;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-        background-size: 200px 200px;
-        opacity: 0.6;
-      }
+    /* card */
+    .ash-card {
+      background: linear-gradient(135deg, rgba(61,58,53,.55), rgba(24,23,22,.85));
+      border: 1px solid rgba(197,194,188,.1);
+      backdrop-filter: blur(10px);
+      transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+    }
+    .ash-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(197,194,188,.25);
+      box-shadow: 0 16px 48px rgba(0,0,0,.5);
+    }
 
-      /* ── Ember particle ── */
-      @keyframes float-up {
-        0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; }
-        50%  { transform: translateY(-60px) translateX(8px) scale(0.8); opacity: 0.5; }
-        100% { transform: translateY(-120px) translateX(-4px) scale(0.2); opacity: 0; }
-      }
-      @keyframes drift {
-        0%   { transform: translateY(0) rotate(0deg); }
-        100% { transform: translateY(-200px) rotate(360deg); }
-      }
-      .ember {
-        position: absolute;
-        border-radius: 50%;
-        background: radial-gradient(circle, #fbbf24, #f97316);
-        animation: float-up linear infinite;
-        pointer-events: none;
-      }
+    /* link button */
+    .link-btn {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      width: 100%;
+      padding: .875rem 1.25rem;
+      border-radius: .75rem;
+      font-size: .9375rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: #dddbd7;
+      background: linear-gradient(135deg, rgba(61,58,53,.6), rgba(24,23,22,.9));
+      border: 1px solid rgba(197,194,188,.12);
+      transition: all .25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .link-btn:hover {
+      color: #fff;
+      border-color: rgba(197,194,188,.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,.45);
+    }
+    .link-btn.ember {
+      border-color: rgba(249,115,22,.28);
+      background: linear-gradient(135deg, rgba(194,65,12,.18), rgba(24,23,22,.9));
+    }
+    .link-btn.ember:hover {
+      border-color: rgba(249,115,22,.55);
+      box-shadow: 0 8px 28px rgba(249,115,22,.2);
+    }
 
-      /* ── Ash particle ── */
-      @keyframes ash-fall {
-        0%   { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0; }
-        10%  { opacity: 0.6; }
-        90%  { opacity: 0.3; }
-        100% { transform: translateY(120px) translateX(20px) rotate(180deg); opacity: 0; }
-      }
-      .ash-particle {
-        position: absolute;
-        background: var(--color-ash-500);
-        border-radius: 2px;
-        animation: ash-fall linear infinite;
-        pointer-events: none;
-      }
+    /* icon badge */
+    .icon-badge {
+      width: 2rem; height: 2rem;
+      border-radius: .5rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
 
-      /* ── Shimmer on hero ── */
-      @keyframes shimmer {
-        0%   { background-position: -400px 0; }
-        100% { background-position: 400px 0; }
-      }
-      .shimmer-text {
-        background: linear-gradient(90deg,
-          var(--color-ash-400) 0%,
-          #fff 40%,
-          var(--color-ash-300) 60%,
-          var(--color-ash-500) 100%
-        );
-        background-size: 800px auto;
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-        animation: shimmer 4s ease-in-out infinite;
-      }
+    /* carousel */
+    .carousel-track {
+      display: flex;
+      transition: transform .42s cubic-bezier(.25,.46,.45,.94);
+    }
+    .carousel-slide { min-width: 100%; }
 
-      /* ── Card hover glow ── */
-      .card-ash {
-        background: linear-gradient(135deg, rgba(61,58,53,0.5), rgba(36,34,32,0.8));
-        border: 1px solid rgba(197,194,188,0.1);
-        backdrop-filter: blur(12px);
-        transition: all 0.35s ease;
-      }
-      .card-ash:hover {
-        border-color: rgba(197,194,188,0.28);
-        transform: translateY(-3px);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(197,194,188,0.12);
-      }
+    /* yt embed */
+    .yt-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0; overflow: hidden;
+    }
+    .yt-wrap iframe {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
 
-      /* ── Link button ── */
-      .link-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        width: 100%;
-        padding: 0.875rem 1.25rem;
-        border-radius: 0.75rem;
-        font-size: 0.9375rem;
-        font-weight: 500;
-        letter-spacing: 0.01em;
-        text-decoration: none;
-        transition: all 0.25s ease;
-        border: 1px solid rgba(197,194,188,0.12);
-        background: linear-gradient(135deg, rgba(61,58,53,0.6), rgba(36,34,32,0.9));
-        color: var(--color-ash-200);
-        position: relative;
-        overflow: hidden;
-      }
-      .link-btn::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(197,194,188,0.05), transparent);
-        opacity: 0;
-        transition: opacity 0.25s ease;
-      }
-      .link-btn:hover {
-        border-color: rgba(197,194,188,0.3);
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      }
-      .link-btn:hover::before {
-        opacity: 1;
-      }
-      .link-btn.ember-btn {
-        border-color: rgba(249,115,22,0.3);
-        background: linear-gradient(135deg, rgba(194,65,12,0.15), rgba(36,34,32,0.9));
-      }
-      .link-btn.ember-btn:hover {
-        border-color: rgba(249,115,22,0.6);
-        box-shadow: 0 8px 32px rgba(249,115,22,0.2);
-      }
+    /* vinyl spin */
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    .vinyl-spin { animation: spin-slow 4s linear infinite; }
 
-      /* ── Carousel ── */
-      .carousel-track {
-        display: flex;
-        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      }
+    /* tag */
+    .tag {
+      display: inline-flex; align-items: center;
+      padding: .2rem .65rem;
+      border-radius: 9999px;
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      background: rgba(197,194,188,.07);
+      border: 1px solid rgba(197,194,188,.14);
+      color: #8c877e;
+    }
 
-      /* ── YouTube embed ── */
-      .yt-wrapper {
-        position: relative;
-        padding-bottom: 56.25%;
-        height: 0;
-        overflow: hidden;
-        border-radius: 0.75rem;
-      }
-      .yt-wrapper iframe {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        border: none;
-      }
+    /* divider */
+    .ash-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(197,194,188,.18), transparent);
+      border: none; margin: 0;
+    }
 
-      /* ── Section divider ── */
-      .ash-divider {
-        width: 100%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(197,194,188,0.2), transparent);
-        margin: 0;
-      }
+    /* accordion */
+    details > summary { list-style: none; cursor: pointer; user-select: none; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] .chev { transform: rotate(180deg); }
+    .chev { transition: transform .22s ease; display: inline-block; }
 
-      /* ── Scroll fade-in ── */
-      .reveal {
-        opacity: 0;
-        transform: translateY(24px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
-      }
-      .reveal.visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #111110; }
+    ::-webkit-scrollbar-thumb { background: #57534c; border-radius: 3px; }
 
-      /* ── Stats count ── */
-      @keyframes count-up {
-        from { opacity: 0; transform: translateY(10px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
+    /* progress bar */
+    @keyframes progress-move {
+      0%   { width: 35%; }
+      100% { width: 72%; }
+    }
+    .progress-bar { width: 35%; }
+    .progress-bar.playing { animation: progress-move 240s linear forwards; }
+  </style>
+</head>
 
-      /* ── Tag pill ── */
-      .tag-pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        background: rgba(197,194,188,0.08);
-        border: 1px solid rgba(197,194,188,0.15);
-        color: var(--color-ash-400);
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
+<body>
 
-      /* ── Toggle ── */
-      details > summary { list-style: none; cursor: pointer; }
-      details > summary::-webkit-details-marker { display: none; }
-      details[open] .chevron { transform: rotate(180deg); }
-      .chevron { transition: transform 0.25s ease; }
+  <!-- ░░ PARTICLE CANVAS ░░ -->
+  <div id="ptcl" style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;"></div>
 
-      /* ── Music player ── */
-      @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-      }
-      .vinyl.playing {
-        animation: spin-slow 4s linear infinite;
-      }
+  <!-- ░░ MAIN ░░ -->
+  <main style="position:relative;z-index:1;max-width:480px;margin:0 auto;padding:3rem 1rem 6rem;">
 
-      /* ── Scrollbar ── */
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-track { background: var(--color-ash-950); }
-      ::-webkit-scrollbar-thumb { background: var(--color-ash-700); border-radius: 3px; }
-    </style>
-  </head>
+    <!-- ═══════════ HERO ═══════════ -->
+    <header class="reveal text-center mb-10">
 
-  <body class="relative">
-
-    <!-- ════════════════════════════════════════════
-         BACKGROUND: Ember & Ash particles
-    ════════════════════════════════════════════ -->
-    <div id="particles" class="fixed inset-0 z-0 overflow-hidden pointer-events-none"></div>
-
-    <!-- ════════════════════════════════════════════
-         MAIN WRAPPER
-    ════════════════════════════════════════════ -->
-    <div class="relative z-10 max-w-[480px] mx-auto px-4 py-12 pb-24">
-
-      <!-- ── HERO SECTION ── -->
-      <header class="text-center mb-10 reveal">
-
-        <!-- Avatar -->
-        <div class="relative inline-block mb-5">
-          <!-- Glow ring -->
-          <div class="absolute inset-0 rounded-full bg-gradient-to-br from-ember-500/30 via-ash-500/20 to-transparent blur-xl scale-150 animate-pulse"></div>
-          <!-- Avatar image (placeholder) -->
-          <div class="relative w-24 h-24 rounded-full overflow-hidden border-2 border-ash-700 mx-auto">
-            <img
-              src="https://api.dicebear.com/9.x/shapes/svg?seed=ash&backgroundColor=242220&color=8c877e,57534c&shape0=polygon&shape1=ellipse"
-              alt="ASH avatar"
-              class="w-full h-full object-cover"
-              onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#3d3a35,#111110)'"
-            />
-          </div>
-          <!-- Status dot -->
-          <span class="absolute bottom-1 right-1 w-3.5 h-3.5 bg-sage-500 rounded-full border-2 border-ash-950 block"></span>
+      <!-- avatar -->
+      <div style="position:relative;display:inline-block;margin-bottom:1.25rem;">
+        <div style="position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(249,115,22,.25),transparent 70%);filter:blur(10px);"></div>
+        <div style="width:96px;height:96px;border-radius:50%;overflow:hidden;border:2px solid #57534c;margin:0 auto;position:relative;background:linear-gradient(135deg,#3d3a35,#111110);">
+          <img src="https://api.dicebear.com/9.x/shapes/svg?seed=ash&backgroundColor=242220&color=8c877e,57534c"
+               alt="ASH"
+               style="width:100%;height:100%;object-fit:cover;"
+               onerror="this.style.display='none'" />
         </div>
-
-        <!-- Name & domain -->
-        <h1 class="font-serif text-3xl font-semibold shimmer-text mb-1 tracking-wide">ASH</h1>
-        <p class="text-ash-500 text-sm font-light tracking-[0.2em] uppercase mb-3">ash.kr</p>
-
-        <!-- Bio -->
-        <p class="text-ash-300 text-sm leading-relaxed max-w-[320px] mx-auto mb-4">
-          From ember to existence —<br/>
-          <span class="text-ash-400">무언가 타고 남은 것에서, 다시 시작되는 것.</span>
-        </p>
-
-        <!-- Tags -->
-        <div class="flex flex-wrap justify-center gap-2 mb-5">
-          <span class="tag-pill">🌿 물푸레나무</span>
-          <span class="tag-pill">🔥 재생</span>
-          <span class="tag-pill">🩶 애쉬 그레이</span>
-        </div>
-
-        <!-- Quick stats -->
-        <div class="flex justify-center gap-8">
-          <div class="text-center">
-            <p class="text-ash-100 font-semibold text-lg">2.4K</p>
-            <p class="text-ash-500 text-xs uppercase tracking-widest">팔로워</p>
-          </div>
-          <div class="w-px bg-ash-800"></div>
-          <div class="text-center">
-            <p class="text-ash-100 font-semibold text-lg">128</p>
-            <p class="text-ash-500 text-xs uppercase tracking-widest">게시물</p>
-          </div>
-          <div class="w-px bg-ash-800"></div>
-          <div class="text-center">
-            <p class="text-ash-100 font-semibold text-lg">47</p>
-            <p class="text-ash-500 text-xs uppercase tracking-widest">프로젝트</p>
-          </div>
-        </div>
-      </header>
-
-      <div class="ash-divider mb-8"></div>
-
-      <!-- ── ANNOUNCEMENT BANNER ── -->
-      <div class="card-ash rounded-xl p-4 mb-6 reveal flex gap-3 items-start border-l-2 border-l-ember-500/60">
-        <span class="text-xl flex-shrink-0 mt-0.5">🔥</span>
-        <div>
-          <p class="text-ash-100 text-sm font-semibold mb-0.5">새 프로젝트 오픈!</p>
-          <p class="text-ash-400 text-xs leading-relaxed">재와 불꽃 사이에서 피어난 새 작업물이 공개되었습니다. 지금 바로 확인해보세요.</p>
-          <a href="#" class="text-ember-400 text-xs font-medium mt-1 inline-block hover:text-ember-300 transition-colors">
-            자세히 보기 →
-          </a>
-        </div>
+        <!-- online dot -->
+        <span style="position:absolute;bottom:4px;right:4px;width:14px;height:14px;background:#4ade80;border-radius:50%;border:2.5px solid #111110;display:block;"></span>
       </div>
 
-      <!-- ── SOCIAL LINKS ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">소셜 채널</p>
-        <div class="flex flex-col gap-2.5">
+      <!-- name -->
+      <h1 class="shimmer-text" style="font-family:'Noto Serif KR',serif;font-size:2rem;font-weight:700;letter-spacing:.12em;margin-bottom:.25rem;">ASH</h1>
+      <p style="color:#706b63;font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;margin-bottom:.9rem;">ash.kr</p>
 
-          <!-- Instagram -->
-          <a href="#" class="link-btn">
-            <span class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
-            </span>
-            <span class="flex-1">Instagram</span>
-            <span class="text-ash-500 text-xs">@ash.kr</span>
-            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
+      <!-- bio -->
+      <p style="color:#a8a49c;font-size:.875rem;line-height:1.75;max-width:300px;margin:0 auto .9rem;">
+        From ember to existence —<br/>
+        <span style="color:#8c877e;">무언가 타고 남은 것에서, 다시 시작되는 것.</span>
+      </p>
 
-          <!-- YouTube -->
-          <a href="#" class="link-btn ember-btn">
-            <span class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-              </svg>
-            </span>
-            <span class="flex-1">YouTube</span>
-            <span class="text-ash-500 text-xs">ASH Channel</span>
-            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
+      <!-- tags -->
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-bottom:1.25rem;">
+        <span class="tag">🌿 물푸레나무</span>
+        <span class="tag">🔥 재생</span>
+        <span class="tag">🩶 애쉬 그레이</span>
+      </div>
 
-          <!-- X / Twitter -->
-          <a href="#" class="link-btn">
-            <span class="w-8 h-8 rounded-lg bg-ash-900 border border-ash-700 flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-ash-200" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </span>
-            <span class="flex-1">X (Twitter)</span>
-            <span class="text-ash-500 text-xs">@ash_kr</span>
-            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
-
-          <!-- GitHub -->
-          <a href="#" class="link-btn">
-            <span class="w-8 h-8 rounded-lg bg-ash-900 border border-ash-700 flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-ash-200" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-              </svg>
-            </span>
-            <span class="flex-1">GitHub</span>
-            <span class="text-ash-500 text-xs">ash-kr</span>
-            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
-
-          <!-- Email -->
-          <a href="mailto:hello@ash.kr" class="link-btn">
-            <span class="w-8 h-8 rounded-lg bg-ash-800 flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-ash-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
-            </span>
-            <span class="flex-1">이메일</span>
-            <span class="text-ash-500 text-xs">hello@ash.kr</span>
-            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
-
+      <!-- stats -->
+      <div style="display:flex;justify-content:center;align-items:center;gap:2rem;">
+        <div style="text-align:center;">
+          <p style="color:#f0efed;font-weight:600;font-size:1.1rem;margin:0;">2.4K</p>
+          <p style="color:#706b63;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;margin:0;">팔로워</p>
         </div>
-      </section>
+        <div style="width:1px;height:28px;background:#3d3a35;"></div>
+        <div style="text-align:center;">
+          <p style="color:#f0efed;font-weight:600;font-size:1.1rem;margin:0;">128</p>
+          <p style="color:#706b63;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;margin:0;">게시물</p>
+        </div>
+        <div style="width:1px;height:28px;background:#3d3a35;"></div>
+        <div style="text-align:center;">
+          <p style="color:#f0efed;font-weight:600;font-size:1.1rem;margin:0;">47</p>
+          <p style="color:#706b63;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;margin:0;">프로젝트</p>
+        </div>
+      </div>
+    </header>
 
-      <div class="ash-divider mb-8"></div>
+    <hr class="ash-divider" style="margin-bottom:2rem;" />
 
-      <!-- ── FEATURED VIDEO ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">추천 영상</p>
-        <div class="card-ash rounded-xl overflow-hidden">
-          <div class="yt-wrapper">
-            <iframe
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1"
-              title="ASH Featured Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen>
-            </iframe>
+    <!-- ═══════════ ANNOUNCEMENT ═══════════ -->
+    <div class="reveal ash-card" style="border-radius:.875rem;padding:1rem 1.125rem;margin-bottom:1.5rem;border-left:2.5px solid rgba(249,115,22,.55);display:flex;gap:.75rem;align-items:flex-start;">
+      <span style="font-size:1.25rem;flex-shrink:0;margin-top:1px;">🔥</span>
+      <div>
+        <p style="color:#f0efed;font-size:.875rem;font-weight:600;margin:0 0 .2rem;">새 프로젝트 오픈!</p>
+        <p style="color:#8c877e;font-size:.78rem;line-height:1.6;margin:0;">재와 불꽃 사이에서 피어난 새 작업물이 공개되었습니다.</p>
+        <a href="#" style="color:#fb923c;font-size:.78rem;font-weight:500;text-decoration:none;display:inline-block;margin-top:.35rem;" onmouseover="this.style.color='#fdba74'" onmouseout="this.style.color='#fb923c'">자세히 보기 →</a>
+      </div>
+    </div>
+
+    <!-- ═══════════ SOCIAL LINKS ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">소셜 채널</p>
+
+      <!-- Instagram -->
+      <a href="#" class="link-btn" style="margin-bottom:.625rem;">
+        <span class="icon-badge" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);">
+          <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </span>
+        <span style="flex:1;">Instagram</span>
+        <span style="color:#706b63;font-size:.78rem;">@ash.kr</span>
+        <svg width="14" height="14" fill="none" stroke="#57534c" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <!-- YouTube -->
+      <a href="#" class="link-btn ember" style="margin-bottom:.625rem;">
+        <span class="icon-badge" style="background:#dc2626;">
+          <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </span>
+        <span style="flex:1;">YouTube</span>
+        <span style="color:#706b63;font-size:.78rem;">ASH Channel</span>
+        <svg width="14" height="14" fill="none" stroke="#57534c" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <!-- X -->
+      <a href="#" class="link-btn" style="margin-bottom:.625rem;">
+        <span class="icon-badge" style="background:#111110;border:1px solid #3d3a35;">
+          <svg width="14" height="14" fill="#c5c2bc" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </span>
+        <span style="flex:1;">X (Twitter)</span>
+        <span style="color:#706b63;font-size:.78rem;">@ash_kr</span>
+        <svg width="14" height="14" fill="none" stroke="#57534c" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <!-- GitHub -->
+      <a href="#" class="link-btn" style="margin-bottom:.625rem;">
+        <span class="icon-badge" style="background:#111110;border:1px solid #3d3a35;">
+          <svg width="16" height="16" fill="#c5c2bc" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </span>
+        <span style="flex:1;">GitHub</span>
+        <span style="color:#706b63;font-size:.78rem;">ash-kr</span>
+        <svg width="14" height="14" fill="none" stroke="#57534c" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <!-- Email -->
+      <a href="mailto:hello@ash.kr" class="link-btn">
+        <span class="icon-badge" style="background:#3d3a35;">
+          <svg width="16" height="16" fill="none" stroke="#c5c2bc" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </span>
+        <span style="flex:1;">이메일</span>
+        <span style="color:#706b63;font-size:.78rem;">hello@ash.kr</span>
+        <svg width="14" height="14" fill="none" stroke="#57534c" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </section>
+
+    <hr class="ash-divider" style="margin-bottom:2rem;" />
+
+    <!-- ═══════════ FEATURED VIDEO ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">추천 영상</p>
+      <div class="ash-card" style="border-radius:.875rem;overflow:hidden;">
+        <div class="yt-wrap">
+          <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1"
+                  title="ASH Featured Video"
+                  allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+                  allowfullscreen></iframe>
+        </div>
+        <div style="padding:1rem;">
+          <h3 style="color:#f0efed;font-size:.875rem;font-weight:600;margin:0 0 .35rem;">From Ember to Existence — ASH Documentary</h3>
+          <p style="color:#8c877e;font-size:.78rem;line-height:1.65;margin:0 0 .6rem;">재에서 피어난 존재의 이야기. 불꽃이 남긴 자리에서 무엇이 자라나는지 담았습니다.</p>
+          <div style="display:flex;align-items:center;gap:.75rem;">
+            <span style="color:#706b63;font-size:.72rem;display:flex;align-items:center;gap:.25rem;">
+              <svg width="12" height="12" fill="#706b63" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+              12.4K
+            </span>
+            <span style="color:#706b63;font-size:.72rem;display:flex;align-items:center;gap:.25rem;">
+              <svg width="12" height="12" fill="#706b63" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/></svg>
+              834
+            </span>
+            <span class="tag" style="margin-left:auto;">다큐멘터리</span>
           </div>
-          <div class="p-4">
-            <h3 class="text-ash-100 font-medium text-sm mb-1">From Ember to Existence — ASH Documentary</h3>
-            <p class="text-ash-500 text-xs leading-relaxed">재에서 피어난 존재의 이야기. 불꽃이 남긴 자리에서 무엇이 자라나는지 담았습니다.</p>
-            <div class="flex items-center gap-3 mt-2">
-              <span class="text-ash-600 text-xs flex items-center gap-1">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
-                12.4K
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ VIDEO PLAYLIST ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">영상 플레이리스트</p>
+
+      <!-- item -->
+      <a href="#" style="text-decoration:none;display:flex;gap:.75rem;align-items:center;padding:.75rem;border-radius:.75rem;margin-bottom:.625rem;transition:all .25s ease;" class="ash-card"
+         onmouseover="this.querySelector('.vt').style.color='#fff'" onmouseout="this.querySelector('.vt').style.color='#dddbd7'">
+        <div style="width:80px;height:52px;border-radius:.5rem;overflow:hidden;flex-shrink:0;background:#3d3a35;position:relative;">
+          <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg" alt="" style="width:100%;height:100%;object-fit:cover;opacity:.7;" onerror="this.style.display='none'" />
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" fill="white" viewBox="0 0 20 20" style="margin-left:2px;"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <p class="vt" style="color:#dddbd7;font-size:.85rem;font-weight:500;margin:0 0 .25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .2s;">재의 철학 — Episode 01</p>
+          <p style="color:#706b63;font-size:.72rem;margin:0;">8:42 · 3.2K 조회</p>
+        </div>
+      </a>
+
+      <a href="#" style="text-decoration:none;display:flex;gap:.75rem;align-items:center;padding:.75rem;border-radius:.75rem;margin-bottom:.625rem;transition:all .25s ease;" class="ash-card"
+         onmouseover="this.querySelector('.vt').style.color='#fff'" onmouseout="this.querySelector('.vt').style.color='#dddbd7'">
+        <div style="width:80px;height:52px;border-radius:.5rem;overflow:hidden;flex-shrink:0;background:#3d3a35;position:relative;">
+          <div style="width:100%;height:100%;background:linear-gradient(135deg,#3d3a35,#1a1917);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🌿</div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" fill="white" viewBox="0 0 20 20" style="margin-left:2px;"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <p class="vt" style="color:#dddbd7;font-size:.85rem;font-weight:500;margin:0 0 .25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .2s;">물푸레나무 숲에서 — Yggdrasil</p>
+          <p style="color:#706b63;font-size:.72rem;margin:0;">14:05 · 7.8K 조회</p>
+        </div>
+      </a>
+
+      <a href="#" style="text-decoration:none;display:flex;gap:.75rem;align-items:center;padding:.75rem;border-radius:.75rem;transition:all .25s ease;" class="ash-card"
+         onmouseover="this.querySelector('.vt').style.color='#fff'" onmouseout="this.querySelector('.vt').style.color='#dddbd7'">
+        <div style="width:80px;height:52px;border-radius:.5rem;overflow:hidden;flex-shrink:0;position:relative;">
+          <div style="width:100%;height:100%;background:radial-gradient(ellipse at center,rgba(249,115,22,.35),#111110);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🔥</div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" fill="white" viewBox="0 0 20 20" style="margin-left:2px;"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <p class="vt" style="color:#dddbd7;font-size:.85rem;font-weight:500;margin:0 0 .25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .2s;">피닉스 & 재탄생의 기록</p>
+          <p style="color:#706b63;font-size:.72rem;margin:0;">22:18 · 5.1K 조회</p>
+        </div>
+      </a>
+    </section>
+
+    <hr class="ash-divider" style="margin-bottom:2rem;" />
+
+    <!-- ═══════════ IMAGE CAROUSEL ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+        <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:500;margin:0;">갤러리</p>
+        <div id="dots" style="display:flex;gap:.375rem;align-items:center;"></div>
+      </div>
+
+      <div id="car-wrap" style="position:relative;border-radius:.875rem;overflow:hidden;">
+        <div id="car-track" class="carousel-track">
+
+          <!-- slide 1 -->
+          <div class="carousel-slide">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#3d3a35,#1a1917,#242220);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;position:relative;">
+              <span style="font-size:3.5rem;margin-bottom:1rem;">🌿</span>
+              <p style="font-family:'Noto Serif KR',serif;color:#f0efed;font-size:1.1rem;font-weight:500;margin:0 0 .35rem;">세계수 Yggdrasil</p>
+              <p style="color:#8c877e;font-size:.8rem;margin:0;">하늘과 땅을 잇는 물푸레나무</p>
+              <div style="position:absolute;bottom:.75rem;left:1rem;right:1rem;display:flex;justify-content:space-between;align-items:flex-end;">
+                <span class="tag">세계수</span>
+                <span style="color:#706b63;font-size:.72rem;">1 / 5</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- slide 2 -->
+          <div class="carousel-slide">
+            <div style="aspect-ratio:4/3;background:radial-gradient(ellipse at center bottom,rgba(249,115,22,.4) 0%,#111110 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;position:relative;">
+              <span style="font-size:3.5rem;margin-bottom:1rem;">🔥</span>
+              <p style="font-family:'Noto Serif KR',serif;color:#f0efed;font-size:1.1rem;font-weight:500;margin:0 0 .35rem;">정화의 불꽃</p>
+              <p style="color:#8c877e;font-size:.8rem;margin:0;">소멸이 아닌 순수한 시작</p>
+              <div style="position:absolute;bottom:.75rem;left:1rem;right:1rem;display:flex;justify-content:space-between;">
+                <span class="tag">재생</span>
+                <span style="color:#706b63;font-size:.72rem;">2 / 5</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- slide 3 -->
+          <div class="carousel-slide">
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#3d3a35,#242220);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;position:relative;">
+              <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#8c877e,#57534c,#3d3a35);margin-bottom:1rem;"></div>
+              <p style="font-family:'Noto Serif KR',serif;color:#f0efed;font-size:1.1rem;font-weight:500;margin:0 0 .35rem;">애쉬 그레이</p>
+              <p style="color:#8c877e;font-size:.8rem;margin:0;">흑도 백도 아닌, 사이의 색</p>
+              <div style="position:absolute;bottom:.75rem;left:1rem;right:1rem;display:flex;justify-content:space-between;">
+                <span class="tag">색채</span>
+                <span style="color:#706b63;font-size:.72rem;">3 / 5</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- slide 4 -->
+          <div class="carousel-slide">
+            <div style="aspect-ratio:4/3;background:#0e0e0d;overflow:hidden;position:relative;">
+              <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80" alt="Forest"
+                   style="width:100%;height:100%;object-fit:cover;opacity:.55;" onerror="this.style.display='none'" />
+              <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 55%);"></div>
+              <div style="position:absolute;bottom:.75rem;left:1rem;right:1rem;display:flex;justify-content:space-between;align-items:flex-end;">
+                <div>
+                  <p style="color:#f0efed;font-size:.85rem;font-weight:500;margin:0;">숲의 침묵</p>
+                  <p style="color:#a8a49c;font-size:.72rem;margin:0;">뿌리가 닿는 곳</p>
+                </div>
+                <span style="color:#706b63;font-size:.72rem;">4 / 5</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- slide 5 -->
+          <div class="carousel-slide">
+            <div style="aspect-ratio:4/3;background:#0e0e0d;overflow:hidden;position:relative;">
+              <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80" alt="Dawn"
+                   style="width:100%;height:100%;object-fit:cover;opacity:.45;" onerror="this.style.display='none'" />
+              <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 55%);"></div>
+              <div style="position:absolute;bottom:.75rem;left:1rem;right:1rem;display:flex;justify-content:space-between;align-items:flex-end;">
+                <div>
+                  <p style="color:#f0efed;font-size:.85rem;font-weight:500;margin:0;">새벽의 경계</p>
+                  <p style="color:#a8a49c;font-size:.72rem;margin:0;">æsc — 고대영어의 빛</p>
+                </div>
+                <span style="color:#706b63;font-size:.72rem;">5 / 5</span>
+              </div>
+            </div>
+          </div>
+        </div><!-- /track -->
+
+        <!-- prev / next -->
+        <button id="car-prev" onclick="carGo(carIdx-1)"
+          style="position:absolute;left:.5rem;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid #57534c;display:flex;align-items:center;justify-content:center;color:#c5c2bc;cursor:pointer;z-index:5;transition:all .2s;"
+          onmouseover="this.style.background='rgba(0,0,0,.85)';this.style.color='#fff'"
+          onmouseout="this.style.background='rgba(0,0,0,.55)';this.style.color='#c5c2bc'">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button id="car-next" onclick="carGo(carIdx+1)"
+          style="position:absolute;right:.5rem;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid #57534c;display:flex;align-items:center;justify-content:center;color:#c5c2bc;cursor:pointer;z-index:5;transition:all .2s;"
+          onmouseover="this.style.background='rgba(0,0,0,.85)';this.style.color='#fff'"
+          onmouseout="this.style.background='rgba(0,0,0,.55)';this.style.color='#c5c2bc'">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <p style="color:#706b63;font-size:.7rem;text-align:center;margin-top:.5rem;">← 스와이프하여 탐색 →</p>
+    </section>
+
+    <hr class="ash-divider" style="margin-bottom:2rem;" />
+
+    <!-- ═══════════ SINGLE FEATURE IMAGE ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">대표 작업</p>
+      <div class="ash-card" style="border-radius:.875rem;overflow:hidden;cursor:pointer;"
+           onmouseover="this.querySelector('.fi-img').style.opacity='.65';this.querySelector('.fi-img').style.transform='scale(1.04)';this.querySelector('.fi-cta').style.opacity='1'"
+           onmouseout="this.querySelector('.fi-img').style.opacity='.45';this.querySelector('.fi-img').style.transform='scale(1)';this.querySelector('.fi-cta').style.opacity='0'">
+        <div style="position:relative;aspect-ratio:16/9;overflow:hidden;background:#0e0e0d;">
+          <img class="fi-img" src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80" alt="Featured"
+               style="width:100%;height:100%;object-fit:cover;opacity:.45;transition:all .5s ease;" onerror="this.style.display='none'" />
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <p class="shimmer-text" style="font-family:'Noto Serif KR',serif;font-size:2.5rem;font-weight:700;letter-spacing:.2em;margin:0;">ASH</p>
+            <p style="color:#8c877e;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;margin-top:.25rem;">From Ember to Existence</p>
+          </div>
+          <div class="fi-cta" style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:1rem;opacity:0;transition:opacity .3s;background:linear-gradient(to top,rgba(0,0,0,.6),transparent);">
+            <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+              <span style="color:#fff;font-size:.85rem;font-weight:500;">대표 포트폴리오 보기</span>
+              <span style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;">
+                <svg width="14" height="14" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </span>
-              <span class="text-ash-600 text-xs flex items-center gap-1">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/></svg>
-                834
-              </span>
-              <span class="tag-pill ml-auto">다큐멘터리</span>
             </div>
           </div>
         </div>
-      </section>
-
-      <!-- ── VIDEO PLAYLIST ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">영상 플레이리스트</p>
-        <div class="flex flex-col gap-3">
-
-          <!-- Video item -->
-          <a href="#" class="card-ash rounded-xl p-3 flex gap-3 items-center group">
-            <div class="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-ash-800">
-              <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg" alt="썸네일" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" onerror="this.style.display='none'" />
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                  <svg class="w-3 h-3 text-white ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-                </div>
-              </div>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-ash-200 text-sm font-medium truncate group-hover:text-white transition-colors">재의 철학 — Episode 01</p>
-              <p class="text-ash-500 text-xs mt-0.5">8:42 · 3.2K 조회</p>
-            </div>
-          </a>
-
-          <a href="#" class="card-ash rounded-xl p-3 flex gap-3 items-center group">
-            <div class="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-ash-800">
-              <img src="https://img.youtube.com/vi/aqz-KE-bpKQ/mqdefault.jpg" alt="썸네일" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" onerror="this.style.display='none'" />
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                  <svg class="w-3 h-3 text-white ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-                </div>
-              </div>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-ash-200 text-sm font-medium truncate group-hover:text-white transition-colors">물푸레나무 숲에서 — Yggdrasil</p>
-              <p class="text-ash-500 text-xs mt-0.5">14:05 · 7.8K 조회</p>
-            </div>
-          </a>
-
-          <a href="#" class="card-ash rounded-xl p-3 flex gap-3 items-center group">
-            <div class="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-ash-800">
-              <div class="w-full h-full bg-gradient-to-br from-ash-700 to-ash-900 flex items-center justify-center">
-                <span class="text-xl">🔥</span>
-              </div>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                  <svg class="w-3 h-3 text-white ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-                </div>
-              </div>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-ash-200 text-sm font-medium truncate group-hover:text-white transition-colors">피닉스 & 재탄생의 기록</p>
-              <p class="text-ash-500 text-xs mt-0.5">22:18 · 5.1K 조회</p>
-            </div>
-          </a>
-
-        </div>
-      </section>
-
-      <div class="ash-divider mb-8"></div>
-
-      <!-- ── IMAGE CAROUSEL ── -->
-      <section class="mb-8 reveal">
-        <div class="flex items-center justify-between mb-3">
-          <p class="text-ash-500 text-xs uppercase tracking-[0.15em] font-medium">갤러리</p>
-          <div class="flex gap-2" id="carousel-dots"></div>
-        </div>
-
-        <div class="relative overflow-hidden rounded-xl" id="carousel-container">
-          <div class="carousel-track" id="carousel-track">
-
-            <!-- Slide 1 -->
-            <div class="min-w-full relative">
-              <div class="aspect-[4/3] bg-gradient-to-br from-ash-800 via-ash-900 to-ash-950 rounded-xl overflow-hidden relative">
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
-                  <span class="text-5xl mb-4">🌿</span>
-                  <p class="font-serif text-ash-200 text-lg font-medium">세계수 Yggdrasil</p>
-                  <p class="text-ash-500 text-sm mt-1">하늘과 땅을 잇는 물푸레나무</p>
-                </div>
-                <div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
-                  <span class="tag-pill">세계수</span>
-                  <span class="text-ash-400 text-xs">1 / 5</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 2 -->
-            <div class="min-w-full relative">
-              <div class="aspect-[4/3] rounded-xl overflow-hidden relative"
-                style="background: radial-gradient(ellipse at center bottom, rgba(249,115,22,0.4) 0%, rgba(17,17,16,1) 70%)">
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
-                  <span class="text-5xl mb-4">🔥</span>
-                  <p class="font-serif text-ash-200 text-lg font-medium">정화의 불꽃</p>
-                  <p class="text-ash-500 text-sm mt-1">소멸이 아닌 순수한 시작</p>
-                </div>
-                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
-                  <span class="tag-pill">재생</span>
-                  <span class="text-ash-400 text-xs">2 / 5</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 3 -->
-            <div class="min-w-full relative">
-              <div class="aspect-[4/3] rounded-xl overflow-hidden relative"
-                style="background: linear-gradient(135deg, #3d3a35 0%, #1a1917 50%, #242220 100%)">
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
-                  <div class="w-16 h-16 rounded-full mb-4"
-                    style="background:linear-gradient(135deg,#8c877e,#57534c,#3d3a35)"></div>
-                  <p class="font-serif text-ash-200 text-lg font-medium">애쉬 그레이</p>
-                  <p class="text-ash-500 text-sm mt-1">흑도 백도 아닌, 사이의 색</p>
-                </div>
-                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
-                  <span class="tag-pill">색채</span>
-                  <span class="text-ash-400 text-xs">3 / 5</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 4 -->
-            <div class="min-w-full relative">
-              <div class="aspect-[4/3] rounded-xl overflow-hidden relative bg-ash-950">
-                <img
-                  src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=600&q=80"
-                  alt="Forest"
-                  class="w-full h-full object-cover opacity-60"
-                  onerror="this.style.display='none'"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
-                  <div>
-                    <p class="text-ash-100 text-sm font-medium">숲의 침묵</p>
-                    <p class="text-ash-400 text-xs">뿌리가 닿는 곳</p>
-                  </div>
-                  <span class="text-ash-400 text-xs">4 / 5</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Slide 5 -->
-            <div class="min-w-full relative">
-              <div class="aspect-[4/3] rounded-xl overflow-hidden relative bg-ash-950">
-                <img
-                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80"
-                  alt="Landscape"
-                  class="w-full h-full object-cover opacity-50"
-                  onerror="this.style.display='none'"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
-                  <div>
-                    <p class="text-ash-100 text-sm font-medium">새벽의 경계</p>
-                    <p class="text-ash-400 text-xs">æsc — 고대영어의 빛</p>
-                  </div>
-                  <span class="text-ash-400 text-xs">5 / 5</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Prev / Next -->
-          <button id="carousel-prev"
-            class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-ash-700 flex items-center justify-center text-ash-300 hover:text-white hover:bg-black/80 transition-all z-10">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-          <button id="carousel-next"
-            class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-ash-700 flex items-center justify-center text-ash-300 hover:text-white hover:bg-black/80 transition-all z-10">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7 7 7"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Swipe hint -->
-        <p class="text-ash-600 text-xs text-center mt-2">← 스와이프하여 탐색 →</p>
-      </section>
-
-      <div class="ash-divider mb-8"></div>
-
-      <!-- ── SINGLE IMAGE FEATURE ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">대표 작업</p>
-        <div class="card-ash rounded-xl overflow-hidden group cursor-pointer">
-          <div class="relative aspect-video bg-gradient-to-br from-ash-800 to-ash-950 overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80"
-              alt="Featured Work"
-              class="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
-              onerror="this.style.display='none'"
-            />
-            <!-- Overlay text -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center">
-              <p class="font-serif text-4xl font-semibold text-white/90 tracking-widest shimmer-text">ASH</p>
-              <p class="text-ash-400 text-xs tracking-[0.3em] mt-1 uppercase">From Ember to Existence</p>
-            </div>
-            <!-- Hover CTA -->
-            <div class="absolute inset-0 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-              <div class="w-full flex justify-between items-center">
-                <span class="text-white text-sm font-medium">대표 포트폴리오 보기</span>
-                <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="p-4">
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <h3 class="text-ash-100 font-medium text-sm">Ember Series, 2024–25</h3>
-                <p class="text-ash-500 text-xs mt-1 leading-relaxed">불과 재 사이의 순간을 포착한 시각 작업 시리즈. 소멸과 재생의 경계를 탐구합니다.</p>
-              </div>
-              <span class="tag-pill flex-shrink-0">포트폴리오</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── MUSIC / AMBIENT PLAYER ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">앰비언트 트랙</p>
-        <div class="card-ash rounded-xl p-4">
-          <div class="flex items-center gap-4">
-            <!-- Vinyl -->
-            <div class="relative flex-shrink-0">
-              <div id="vinyl-disc" class="w-14 h-14 rounded-full border-4 border-ash-800"
-                style="background: conic-gradient(from 0deg, #242220, #3d3a35, #1a1917, #242220)">
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <div class="w-4 h-4 rounded-full bg-ash-950 border-2 border-ash-700"></div>
-                </div>
-              </div>
-            </div>
-            <!-- Info -->
-            <div class="flex-1 min-w-0">
-              <p class="text-ash-100 text-sm font-medium truncate">Embers Fade Slowly</p>
-              <p class="text-ash-500 text-xs">ASH Ambient Vol.1 · 6:14</p>
-              <!-- Progress bar -->
-              <div class="mt-2 h-1 bg-ash-800 rounded-full overflow-hidden">
-                <div id="progress-bar" class="h-full rounded-full transition-all duration-300"
-                  style="width:35%; background:linear-gradient(90deg,#f97316,#c2410c)"></div>
-              </div>
-              <div class="flex justify-between mt-1">
-                <span class="text-ash-600 text-xs">2:11</span>
-                <span class="text-ash-600 text-xs">6:14</span>
-              </div>
-            </div>
-            <!-- Play button -->
-            <button id="play-btn" onclick="togglePlay()"
-              class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all border border-ember-500/40"
-              style="background:linear-gradient(135deg,rgba(194,65,12,0.3),rgba(36,34,32,0.8))">
-              <svg id="play-icon" class="w-4 h-4 text-ember-400 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Track list -->
-          <div class="mt-4 space-y-2 border-t border-ash-800 pt-4">
-            <div class="flex items-center gap-3 group cursor-pointer">
-              <span class="text-ember-500 text-xs w-4 text-center font-medium">▶</span>
-              <span class="text-ash-200 text-xs flex-1">Embers Fade Slowly</span>
-              <span class="text-ash-600 text-xs">6:14</span>
-            </div>
-            <div class="flex items-center gap-3 group cursor-pointer">
-              <span class="text-ash-600 text-xs w-4 text-center">02</span>
-              <span class="text-ash-400 text-xs flex-1 group-hover:text-ash-200 transition-colors">Ash & Morning Light</span>
-              <span class="text-ash-600 text-xs">4:52</span>
-            </div>
-            <div class="flex items-center gap-3 group cursor-pointer">
-              <span class="text-ash-600 text-xs w-4 text-center">03</span>
-              <span class="text-ash-400 text-xs flex-1 group-hover:text-ash-200 transition-colors">Yggdrasil Roots</span>
-              <span class="text-ash-600 text-xs">9:01</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div class="ash-divider mb-8"></div>
-
-      <!-- ── PROJECT CARDS ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">진행 중인 프로젝트</p>
-        <div class="grid grid-cols-2 gap-3">
-
-          <a href="#" class="card-ash rounded-xl p-4 group">
-            <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-xl"
-              style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.2)">🔥</div>
-            <h3 class="text-ash-100 text-sm font-semibold mb-1 group-hover:text-white transition-colors">Ember Lab</h3>
-            <p class="text-ash-500 text-xs leading-relaxed">불꽃 데이터 시각화 실험 프로젝트</p>
-            <div class="mt-3 flex items-center gap-1 text-ash-500 text-xs">
-              <span>탐색하기</span>
-              <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </div>
-          </a>
-
-          <a href="#" class="card-ash rounded-xl p-4 group">
-            <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-xl"
-              style="background:rgba(134,239,172,0.08);border:1px solid rgba(134,239,172,0.15)">🌿</div>
-            <h3 class="text-ash-100 text-sm font-semibold mb-1 group-hover:text-white transition-colors">Tree Archive</h3>
-            <p class="text-ash-500 text-xs leading-relaxed">세계수 신화 아카이브 디지털 정원</p>
-            <div class="mt-3 flex items-center gap-1 text-ash-500 text-xs">
-              <span>탐색하기</span>
-              <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </div>
-          </a>
-
-          <a href="#" class="card-ash rounded-xl p-4 group">
-            <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-xl"
-              style="background:rgba(140,135,126,0.12);border:1px solid rgba(140,135,126,0.2)">🩶</div>
-            <h3 class="text-ash-100 text-sm font-semibold mb-1 group-hover:text-white transition-colors">Gray Palette</h3>
-            <p class="text-ash-500 text-xs leading-relaxed">애쉬 그레이 컬러 시스템 & 브랜딩</p>
-            <div class="mt-3 flex items-center gap-1 text-ash-500 text-xs">
-              <span>탐색하기</span>
-              <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </div>
-          </a>
-
-          <a href="#" class="card-ash rounded-xl p-4 group">
-            <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-xl"
-              style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08)">✦</div>
-            <h3 class="text-ash-100 text-sm font-semibold mb-1 group-hover:text-white transition-colors">Open Source</h3>
-            <p class="text-ash-500 text-xs leading-relaxed">재에서 피어난 오픈소스 도구들</p>
-            <div class="mt-3 flex items-center gap-1 text-ash-500 text-xs">
-              <span>탐색하기</span>
-              <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </div>
-          </a>
-
-        </div>
-      </section>
-
-      <div class="ash-divider mb-8"></div>
-
-      <!-- ── LATEST POSTS / BLOG ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">최근 글</p>
-        <div class="flex flex-col gap-3">
-
-          <a href="#" class="card-ash rounded-xl p-4 group flex gap-4 items-start">
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1.5">
-                <span class="tag-pill">에세이</span>
-                <span class="text-ash-600 text-xs">2025.01.14</span>
-              </div>
-              <h3 class="text-ash-100 text-sm font-semibold leading-snug group-hover:text-white transition-colors mb-1">
-                재(灰)가 된다는 것의 의미
-              </h3>
-              <p class="text-ash-500 text-xs leading-relaxed line-clamp-2">
-                불이 지나간 자리에 무엇이 남는가. 소멸이 아닌 가장 순수한 본질로 돌아가는 여정에 대하여.
-              </p>
-            </div>
-            <svg class="w-4 h-4 text-ash-600 flex-shrink-0 mt-1 group-hover:text-ash-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-            </svg>
-          </a>
-
-          <a href="#" class="card-ash rounded-xl p-4 group flex gap-4 items-start">
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1.5">
-                <span class="tag-pill">신화</span>
-                <span class="text-ash-600 text-xs">2025.01.03</span>
-              </div>
-              <h3 class="text-ash-100 text-sm font-semibold leading-snug group-hover:text-white transition-colors mb-1">
-                Yggdrasil: 세계를 잇는 나무의 뿌리
-              </h3>
-              <p class="text-ash-500 text-xs leading-relaxed line-clamp-2">
-                북유럽 신화 속 물푸레나무가 왜 세계의 중심인지, 그 상징과 현대적 의미를 탐구합니다.
-              </p>
-            </div>
-            <svg class="w-4 h-4 text-ash-600 flex-shrink-0 mt-1 group-hover:text-ash-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-            </svg>
-          </a>
-
-          <a href="#" class="card-ash rounded-xl p-4 group flex gap-4 items-start">
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1.5">
-                <span class="tag-pill">색채</span>
-                <span class="text-ash-600 text-xs">2024.12.27</span>
-              </div>
-              <h3 class="text-ash-100 text-sm font-semibold leading-snug group-hover:text-white transition-colors mb-1">
-                애쉬 그레이: 선택을 강요하지 않는 색
-              </h3>
-              <p class="text-ash-500 text-xs leading-relaxed line-clamp-2">
-                흑도 백도 아닌 그 사이. 모든 것을 담아내는 침묵의 팔레트가 지닌 미적 철학.
-              </p>
-            </div>
-            <svg class="w-4 h-4 text-ash-600 flex-shrink-0 mt-1 group-hover:text-ash-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-            </svg>
-          </a>
-
-        </div>
-
-        <a href="#" class="link-btn mt-3 justify-center text-ash-400 text-sm">
-          모든 글 보기
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
-        </a>
-      </section>
-
-      <div class="ash-divider mb-8"></div>
-
-      <!-- ── FAQ / ACCORDION ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">자주 묻는 질문</p>
-        <div class="flex flex-col gap-2">
-
-          <details class="card-ash rounded-xl overflow-hidden group">
-            <summary class="flex items-center justify-between p-4 select-none">
-              <span class="text-ash-200 text-sm font-medium">ASH는 어떤 의미인가요?</span>
-              <svg class="chevron w-4 h-4 text-ash-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
-            </summary>
-            <div class="px-4 pb-4">
-              <div class="ash-divider mb-3"></div>
-              <p class="text-ash-400 text-xs leading-relaxed">
-                ASH는 세 가지 의미를 담고 있습니다. 북유럽 신화의 세계수인 <strong class="text-ash-300">물푸레나무(Ash Tree)</strong>, 불이 지나간 자리에 남는 순수한 <strong class="text-ash-300">재(灰)</strong>, 그리고 흑과 백 사이의 절제된 아름다움인 <strong class="text-ash-300">애쉬 그레이</strong>입니다.
-              </p>
-            </div>
-          </details>
-
-          <details class="card-ash rounded-xl overflow-hidden group">
-            <summary class="flex items-center justify-between p-4 select-none">
-              <span class="text-ash-200 text-sm font-medium">협업이나 의뢰는 어떻게 하나요?</span>
-              <svg class="chevron w-4 h-4 text-ash-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
-            </summary>
-            <div class="px-4 pb-4">
-              <div class="ash-divider mb-3"></div>
-              <p class="text-ash-400 text-xs leading-relaxed">
-                hello@ash.kr 로 메일을 보내주시거나, 아래 문의 폼을 통해 연락 주시면 됩니다. 보통 1–2 영업일 내에 답변드립니다.
-              </p>
-            </div>
-          </details>
-
-          <details class="card-ash rounded-xl overflow-hidden group">
-            <summary class="flex items-center justify-between p-4 select-none">
-              <span class="text-ash-200 text-sm font-medium">ash.kr 도메인을 선택한 이유는?</span>
-              <svg class="chevron w-4 h-4 text-ash-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
-            </summary>
-            <div class="px-4 pb-4">
-              <div class="ash-divider mb-3"></div>
-              <p class="text-ash-400 text-xs leading-relaxed">
-                고대 영어 <strong class="text-ash-300">æsc</strong>에서 온 단어로, 나무이자 불꽃의 흔적이자 새벽빛을 닮은 색조입니다. 이 도메인은 그 이름의 가장 순수한 형태를 담기 위해 선택했습니다.
-              </p>
-            </div>
-          </details>
-
-        </div>
-      </section>
-
-      <div class="ash-divider mb-8"></div>
-
-      <!-- ── CONTACT / NEWSLETTER ── -->
-      <section class="mb-8 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">뉴스레터 구독</p>
-        <div class="card-ash rounded-xl p-5">
-          <div class="flex items-start gap-3 mb-4">
-            <span class="text-2xl">📨</span>
+        <div style="padding:1rem;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;">
             <div>
-              <h3 class="text-ash-100 font-medium text-sm mb-1">재에서 피어난 소식을 받아보세요</h3>
-              <p class="text-ash-500 text-xs leading-relaxed">새로운 작업, 에세이, 프로젝트 업데이트를 가장 먼저 받아볼 수 있습니다.</p>
+              <h3 style="color:#f0efed;font-size:.875rem;font-weight:600;margin:0 0 .3rem;">Ember Series, 2024–25</h3>
+              <p style="color:#8c877e;font-size:.78rem;line-height:1.6;margin:0;">불과 재 사이의 순간을 포착한 시각 작업 시리즈.</p>
+            </div>
+            <span class="tag" style="flex-shrink:0;">포트폴리오</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ MUSIC PLAYER ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">앰비언트 트랙</p>
+      <div class="ash-card" style="border-radius:.875rem;padding:1rem;">
+        <!-- player row -->
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <!-- vinyl -->
+          <div id="vinyl" style="width:56px;height:56px;border-radius:50%;flex-shrink:0;background:conic-gradient(from 0deg,#242220,#3d3a35,#1a1917,#242220);border:3px solid #3d3a35;position:relative;">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+              <div style="width:16px;height:16px;border-radius:50%;background:#111110;border:2px solid #57534c;"></div>
             </div>
           </div>
-          <form onsubmit="handleSubscribe(event)" class="flex gap-2">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              class="flex-1 bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-200 text-sm placeholder-ash-600 outline-none focus:border-ash-500 transition-colors"
-            />
-            <button type="submit"
-              class="px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-all hover:brightness-110"
-              style="background:linear-gradient(135deg,#c2410c,#ea580c)">
-              구독
-            </button>
-          </form>
-          <p id="subscribe-msg" class="text-sage-500 text-xs mt-2 hidden">✓ 구독 완료! 재 속에서 피어나는 소식을 기대해주세요.</p>
+          <!-- info -->
+          <div style="flex:1;min-width:0;">
+            <p style="color:#f0efed;font-size:.875rem;font-weight:500;margin:0 0 .2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Embers Fade Slowly</p>
+            <p style="color:#706b63;font-size:.72rem;margin:0 0 .5rem;">ASH Ambient Vol.1 · 6:14</p>
+            <!-- progress -->
+            <div style="height:3px;background:#3d3a35;border-radius:9999px;overflow:hidden;">
+              <div id="pbar" class="progress-bar" style="height:100%;background:linear-gradient(90deg,#f97316,#ea580c);border-radius:9999px;transition:width .3s;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:.3rem;">
+              <span style="color:#706b63;font-size:.65rem;">2:11</span>
+              <span style="color:#706b63;font-size:.65rem;">6:14</span>
+            </div>
+          </div>
+          <!-- play btn -->
+          <button id="playbtn" onclick="togglePlay()"
+            style="width:40px;height:40px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,rgba(194,65,12,.35),rgba(36,34,32,.9));border:1px solid rgba(249,115,22,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;">
+            <svg id="picon" width="14" height="14" fill="#fb923c" viewBox="0 0 20 20" style="margin-left:2px;">
+              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+            </svg>
+          </button>
         </div>
-      </section>
+        <!-- tracklist -->
+        <div style="border-top:1px solid #3d3a35;margin-top:1rem;padding-top:1rem;display:flex;flex-direction:column;gap:.6rem;">
+          <div style="display:flex;align-items:center;gap:.75rem;cursor:pointer;">
+            <span style="color:#f97316;font-size:.7rem;width:1rem;text-align:center;">▶</span>
+            <span style="color:#dddbd7;font-size:.78rem;flex:1;">Embers Fade Slowly</span>
+            <span style="color:#706b63;font-size:.72rem;">6:14</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem;cursor:pointer;"
+               onmouseover="this.querySelector('span:nth-child(2)').style.color='#dddbd7'"
+               onmouseout="this.querySelector('span:nth-child(2)').style.color='#8c877e'">
+            <span style="color:#706b63;font-size:.7rem;width:1rem;text-align:center;">02</span>
+            <span style="color:#8c877e;font-size:.78rem;flex:1;transition:color .2s;">Ash & Morning Light</span>
+            <span style="color:#706b63;font-size:.72rem;">4:52</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem;cursor:pointer;"
+               onmouseover="this.querySelector('span:nth-child(2)').style.color='#dddbd7'"
+               onmouseout="this.querySelector('span:nth-child(2)').style.color='#8c877e'">
+            <span style="color:#706b63;font-size:.7rem;width:1rem;text-align:center;">03</span>
+            <span style="color:#8c877e;font-size:.78rem;flex:1;transition:color .2s;">Yggdrasil Roots</span>
+            <span style="color:#706b63;font-size:.72rem;">9:01</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-      <!-- ── CONTACT FORM ── -->
-      <section class="mb-10 reveal">
-        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">문의하기</p>
-        <div class="card-ash rounded-xl p-5">
-          <form onsubmit="handleContact(event)" class="flex flex-col gap-3">
-            <input
-              type="text"
-              placeholder="이름"
-              class="bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-200 text-sm placeholder-ash-600 outline-none focus:border-ash-500 transition-colors"
-            />
-            <input
-              type="email"
-              placeholder="이메일"
-              class="bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-200 text-sm placeholder-ash-600 outline-none focus:border-ash-500 transition-colors"
-            />
-            <select class="bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-400 text-sm outline-none focus:border-ash-500 transition-colors appearance-none">
-              <option value="" disabled selected>문의 유형 선택</option>
-              <option>협업 제안</option>
-              <option>프로젝트 의뢰</option>
-              <option>인터뷰 요청</option>
-              <option>기타 문의</option>
-            </select>
-            <textarea
-              rows="4"
-              placeholder="메시지를 입력해주세요..."
-              class="bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-200 text-sm placeholder-ash-600 outline-none focus:border-ash-500 transition-colors resize-none"
-            ></textarea>
-            <button type="submit"
-              class="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-all hover:brightness-110 hover:-translate-y-0.5"
-              style="background:linear-gradient(135deg,#57534c,#3d3a35)">
-              보내기 🔥
-            </button>
-          </form>
-          <p id="contact-msg" class="text-sage-500 text-xs mt-2 hidden text-center">✓ 메시지가 전송되었습니다. 곧 연락드리겠습니다.</p>
-        </div>
-      </section>
+    <hr class="ash-divider" style="margin-bottom:2rem;" />
 
-      <!-- ── FOOTER ── -->
-      <footer class="text-center reveal">
-        <div class="ash-divider mb-6"></div>
-        <!-- ASH meaning pills -->
-        <div class="flex justify-center gap-2 flex-wrap mb-4">
-          <span class="tag-pill">🌿 나무</span>
-          <span class="tag-pill text-ash-500">·</span>
-          <span class="tag-pill">🔥 불꽃</span>
-          <span class="tag-pill text-ash-500">·</span>
-          <span class="tag-pill">🩶 색</span>
-        </div>
-        <p class="font-serif text-ash-600 text-sm italic mb-1">From ember to existence</p>
-        <p class="text-ash-700 text-xs tracking-[0.15em] mb-4">— beauty born in between —</p>
-        <a href="https://ash.kr" class="text-ash-500 text-xs hover:text-ash-300 transition-colors tracking-widest uppercase">
-          ash.kr
+    <!-- ═══════════ PROJECT CARDS 2×2 ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">진행 중인 프로젝트</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+
+        <a href="#" class="ash-card" style="border-radius:.875rem;padding:1rem;text-decoration:none;display:block;">
+          <div style="width:40px;height:40px;border-radius:.5rem;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:.75rem;">🔥</div>
+          <p style="color:#f0efed;font-size:.85rem;font-weight:600;margin:0 0 .3rem;">Ember Lab</p>
+          <p style="color:#8c877e;font-size:.75rem;line-height:1.5;margin:0 0 .75rem;">불꽃 데이터 시각화 실험 프로젝트</p>
+          <span style="color:#8c877e;font-size:.75rem;display:flex;align-items:center;gap:.25rem;">탐색 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
         </a>
-        <p class="text-ash-800 text-xs mt-3">
-          고대 영어 <span class="text-ash-700">æsc</span> · Made with Tailwind CSS 4
-        </p>
-      </footer>
 
-    </div><!-- /main wrapper -->
+        <a href="#" class="ash-card" style="border-radius:.875rem;padding:1rem;text-decoration:none;display:block;">
+          <div style="width:40px;height:40px;border-radius:.5rem;background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.14);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:.75rem;">🌿</div>
+          <p style="color:#f0efed;font-size:.85rem;font-weight:600;margin:0 0 .3rem;">Tree Archive</p>
+          <p style="color:#8c877e;font-size:.75rem;line-height:1.5;margin:0 0 .75rem;">세계수 신화 디지털 정원 아카이브</p>
+          <span style="color:#8c877e;font-size:.75rem;display:flex;align-items:center;gap:.25rem;">탐색 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+        </a>
 
-    <!-- ════════════════════════════════════════════
-         JAVASCRIPT
-    ════════════════════════════════════════════ -->
-    <script>
-      // ── Particles ──────────────────────────────
-      (function spawnParticles() {
-        const container = document.getElementById('particles');
-        const W = window.innerWidth;
+        <a href="#" class="ash-card" style="border-radius:.875rem;padding:1rem;text-decoration:none;display:block;">
+          <div style="width:40px;height:40px;border-radius:.5rem;background:rgba(140,135,126,.1);border:1px solid rgba(140,135,126,.2);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:.75rem;">🩶</div>
+          <p style="color:#f0efed;font-size:.85rem;font-weight:600;margin:0 0 .3rem;">Gray Palette</p>
+          <p style="color:#8c877e;font-size:.75rem;line-height:1.5;margin:0 0 .75rem;">애쉬 그레이 컬러 시스템 & 브랜딩</p>
+          <span style="color:#8c877e;font-size:.75rem;display:flex;align-items:center;gap:.25rem;">탐색 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+        </a>
 
-        // Embers
-        for (let i = 0; i < 12; i++) {
-          const el = document.createElement('div');
-          el.className = 'ember';
-          const size = Math.random() * 4 + 2;
-          el.style.cssText = `
-            width:${size}px; height:${size}px;
-            left:${Math.random() * 100}%;
-            bottom:${Math.random() * 30}%;
-            animation-duration:${Math.random() * 4 + 3}s;
-            animation-delay:${Math.random() * 5}s;
-          `;
-          container.appendChild(el);
+        <a href="#" class="ash-card" style="border-radius:.875rem;padding:1rem;text-decoration:none;display:block;">
+          <div style="width:40px;height:40px;border-radius:.5rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:.75rem;">✦</div>
+          <p style="color:#f0efed;font-size:.85rem;font-weight:600;margin:0 0 .3rem;">Open Source</p>
+          <p style="color:#8c877e;font-size:.75rem;line-height:1.5;margin:0 0 .75rem;">재에서 피어난 오픈소스 도구들</p>
+          <span style="color:#8c877e;font-size:.75rem;display:flex;align-items:center;gap:.25rem;">탐색 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+        </a>
+
+      </div>
+    </section>
+
+    <hr class="ash-divider" style="margin-bottom:2rem;" />
+
+    <!-- ═══════════ BLOG POSTS ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">최근 글</p>
+
+      <a href="#" class="ash-card" style="border-radius:.875rem;padding:1rem;text-decoration:none;display:flex;align-items:flex-start;gap:1rem;margin-bottom:.625rem;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+            <span class="tag">에세이</span>
+            <span style="color:#57534c;font-size:.68rem;">2025.01.14</span>
+          </div>
+          <p style="color:#f0efed;font-size:.875rem;font-weight:600;margin:0 0 .3rem;line-height:1.45;">재(灰)가 된다는 것의 의미</p>
+          <p style="color:#8c877e;font-size:.76rem;line-height:1.6;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">불이 지나간 자리에 무엇이 남는가. 소멸이 아닌 가장 순수한 본질로 돌아가는 여정에 대하여.</p>
+        </div>
+        <svg width="16" height="16" fill="none" stroke="#57534c" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+
+      <a href="#" class="ash-card" style="border-radius:.875rem;padding:1rem;text-decoration:none;display:flex;align-items:flex-start;gap:1rem;margin-bottom:.625rem;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+            <span class="tag">신화</span>
+            <span style="color:#57534c;font-size:.68rem;">2025.01.03</span>
+          </div>
+          <p style="color:#f0efed;font-size:.875rem;font-weight:600;margin:0 0 .3rem;line-height:1.45;">Yggdrasil: 세계를 잇는 나무의 뿌리</p>
+          <p style="color:#8c877e;font-size:.76rem;line-height:1.6;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">북유럽 신화 속 물푸레나무가 왜 세계의 중심인지, 그 상징과 현대적 의미를 탐구합니다.</p>
+        </div>
+        <svg width="16" height="16" fill="none" stroke="#57534c" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+
+      <a href="#" class="ash-card" style="border-radius:.875rem;padding:1rem;text-decoration:none;display:flex;align-items:flex-start;gap:1rem;margin-bottom:.875rem;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+            <span class="tag">색채</span>
+            <span style="color:#57534c;font-size:.68rem;">2024.12.27</span>
+          </div>
+          <p style="color:#f0efed;font-size:.875rem;font-weight:600;margin:0 0 .3rem;line-height:1.45;">애쉬 그레이: 선택을 강요하지 않는 색</p>
+          <p style="color:#8c877e;font-size:.76rem;line-height:1.6;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">흑도 백도 아닌 그 사이. 모든 것을 담아내는 침묵의 팔레트가 지닌 미적 철학.</p>
+        </div>
+        <svg width="16" height="16" fill="none" stroke="#57534c" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+
+      <a href="#" class="link-btn" style="justify-content:center;color:#a8a49c;">
+        모든 글 보기
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </section>
+
+    <hr class="ash-divider" style="margin-bottom:2rem;" />
+
+    <!-- ═══════════ FAQ ACCORDION ═══════════ -->
+    <section class="reveal" style="margin-bottom:2rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">자주 묻는 질문</p>
+
+      <details class="ash-card" style="border-radius:.875rem;overflow:hidden;margin-bottom:.625rem;">
+        <summary style="display:flex;align-items:center;justify-content:space-between;padding:1rem;">
+          <span style="color:#dddbd7;font-size:.875rem;font-weight:500;">ASH는 어떤 의미인가요?</span>
+          <span class="chev" style="color:#8c877e;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </span>
+        </summary>
+        <div style="padding:0 1rem 1rem;">
+          <div class="ash-divider" style="margin-bottom:.75rem;"></div>
+          <p style="color:#8c877e;font-size:.8rem;line-height:1.7;margin:0;">ASH는 세 가지 의미를 담고 있습니다. 북유럽 신화의 세계수인 <strong style="color:#c5c2bc;">물푸레나무(Ash Tree)</strong>, 불이 지나간 자리에 남는 순수한 <strong style="color:#c5c2bc;">재(灰)</strong>, 그리고 흑과 백 사이의 절제된 아름다움인 <strong style="color:#c5c2bc;">애쉬 그레이</strong>입니다.</p>
+        </div>
+      </details>
+
+      <details class="ash-card" style="border-radius:.875rem;overflow:hidden;margin-bottom:.625rem;">
+        <summary style="display:flex;align-items:center;justify-content:space-between;padding:1rem;">
+          <span style="color:#dddbd7;font-size:.875rem;font-weight:500;">협업이나 의뢰는 어떻게 하나요?</span>
+          <span class="chev" style="color:#8c877e;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </span>
+        </summary>
+        <div style="padding:0 1rem 1rem;">
+          <div class="ash-divider" style="margin-bottom:.75rem;"></div>
+          <p style="color:#8c877e;font-size:.8rem;line-height:1.7;margin:0;">hello@ash.kr 로 메일을 보내주시거나 아래 문의 폼을 이용해주세요. 보통 1–2 영업일 내에 답변드립니다.</p>
+        </div>
+      </details>
+
+      <details class="ash-card" style="border-radius:.875rem;overflow:hidden;">
+        <summary style="display:flex;align-items:center;justify-content:space-between;padding:1rem;">
+          <span style="color:#dddbd7;font-size:.875rem;font-weight:500;">ash.kr 도메인을 선택한 이유는?</span>
+          <span class="chev" style="color:#8c877e;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </span>
+        </summary>
+        <div style="padding:0 1rem 1rem;">
+          <div class="ash-divider" style="margin-bottom:.75rem;"></div>
+          <p style="color:#8c877e;font-size:.8rem;line-height:1.7;margin:0;">고대 영어 <strong style="color:#c5c2bc;">æsc</strong>에서 온 단어로, 나무이자 불꽃의 흔적이자 새벽빛을 닮은 색조입니다. 이 도메인은 그 이름의 가장 순수한 형태를 담기 위해 선택했습니다.</p>
+        </div>
+      </details>
+    </section>
+
+    <hr class="ash-divider" style="margin-bottom:2rem;" />
+
+    <!-- ═══════════ NEWSLETTER ═══════════ -->
+    <section class="reveal" style="margin-bottom:1.75rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">뉴스레터 구독</p>
+      <div class="ash-card" style="border-radius:.875rem;padding:1.25rem;">
+        <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:1rem;">
+          <span style="font-size:1.5rem;">📨</span>
+          <div>
+            <p style="color:#f0efed;font-size:.875rem;font-weight:600;margin:0 0 .2rem;">재에서 피어난 소식을 받아보세요</p>
+            <p style="color:#8c877e;font-size:.78rem;line-height:1.6;margin:0;">새로운 작업, 에세이, 프로젝트 업데이트를 가장 먼저 받아볼 수 있습니다.</p>
+          </div>
+        </div>
+        <form onsubmit="doSubscribe(event)" style="display:flex;gap:.5rem;">
+          <input type="email" placeholder="your@email.com"
+            style="flex:1;background:#242220;border:1px solid #3d3a35;border-radius:.5rem;padding:.65rem .9rem;color:#dddbd7;font-size:.85rem;outline:none;transition:border-color .2s;"
+            onfocus="this.style.borderColor='#706b63'" onblur="this.style.borderColor='#3d3a35'" />
+          <button type="submit"
+            style="padding:.65rem 1.1rem;border-radius:.5rem;background:linear-gradient(135deg,#c2410c,#ea580c);color:#fff;font-size:.85rem;font-weight:600;border:none;cursor:pointer;white-space:nowrap;transition:filter .2s;"
+            onmouseover="this.style.filter='brightness(1.15)'" onmouseout="this.style.filter='brightness(1)'">구독</button>
+        </form>
+        <p id="sub-ok" style="color:#4ade80;font-size:.78rem;margin-top:.5rem;display:none;">✓ 구독 완료! 재 속에서 피어나는 소식을 기대해주세요.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════ CONTACT FORM ═══════════ -->
+    <section class="reveal" style="margin-bottom:3rem;">
+      <p style="color:#706b63;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.75rem;font-weight:500;">문의하기</p>
+      <div class="ash-card" style="border-radius:.875rem;padding:1.25rem;">
+        <form onsubmit="doContact(event)" style="display:flex;flex-direction:column;gap:.75rem;">
+          <input type="text" placeholder="이름"
+            style="background:#242220;border:1px solid #3d3a35;border-radius:.5rem;padding:.65rem .9rem;color:#dddbd7;font-size:.85rem;outline:none;transition:border-color .2s;"
+            onfocus="this.style.borderColor='#706b63'" onblur="this.style.borderColor='#3d3a35'" />
+          <input type="email" placeholder="이메일"
+            style="background:#242220;border:1px solid #3d3a35;border-radius:.5rem;padding:.65rem .9rem;color:#dddbd7;font-size:.85rem;outline:none;transition:border-color .2s;"
+            onfocus="this.style.borderColor='#706b63'" onblur="this.style.borderColor='#3d3a35'" />
+          <select style="background:#242220;border:1px solid #3d3a35;border-radius:.5rem;padding:.65rem .9rem;color:#8c877e;font-size:.85rem;outline:none;transition:border-color .2s;appearance:none;"
+            onfocus="this.style.borderColor='#706b63'" onblur="this.style.borderColor='#3d3a35'">
+            <option value="" disabled selected>문의 유형 선택</option>
+            <option style="background:#242220;color:#dddbd7;">협업 제안</option>
+            <option style="background:#242220;color:#dddbd7;">프로젝트 의뢰</option>
+            <option style="background:#242220;color:#dddbd7;">인터뷰 요청</option>
+            <option style="background:#242220;color:#dddbd7;">기타 문의</option>
+          </select>
+          <textarea rows="4" placeholder="메시지를 입력해주세요..."
+            style="background:#242220;border:1px solid #3d3a35;border-radius:.5rem;padding:.65rem .9rem;color:#dddbd7;font-size:.85rem;outline:none;resize:none;transition:border-color .2s;font-family:inherit;"
+            onfocus="this.style.borderColor='#706b63'" onblur="this.style.borderColor='#3d3a35'"></textarea>
+          <button type="submit"
+            style="width:100%;padding:.75rem;border-radius:.5rem;background:linear-gradient(135deg,#57534c,#3d3a35);color:#f0efed;font-size:.875rem;font-weight:600;border:none;cursor:pointer;transition:filter .2s,transform .2s;"
+            onmouseover="this.style.filter='brightness(1.2)';this.style.transform='translateY(-1px)'"
+            onmouseout="this.style.filter='brightness(1)';this.style.transform='translateY(0)'">
+            보내기 🔥
+          </button>
+        </form>
+        <p id="con-ok" style="color:#4ade80;font-size:.78rem;margin-top:.5rem;text-align:center;display:none;">✓ 메시지가 전송되었습니다. 곧 연락드리겠습니다.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════ FOOTER ═══════════ -->
+    <footer class="reveal" style="text-align:center;">
+      <hr class="ash-divider" style="margin-bottom:1.5rem;" />
+      <div style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <span class="tag">🌿 나무</span>
+        <span style="color:#3d3a35;font-size:.8rem;display:flex;align-items:center;">·</span>
+        <span class="tag">🔥 불꽃</span>
+        <span style="color:#3d3a35;font-size:.8rem;display:flex;align-items:center;">·</span>
+        <span class="tag">🩶 색</span>
+      </div>
+      <p style="font-family:'Noto Serif KR',serif;color:#706b63;font-size:.875rem;font-style:italic;margin:0 0 .25rem;">From ember to existence</p>
+      <p style="color:#3d3a35;font-size:.75rem;margin:0 0 1rem;">— beauty born in between —</p>
+      <a href="https://ash.kr" style="color:#8c877e;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;transition:color .2s;"
+         onmouseover="this.style.color='#c5c2bc'" onmouseout="this.style.color='#8c877e'">ash.kr</a>
+      <p style="color:#3d3a35;font-size:.7rem;margin-top:.75rem;">고대 영어 <span style="color:#57534c;">æsc</span> · Made with Tailwind CSS 4</p>
+    </footer>
+
+  </main><!-- /main -->
+
+  <!-- ░░ JS ░░ -->
+  <script>
+    // ── Particles ──────────────────────────────────
+    (function() {
+      const c = document.getElementById('ptcl');
+      // embers
+      for (let i = 0; i < 10; i++) {
+        const e = document.createElement('div');
+        const s = Math.random() * 4 + 2;
+        e.style.cssText = `
+          position:absolute;
+          width:${s}px;height:${s}px;
+          border-radius:50%;
+          background:radial-gradient(circle,#fbbf24,#f97316);
+          left:${Math.random()*100}%;
+          bottom:${Math.random()*25}%;
+          animation:float-up ${Math.random()*4+3}s linear ${Math.random()*6}s infinite;
+          pointer-events:none;
+        `;
+        c.appendChild(e);
+      }
+      // ash flakes
+      for (let i = 0; i < 16; i++) {
+        const e = document.createElement('div');
+        const s = Math.random() * 3 + 1;
+        e.style.cssText = `
+          position:absolute;
+          width:${s}px;height:${s * (Math.random()+.5)}px;
+          background:#8c877e;
+          border-radius:2px;
+          left:${Math.random()*100}%;
+          top:${Math.random()*20}%;
+          animation:ash-fall ${Math.random()*6+5}s linear ${Math.random()*8}s infinite;
+          opacity:${Math.random()*.35+.05};
+          pointer-events:none;
+        `;
+        c.appendChild(e);
+      }
+    })();
+
+    // ── Scroll reveal ──────────────────────────────
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationDelay = (i * 0.07) + 's';
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
         }
-
-        // Ash flakes
-        for (let i = 0; i < 18; i++) {
-          const el = document.createElement('div');
-          el.className = 'ash-particle';
-          const size = Math.random() * 3 + 1;
-          el.style.cssText = `
-            width:${size}px; height:${size * (Math.random() + 0.5)}px;
-            left:${Math.random() * 100}%;
-            top:${Math.random() * 30}%;
-            animation-duration:${Math.random() * 6 + 5}s;
-            animation-delay:${Math.random() * 8}s;
-            opacity:${Math.random() * 0.4 + 0.1};
-          `;
-          container.appendChild(el);
-        }
-      })();
-
-      // ── Scroll reveal ───────────────────────────
-      const revealEls = document.querySelectorAll('.reveal');
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((e, i) => {
-          if (e.isIntersecting) {
-            setTimeout(() => e.target.classList.add('visible'), i * 80);
-          }
-        });
-      }, { threshold: 0.1 });
-      revealEls.forEach(el => observer.observe(el));
-
-      // ── Carousel ───────────────────────────────
-      const track = document.getElementById('carousel-track');
-      const dotsContainer = document.getElementById('carousel-dots');
-      const total = track.children.length;
-      let current = 0;
-      let autoTimer;
-
-      // Create dots
-      for (let i = 0; i < total; i++) {
-        const dot = document.createElement('button');
-        dot.className = `w-1.5 h-1.5 rounded-full transition-all ${i === 0 ? 'bg-ash-300 w-4' : 'bg-ash-700'}`;
-        dot.onclick = () => goTo(i);
-        dotsContainer.appendChild(dot);
-      }
-
-      function goTo(n) {
-        current = (n + total) % total;
-        track.style.transform = `translateX(-${current * 100}%)`;
-        Array.from(dotsContainer.children).forEach((d, i) => {
-          d.className = `h-1.5 rounded-full transition-all ${i === current ? 'bg-ash-300 w-4' : 'bg-ash-700 w-1.5'}`;
-        });
-        resetAuto();
-      }
-
-      function resetAuto() {
-        clearInterval(autoTimer);
-        autoTimer = setInterval(() => goTo(current + 1), 4000);
-      }
-
-      document.getElementById('carousel-prev').onclick = () => goTo(current - 1);
-      document.getElementById('carousel-next').onclick = () => goTo(current + 1);
-
-      // Touch / swipe
-      let touchStartX = 0;
-      const carouselEl = document.getElementById('carousel-container');
-      carouselEl.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
-      carouselEl.addEventListener('touchend', e => {
-        const diff = touchStartX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
-      }, {passive:true});
-
-      resetAuto();
-
-      // ── Music player (mock) ────────────────────
-      let isPlaying = false;
-      const vinyl = document.getElementById('vinyl-disc');
-      const playIcon = document.getElementById('play-icon');
-
-      function togglePlay() {
-        isPlaying = !isPlaying;
-        vinyl.classList.toggle('playing', isPlaying);
-        playIcon.innerHTML = isPlaying
-          ? `<path d="M5.5 3.5A1.5 1.5 0 017 5v10a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5zM12.5 3.5A1.5 1.5 0 0114 5v10a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5z"/>`
-          : `<path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>`;
-      }
-
-      // ── Subscribe form ─────────────────────────
-      function handleSubscribe(e) {
-        e.preventDefault();
-        document.getElementById('subscribe-msg').classList.remove('hidden');
-        e.target.reset();
-      }
-
-      // ── Contact form ───────────────────────────
-      function handleContact(e) {
-        e.preventDefault();
-        document.getElementById('contact-msg').classList.remove('hidden');
-        e.target.reset();
-      }
-
-      // ── Keyboard: carousel arrow keys ─────────
-      document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft') goTo(current - 1);
-        if (e.key === 'ArrowRight') goTo(current + 1);
       });
-    </script>
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  </body>
+    // ── Carousel ───────────────────────────────────
+    let carIdx = 0;
+    const carTotal = 5;
+    const carTrack = document.getElementById('car-track');
+    const dotsEl = document.getElementById('dots');
+
+    // build dots
+    for (let i = 0; i < carTotal; i++) {
+      const d = document.createElement('button');
+      d.style.cssText = `height:6px;border-radius:9999px;border:none;cursor:pointer;transition:all .25s;background:${i===0?'#c5c2bc':'#3d3a35'};width:${i===0?'16px':'6px'};padding:0;`;
+      d.onclick = () => carGo(i);
+      dotsEl.appendChild(d);
+    }
+
+    function carGo(n) {
+      carIdx = ((n % carTotal) + carTotal) % carTotal;
+      carTrack.style.transform = `translateX(-${carIdx * 100}%)`;
+      Array.from(dotsEl.children).forEach((d, i) => {
+        d.style.background = i === carIdx ? '#c5c2bc' : '#3d3a35';
+        d.style.width = i === carIdx ? '16px' : '6px';
+      });
+    }
+
+    // auto-play
+    let carTimer = setInterval(() => carGo(carIdx + 1), 4200);
+    document.getElementById('car-wrap').addEventListener('mouseenter', () => clearInterval(carTimer));
+    document.getElementById('car-wrap').addEventListener('mouseleave', () => { carTimer = setInterval(() => carGo(carIdx + 1), 4200); });
+
+    // touch swipe
+    let tx = 0;
+    document.getElementById('car-wrap').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+    document.getElementById('car-wrap').addEventListener('touchend', e => {
+      const d = tx - e.changedTouches[0].clientX;
+      if (Math.abs(d) > 38) carGo(carIdx + (d > 0 ? 1 : -1));
+    }, {passive:true});
+
+    // keyboard
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft')  carGo(carIdx - 1);
+      if (e.key === 'ArrowRight') carGo(carIdx + 1);
+    });
+
+    // ── Music player ───────────────────────────────
+    let playing = false;
+    const vinyl = document.getElementById('vinyl');
+    const picon = document.getElementById('picon');
+    const pbar  = document.getElementById('pbar');
+
+    function togglePlay() {
+      playing = !playing;
+      if (playing) {
+        vinyl.classList.add('vinyl-spin');
+        pbar.classList.add('playing');
+        picon.innerHTML = `<path d="M5.5 3.5A1.5 1.5 0 017 5v10a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5zM12.5 3.5A1.5 1.5 0 0114 5v10a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5z"/>`;
+      } else {
+        vinyl.classList.remove('vinyl-spin');
+        pbar.classList.remove('playing');
+        picon.innerHTML = `<path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>`;
+      }
+    }
+
+    // ── Forms ──────────────────────────────────────
+    function doSubscribe(e) {
+      e.preventDefault();
+      document.getElementById('sub-ok').style.display = 'block';
+      e.target.reset();
+    }
+    function doContact(e) {
+      e.preventDefault();
+      document.getElementById('con-ok').style.display = 'block';
+      e.target.reset();
+    }
+  </script>
+
+</body>
 </html>

@@ -1,297 +1,998 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ash.kr</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style type="text/tailwindcss">
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ash.kr — Card</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
-      @theme {
-        --color-ash-50:  #f7f6f4;
-        --color-ash-100: #ede9e2;
-        --color-ash-200: #d8d0c4;
-        --color-ash-300: #bfb4a3;
-        --color-ash-400: #a4957f;
-        --color-ash-500: #8e7d68;
-        --color-ash-600: #7a6a57;
-        --color-ash-700: #655748;
-        --color-ash-800: #54483c;
-        --color-ash-900: #473d33;
-        --color-ember-400: #e8834a;
-        --color-ember-500: #d4632a;
-        --color-ember-600: #b84e1e;
-        --color-bark-900:  #1c1410;
-        --color-bark-800:  #2a1f17;
-        --color-bark-700:  #3b2c20;
-        --color-leaf-400:  #7aaa72;
-        --color-leaf-500:  #5a8f52;
+  <style type="text/tailwindcss">
+    @theme {
+      --font-cinzel: 'Cinzel', serif;
+      --font-inter:  'Inter', sans-serif;
+    }
+  </style>
 
-        --font-serif: 'Fraunces', Georgia, serif;
-        --font-sans:  'Inter', system-ui, sans-serif;
-      }
+  <style>
+    /* ─────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      * {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a0f;
+      background-image:
+        radial-gradient(ellipse 120% 80% at 50% -20%, #1a0e2e 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 90%, #0e1a10 0%, transparent 50%);
+      overflow: hidden;
+    }
 
-      body {
-        font-family: var(--font-sans);
-        background-color: var(--color-bark-900);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 1rem;
-        background-image:
-          radial-gradient(ellipse 80% 50% at 50% -10%, rgba(100,70,40,0.35) 0%, transparent 70%),
-          url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.018'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-      }
+    /* 배경 미세 노이즈 */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-      /* 카드 진입 애니메이션 */
-      @keyframes card-rise {
-        from { opacity: 0; transform: translateY(28px) scale(0.97); }
-        to   { opacity: 1; transform: translateY(0)   scale(1);    }
-      }
-      .card-enter {
-        animation: card-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-      }
+    /* ─────────────────────────────────────────
+       SCENE — 카드 원근감 컨테이너
+    ───────────────────────────────────────── */
+    .scene {
+      perspective: 800px;
+      position: relative;
+      z-index: 1;
+    }
 
-      /* 불씨 파티클 */
-      @keyframes ember-float {
-        0%   { opacity: 0;   transform: translateY(0)   scale(1)   rotate(0deg);   }
-        20%  { opacity: 0.8; }
-        80%  { opacity: 0.4; }
-        100% { opacity: 0;   transform: translateY(-80px) scale(0.3) rotate(40deg); }
-      }
-      .ember { animation: ember-float linear infinite; }
-      .e1  { animation-duration: 3.2s; animation-delay: 0s;    left: 18%; }
-      .e2  { animation-duration: 4.0s; animation-delay: 0.8s;  left: 35%; }
-      .e3  { animation-duration: 2.8s; animation-delay: 1.5s;  left: 52%; }
-      .e4  { animation-duration: 3.6s; animation-delay: 0.3s;  left: 68%; }
-      .e5  { animation-duration: 4.4s; animation-delay: 2.1s;  left: 80%; }
+    /* ─────────────────────────────────────────
+       CARD WRAPPER — 3D tilt
+    ───────────────────────────────────────── */
+    .card-wrap {
+      width: 320px;
+      aspect-ratio: 2.5 / 3.5; /* 포켓몬 카드 황금비 */
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateX(0deg) rotateY(0deg);
+      transition: transform 0.08s ease-out, box-shadow 0.3s ease;
+      border-radius: 18px;
+      cursor: pointer;
+      /* 입장 애니메이션 */
+      animation: card-enter 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
 
-      /* 나뭇잎 흔들림 */
-      @keyframes leaf-sway {
-        0%, 100% { transform: rotate(-4deg) scaleX(1);   }
-        50%       { transform: rotate( 4deg) scaleX(0.96); }
-      }
-      .leaf-sway { animation: leaf-sway 4s ease-in-out infinite; transform-origin: bottom center; }
+    @keyframes card-enter {
+      from { opacity: 0; transform: rotateX(25deg) rotateY(-15deg) scale(0.85) translateY(40px); }
+      to   { opacity: 1; transform: rotateX(0deg)  rotateY(0deg)   scale(1)    translateY(0); }
+    }
 
-      /* 테두리 shimmer */
-      @keyframes border-shimmer {
-        0%, 100% { opacity: 0.5; }
-        50%       { opacity: 1; }
-      }
-      .border-shimmer { animation: border-shimmer 3s ease-in-out infinite; }
+    .card-wrap:hover {
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.8),
+        0 0  40px rgba(180, 120, 255, 0.15),
+        0 0  80px rgba(100, 200, 150, 0.08);
+    }
 
-      /* 구분선 그라디언트 */
-      .divider {
-        height: 1px;
-        background: linear-gradient(to right, transparent, var(--color-ash-600), transparent);
-      }
+    /* ─────────────────────────────────────────
+       CARD FACE — 기본 배경
+    ───────────────────────────────────────── */
+    .card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        linear-gradient(160deg,
+          #1a1025 0%,
+          #0f1a18 40%,
+          #1a1025 70%,
+          #0d0d14 100%
+        );
+      border: 1.5px solid rgba(255,255,255,0.08);
+    }
 
-      /* 뱃지 hover glow */
-      .badge-glow:hover {
-        box-shadow: 0 0 12px rgba(232, 131, 74, 0.45);
-        border-color: var(--color-ember-400) !important;
-      }
-    </style>
-  </head>
+    /* ─────────────────────────────────────────
+       LAYER 1 — 홀로그래픽 레인보우 오버레이
+       마우스 위치에 따라 JS로 --mx, --my 갱신
+    ───────────────────────────────────────── */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
 
-  <body>
+      background:
+        /* 무지개 스펙트럼 — 마우스 위치 기반 */
+        repeating-linear-gradient(
+          calc(var(--r, 130deg)),
+          hsla(0,  100%, 65%, 0.12) 0%,
+          hsla(30, 100%, 65%, 0.10) 8%,
+          hsla(60, 100%, 60%, 0.12) 16%,
+          hsla(120,100%, 55%, 0.10) 24%,
+          hsla(180,100%, 60%, 0.12) 32%,
+          hsla(240,100%, 65%, 0.10) 40%,
+          hsla(300,100%, 65%, 0.12) 48%,
+          hsla(340,100%, 65%, 0.10) 56%,
+          hsla(0,  100%, 65%, 0.12) 64%
+        ),
+        /* 스포트라이트 — 마우스 위치 기반 */
+        radial-gradient(
+          ellipse 60% 60% at var(--mx, 50%) var(--my, 50%),
+          rgba(255,255,255,0.06) 0%,
+          transparent 70%
+        );
 
-    <!-- ══════════════ CARD ══════════════ -->
-    <article class="card-enter relative w-full max-w-sm">
+      mix-blend-mode: color-dodge;
+      filter: brightness(1) contrast(1.2);
+    }
 
-      <!-- 카드 외곽 글로우 링 -->
-      <div class="border-shimmer absolute -inset-px rounded-3xl border border-ash-700/60 pointer-events-none"></div>
+    .card-wrap:hover .card::before {
+      opacity: 1;
+    }
+
+    /* ─────────────────────────────────────────
+       LAYER 2 — 글리터 / 스파클 패턴
+    ───────────────────────────────────────── */
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: 11;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='8'/%3E%3CfeBlend in='SourceGraphic' mode='screen'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.15'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      mix-blend-mode: overlay;
+      filter: brightness(2.5) contrast(1.5);
+    }
+
+    .card-wrap:hover .card::after {
+      opacity: 0.4;
+    }
+
+    /* ─────────────────────────────────────────
+       CARD INNER — 실제 컨텐츠
+    ───────────────────────────────────────── */
+    .card-inner {
+      position: relative;
+      z-index: 5;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+      gap: 0;
+    }
+
+    /* ─────────────────────────────────────────
+       CARD BORDER — 금빛 테두리 (포켓몬 카드 느낌)
+    ───────────────────────────────────────── */
+    .card-border {
+      position: absolute;
+      inset: 6px;
+      border-radius: 12px;
+      border: 1px solid rgba(200, 170, 90, 0.35);
+      z-index: 6;
+      pointer-events: none;
+    }
+
+    .card-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ─────────────────────────────────────────
+       HEADER — 카드 이름 + HP 영역
+    ───────────────────────────────────────── */
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 8px 10px 6px;
+      position: relative;
+      z-index: 7;
+    }
+
+    .card-name {
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      background: linear-gradient(135deg, #e8d5a3 0%, #c9a84c 40%, #f0e6b8 70%, #a87830 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 8px rgba(200, 160, 60, 0.4));
+    }
+
+    .card-stage {
+      font-family: 'Inter', sans-serif;
+      font-size: 7.5px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(200,170,100,0.6);
+      margin-top: 3px;
+    }
+
+    .card-hp {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(180, 140, 80, 0.7);
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+
+    .card-hp span {
+      font-size: 22px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #c8a84c, #f0d980);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    /* ─────────────────────────────────────────
+       ILLUSTRATION — 메인 아트워크 영역
+    ───────────────────────────────────────── */
+    .card-art {
+      margin: 0 10px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      z-index: 7;
+      flex: 0 0 auto;
+      height: 158px;
+      border: 1.5px solid rgba(200,170,90,0.3);
+      background:
+        /* 깊은 숲 + 잿불 하늘 */
+        radial-gradient(ellipse 100% 60% at 50% 100%, #0d1a0d 0%, transparent 70%),
+        radial-gradient(ellipse 80% 50% at 30% 80%,  #0a1208 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 70% 20%,  #1a0d08 0%, transparent 50%),
+        linear-gradient(180deg,
+          #100808 0%,
+          #1a0f0a 25%,
+          #0d1508 60%,
+          #060d04 100%
+        );
+    }
+
+    /* SVG 일러스트 — 세계수 Yggdrasil + 잿불 */
+    .card-art svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 아트워크 홀로 shimmer */
+    .card-art::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(255,255,255,0.03) 40%,
+        rgba(180,150,255,0.05) 60%,
+        transparent 100%
+      );
+      mix-blend-mode: screen;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    /* ─────────────────────────────────────────
+       TYPE TAG — 그림 위 우측 상단
+    ───────────────────────────────────────── */
+    .type-tag {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff9a5c, #cc4400);
+      border: 1.5px solid rgba(255,200,150,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      box-shadow: 0 0 8px rgba(255, 100, 30, 0.5), inset 0 1px 1px rgba(255,255,255,0.25);
+    }
+
+    /* ─────────────────────────────────────────
+       INFO STRIP — 아트 아래 종류/길이/무게
+    ───────────────────────────────────────── */
+    .card-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 10px;
+      margin: 0 10px;
+      position: relative;
+      z-index: 7;
+    }
+
+    .info-label {
+      font-size: 7px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(200,175,120,0.5);
+    }
+
+    .info-value {
+      font-family: 'Cinzel', serif;
+      font-size: 8.5px;
+      font-weight: 600;
+      color: rgba(220,195,140,0.75);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─────────────────────────────────────────
+       ABILITY / FLAVOR TEXT
+    ───────────────────────────────────────── */
+    .card-divider {
+      height: 1px;
+      margin: 0 10px;
+      background: linear-gradient(to right,
+        transparent,
+        rgba(200,170,90,0.3) 20%,
+        rgba(200,170,90,0.5) 50%,
+        rgba(200,170,90,0.3) 80%,
+        transparent
+      );
+      position: relative;
+      z-index: 7;
+    }
+
+    .card-ability {
+      padding: 7px 12px 5px;
+      position: relative;
+      z-index: 7;
+    }
+
+    .ability-name {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(220, 180, 80, 0.8);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 4px;
+    }
+
+    .ability-name::before {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #7aef8a, #1a6b28);
+      border: 1px solid rgba(150,255,150,0.3);
+      flex-shrink: 0;
+      box-shadow: 0 0 5px rgba(80,200,80,0.4);
+    }
+
+    .ability-text {
+      font-size: 8px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(210, 195, 165, 0.7);
+      letter-spacing: 0.02em;
+      padding-left: 19px;
+    }
+
+    /* ─────────────────────────────────────────
+       ATTACK — 메인 공격
+    ───────────────────────────────────────── */
+    .card-attack {
+      padding: 6px 12px;
+      position: relative;
+      z-index: 7;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .attack-cost {
+      display: flex;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .cost-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 7px;
+    }
+
+    .cost-fire {
+      background: radial-gradient(circle at 35% 35%, #ff9a5c, #cc4400);
+      border: 1px solid rgba(255,180,100,0.4);
+      box-shadow: 0 0 4px rgba(255,100,30,0.4);
+    }
+
+    .cost-colorless {
+      background: radial-gradient(circle at 35% 35%, #d0c8b8, #8a8070);
+      border: 1px solid rgba(220,210,180,0.3);
+    }
+
+    .attack-name {
+      font-family: 'Cinzel', serif;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: rgba(230, 210, 160, 0.9);
+      flex: 1;
+    }
+
+    .attack-damage {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, #f0e060, #e8a020, #f0e060);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 6px rgba(230,160,30,0.5));
+    }
+
+    .attack-desc {
+      font-size: 7.5px;
+      color: rgba(200,185,150,0.6);
+      line-height: 1.5;
+      padding-left: 0;
+      width: 100%;
+      letter-spacing: 0.02em;
+    }
+
+    /* ─────────────────────────────────────────
+       WEAKNESS / RESISTANCE / RETREAT
+    ───────────────────────────────────────── */
+    .card-stats {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 5px 12px;
+      margin: 0 10px;
+      border-top: 1px solid rgba(200,170,90,0.2);
+      border-bottom: 1px solid rgba(200,170,90,0.2);
+      position: relative;
+      z-index: 7;
+    }
+
+    .stat-block {
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat-block + .stat-block {
+      border-left: 1px solid rgba(200,170,90,0.15);
+    }
+
+    .stat-label {
+      font-size: 6.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(180,155,100,0.5);
+      margin-bottom: 2px;
+    }
+
+    .stat-value {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(220,195,140,0.8);
+      letter-spacing: 0.04em;
+    }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    .card-footer {
+      padding: 5px 12px 8px;
+      position: relative;
+      z-index: 7;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-flavor {
+      font-size: 6.5px;
+      font-style: italic;
+      color: rgba(180,165,130,0.5);
+      line-height: 1.5;
+      max-width: 72%;
+      letter-spacing: 0.01em;
+    }
+
+    .footer-number {
+      font-family: 'Cinzel', serif;
+      font-size: 7px;
+      color: rgba(180,155,100,0.45);
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    /* ─────────────────────────────────────────
+       HOLOGRAPHIC SHINE — 마우스 추적 light ray
+    ───────────────────────────────────────── */
+    .card-shine {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      z-index: 12;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      background: radial-gradient(
+        ellipse 50% 50% at var(--mx, 50%) var(--my, 50%),
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.03) 40%,
+        transparent 70%
+      );
+    }
+
+    .card-wrap:hover .card-shine {
+      opacity: 1;
+    }
+
+    /* ─────────────────────────────────────────
+       FOIL TEXTURE — 다이아몬드 패턴
+    ───────────────────────────────────────── */
+    .card-foil {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      z-index: 9;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      background-image:
+        repeating-linear-gradient(
+          45deg,
+          rgba(255,255,255,0.015) 0px,
+          rgba(255,255,255,0.015) 1px,
+          transparent 1px,
+          transparent 8px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          rgba(255,255,255,0.015) 0px,
+          rgba(255,255,255,0.015) 1px,
+          transparent 1px,
+          transparent 8px
+        );
+      mix-blend-mode: overlay;
+    }
+
+    .card-wrap:hover .card-foil {
+      opacity: 1;
+    }
+
+    /* ─────────────────────────────────────────
+       IDLE 부유 애니메이션 (hover 아닐 때)
+    ───────────────────────────────────────── */
+    @keyframes float-idle {
+      0%, 100% { transform: rotateX(2deg) rotateY(-2deg) translateY(0px); }
+      33%       { transform: rotateX(-1deg) rotateY(3deg) translateY(-6px); }
+      66%       { transform: rotateX(3deg) rotateY(-1deg) translateY(-3px); }
+    }
+
+    .card-wrap.idle {
+      animation: card-enter 1s cubic-bezier(0.22, 1, 0.36, 1) both,
+                 float-idle 6s ease-in-out 1s infinite;
+    }
+
+    /* ─────────────────────────────────────────
+       EMBER 파티클 (SVG 위)
+    ───────────────────────────────────────── */
+    @keyframes rise {
+      0%   { transform: translate(0, 0) scale(1);     opacity: 0.8; }
+      50%  { transform: translate(var(--dx), -40px) scale(0.7); opacity: 0.5; }
+      100% { transform: translate(calc(var(--dx)*1.5), -85px) scale(0.2); opacity: 0; }
+    }
+
+    .ember-particle {
+      animation: rise ease-in infinite;
+      transform-origin: center;
+    }
+
+    /* ─────────────────────────────────────────
+       TREE 잎 흔들림
+    ───────────────────────────────────────── */
+    @keyframes sway-l {
+      0%,100% { transform: rotate(-3deg); }
+      50%      { transform: rotate(2deg);  }
+    }
+
+    @keyframes sway-r {
+      0%,100% { transform: rotate(3deg);  }
+      50%      { transform: rotate(-2deg); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="scene">
+    <div class="card-wrap idle" id="cardWrap">
+
+      <!-- 홀로그래픽 레이어들 -->
+      <div class="card-shine"></div>
+      <div class="card-foil"></div>
 
       <!-- 카드 본체 -->
-      <div class="relative overflow-hidden rounded-3xl bg-bark-800 shadow-2xl shadow-black/70 border border-bark-700">
+      <div class="card">
+        <div class="card-border"></div>
 
-        <!-- ── HEADER ILLUSTRATION ── -->
-        <div class="relative h-52 overflow-hidden bg-bark-900">
+        <div class="card-inner">
 
-          <!-- 배경 그라디언트 -->
-          <div class="absolute inset-0 bg-gradient-to-b from-bark-900 via-bark-900/80 to-bark-800"></div>
-
-          <!-- 별빛 점들 -->
-          <div class="absolute inset-0">
-            <div class="absolute w-0.5 h-0.5 rounded-full bg-ash-200/60 top-[12%] left-[8%]"></div>
-            <div class="absolute w-px   h-px   rounded-full bg-ash-100/50 top-[22%] left-[25%]"></div>
-            <div class="absolute w-0.5 h-0.5 rounded-full bg-ash-200/40 top-[8%]  left-[60%]"></div>
-            <div class="absolute w-px   h-px   rounded-full bg-white/40    top-[18%] left-[78%]"></div>
-            <div class="absolute w-0.5 h-0.5 rounded-full bg-ash-100/50 top-[35%] left-[88%]"></div>
-            <div class="absolute w-px   h-px   rounded-full bg-ash-200/30 top-[5%]  left-[44%]"></div>
-          </div>
-
-          <!-- SVG 물푸레나무 (Yggdrasil 스타일) -->
-          <svg
-            viewBox="0 0 200 160"
-            class="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 opacity-90"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <!-- 뿌리 -->
-            <path d="M100 140 Q85 148 72 152" stroke="#54483c" stroke-width="2" stroke-linecap="round"/>
-            <path d="M100 140 Q110 150 124 154" stroke="#54483c" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M100 140 Q95 155 94 160" stroke="#3b2c20" stroke-width="1.2" stroke-linecap="round"/>
-
-            <!-- 기둥 -->
-            <path d="M100 140 L100 70" stroke="#7a6a57" stroke-width="5" stroke-linecap="round"/>
-            <path d="M100 100 L100 70" stroke="#a4957f" stroke-width="3" stroke-linecap="round"/>
-
-            <!-- 가지들 -->
-            <path d="M100 95 Q78 85 62 78" stroke="#7a6a57" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M100 88 Q118 78 132 70" stroke="#7a6a57" stroke-width="2"   stroke-linecap="round"/>
-            <path d="M100 80 Q88  65 80 55"  stroke="#655748" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M100 80 Q110 62 116 52" stroke="#655748" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M100 74 Q100 58 100 48" stroke="#655748" stroke-width="2"   stroke-linecap="round"/>
-            <path d="M62  78 Q50  72 44 65"  stroke="#655748" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M132 70 Q142 63 148 56" stroke="#655748" stroke-width="1.5" stroke-linecap="round"/>
-
-            <!-- 잎 클러스터 (초록) -->
-            <g class="leaf-sway">
-              <ellipse cx="100" cy="34" rx="22" ry="16" fill="#2d4a2a" opacity="0.85"/>
-              <ellipse cx="100" cy="30" rx="15" ry="11" fill="#3a5e36" opacity="0.75"/>
-            </g>
-            <ellipse cx="60"  cy="64" rx="14" ry="10" fill="#2d4a2a" opacity="0.70"/>
-            <ellipse cx="135" cy="57" rx="12" ry="9"  fill="#2d4a2a" opacity="0.65"/>
-            <ellipse cx="78"  cy="46" rx="10" ry="8"  fill="#3a5e36" opacity="0.60"/>
-            <ellipse cx="118" cy="42" rx="10" ry="8"  fill="#3a5e36" opacity="0.60"/>
-
-            <!-- 불씨/잿불 파티클 (트리 아래쪽) -->
-            <circle cx="92"  cy="130" r="1.2" fill="#e8834a" opacity="0.6"/>
-            <circle cx="108" cy="135" r="0.9" fill="#d4632a" opacity="0.5"/>
-            <circle cx="100" cy="128" r="1.0" fill="#e8834a" opacity="0.7"/>
-          </svg>
-
-          <!-- 떠오르는 불씨 파티클 (CSS 애니메이션) -->
-          <div class="absolute bottom-4 w-full pointer-events-none">
-            <span class="ember e1 absolute w-1 h-1 rounded-full bg-ember-400 opacity-0 bottom-0"></span>
-            <span class="ember e2 absolute w-0.5 h-0.5 rounded-full bg-ember-500 opacity-0 bottom-0"></span>
-            <span class="ember e3 absolute w-1 h-1 rounded-full bg-amber-300 opacity-0 bottom-0"></span>
-            <span class="ember e4 absolute w-0.5 h-0.5 rounded-full bg-ember-400 opacity-0 bottom-0"></span>
-            <span class="ember e5 absolute w-1 h-1 rounded-full bg-ember-500 opacity-0 bottom-0"></span>
-          </div>
-
-          <!-- 헤더 상단 도메인 태그 -->
-          <div class="absolute top-4 left-4">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-bark-900/70 backdrop-blur-sm border border-ash-700/50 text-ash-300 text-[11px] font-medium tracking-widest uppercase">
-              <span class="w-1.5 h-1.5 rounded-full bg-leaf-400 inline-block"></span>
-              ash.kr
-            </span>
-          </div>
-        </div>
-
-        <!-- ── CARD BODY ── -->
-        <div class="px-7 pb-7 pt-6 space-y-5">
-
-          <!-- 타이틀 -->
-          <div>
-            <h1 class="font-serif text-4xl font-light tracking-tight text-ash-100 leading-none">
-              ash
-              <span class="text-ember-400">.</span>
-            </h1>
-            <p class="mt-1.5 text-ash-400 text-[11px] tracking-[0.18em] uppercase font-medium">
-              Where things burn &amp; grow
-            </p>
-          </div>
-
-          <div class="divider"></div>
-
-          <!-- 의미 섹션 -->
-          <div class="space-y-4">
-
-            <!-- 의미 1: 물푸레나무 / Yggdrasil -->
-            <div class="flex gap-3.5 items-start group">
-              <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-xl bg-leaf-500/15 border border-leaf-500/25 flex items-center justify-center text-leaf-400 text-base transition-all duration-300 group-hover:bg-leaf-500/25">
-                🌳
-              </div>
-              <div>
-                <p class="text-ash-100 text-sm font-medium leading-snug">물푸레나무 · Ash Tree</p>
-                <p class="text-ash-400 text-[12px] leading-relaxed mt-0.5">
-                  북유럽 신화의 세계수 <em class="text-ash-300 not-italic">Yggdrasil</em>이자 아홉 세계를 잇는 생명의 축. 강인함과 치유, 연결을 상징합니다.
-                </p>
-              </div>
+          <!-- ── HEADER ── -->
+          <div class="card-header">
+            <div>
+              <div class="card-name">ASH</div>
+              <div class="card-stage">World-Tree Keeper</div>
             </div>
-
-            <!-- 의미 2: 재 (灰) / 소멸과 재생 -->
-            <div class="flex gap-3.5 items-start group">
-              <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-xl bg-ember-500/15 border border-ember-500/25 flex items-center justify-center text-ember-400 text-base transition-all duration-300 group-hover:bg-ember-500/25">
-                🔥
-              </div>
-              <div>
-                <p class="text-ash-100 text-sm font-medium leading-snug">재(灰) · Ash &amp; Ember</p>
-                <p class="text-ash-400 text-[12px] leading-relaxed mt-0.5">
-                  불이 남긴 자리. 소멸은 끝이 아니라 <em class="text-ash-300 not-italic">재생의 씨앗</em>입니다. 잿더미에서 다시 피어오르는 것들.
-                </p>
-              </div>
+            <div class="card-hp">
+              <span>130</span>HP
             </div>
-
-            <!-- 의미 3: 히브리어 Asher / 행복 -->
-            <div class="flex gap-3.5 items-start group">
-              <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-xl bg-ash-600/20 border border-ash-600/30 flex items-center justify-center text-ash-300 text-base transition-all duration-300 group-hover:bg-ash-600/35">
-                ✦
-              </div>
-              <div>
-                <p class="text-ash-100 text-sm font-medium leading-snug">אָשֵׁר · Asher</p>
-                <p class="text-ash-400 text-[12px] leading-relaxed mt-0.5">
-                  히브리어 어원 <em class="text-ash-300 not-italic">Asher</em>는 '행복한 자'. 단순하고 고요한 충족감을 의미합니다.
-                </p>
-              </div>
-            </div>
-
           </div>
 
-          <div class="divider"></div>
+          <!-- ── ART ── -->
+          <div class="card-art">
+            <svg viewBox="0 0 280 158" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- 하늘 그라디언트 -->
+              <defs>
+                <radialGradient id="sky" cx="50%" cy="30%" r="70%">
+                  <stop offset="0%"  stop-color="#1a0e08"/>
+                  <stop offset="60%" stop-color="#0d1008"/>
+                  <stop offset="100%" stop-color="#050805"/>
+                </radialGradient>
+                <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%"  stop-color="#fff5d0" stop-opacity="0.9"/>
+                  <stop offset="50%" stop-color="#f0d880" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="#e0a830" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="fireGlow" cx="50%" cy="80%" r="60%">
+                  <stop offset="0%"  stop-color="#ff6010" stop-opacity="0.7"/>
+                  <stop offset="50%" stop-color="#cc3800" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#800000" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="blur2">
+                  <feGaussianBlur stdDeviation="2"/>
+                </filter>
+                <filter id="blur4">
+                  <feGaussianBlur stdDeviation="4"/>
+                </filter>
+                <filter id="blur1">
+                  <feGaussianBlur stdDeviation="1"/>
+                </filter>
+              </defs>
 
-          <!-- 태그 뱃지 -->
-          <div class="flex flex-wrap gap-2">
-            <span class="badge-glow inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-ash-900/60 border border-ash-700/50 text-ash-300 cursor-default transition-all duration-200">
-              strength
-            </span>
-            <span class="badge-glow inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-ash-900/60 border border-ash-700/50 text-ash-300 cursor-default transition-all duration-200">
-              renewal
-            </span>
-            <span class="badge-glow inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-ash-900/60 border border-ash-700/50 text-ash-300 cursor-default transition-all duration-200">
-              connection
-            </span>
-            <span class="badge-glow inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-ember-600/20 border border-ember-600/40 text-ember-400 cursor-default transition-all duration-200">
-              ash.kr
-            </span>
-          </div>
+              <!-- 배경 -->
+              <rect width="280" height="158" fill="url(#sky)"/>
 
-          <!-- CTA 링크 -->
-          <a
-            href="https://ash.kr"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group flex items-center justify-between w-full px-5 py-3.5 rounded-2xl bg-gradient-to-r from-ash-800 to-bark-700 border border-ash-700/50 hover:border-ember-500/60 hover:from-ember-600/20 hover:to-bark-700 transition-all duration-300 shadow-md hover:shadow-ember-500/10"
-          >
-            <span class="text-ash-200 text-sm font-medium group-hover:text-ember-400 transition-colors duration-200">
-              ash.kr 방문하기
-            </span>
-            <svg class="w-4 h-4 text-ash-500 group-hover:text-ember-400 group-hover:translate-x-1 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <!-- 달 글로우 -->
+              <circle cx="220" cy="28" r="28" fill="url(#moonGlow)" filter="url(#blur4)"/>
+              <!-- 달 본체 -->
+              <circle cx="220" cy="28" r="12" fill="#fff5d0" opacity="0.85"/>
+              <circle cx="220" cy="28" r="10" fill="#fef0c0" opacity="0.9"/>
+
+              <!-- 별들 -->
+              <circle cx="30"  cy="12" r="0.8" fill="white" opacity="0.6"/>
+              <circle cx="55"  cy="8"  r="0.6" fill="white" opacity="0.5"/>
+              <circle cx="90"  cy="18" r="0.7" fill="white" opacity="0.4"/>
+              <circle cx="140" cy="6"  r="0.9" fill="white" opacity="0.7"/>
+              <circle cx="170" cy="20" r="0.5" fill="white" opacity="0.4"/>
+              <circle cx="250" cy="14" r="0.7" fill="white" opacity="0.5"/>
+              <circle cx="265" cy="40" r="0.6" fill="white" opacity="0.4"/>
+              <circle cx="15"  cy="35" r="0.5" fill="white" opacity="0.3"/>
+              <circle cx="75"  cy="30" r="0.4" fill="white" opacity="0.35"/>
+
+              <!-- 땅 실루엣 -->
+              <ellipse cx="140" cy="170" rx="150" ry="40" fill="#060c04"/>
+              <rect x="0" y="135" width="280" height="30" fill="#060c04"/>
+
+              <!-- 잔불 빛 (바닥) -->
+              <ellipse cx="140" cy="140" rx="80" ry="20" fill="url(#fireGlow)" filter="url(#blur4)"/>
+
+              <!-- ── 나무 뿌리 ── -->
+              <path d="M140 138 Q120 145 105 152" stroke="#2a1e10" stroke-width="3" stroke-linecap="round"/>
+              <path d="M140 138 Q160 146 175 153" stroke="#2a1e10" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M140 138 Q132 150 130 158" stroke="#1e1508" stroke-width="2" stroke-linecap="round"/>
+              <path d="M140 138 Q148 150 150 158" stroke="#1e1508" stroke-width="2" stroke-linecap="round"/>
+              <path d="M140 138 Q112 148 98 158" stroke="#221808" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M140 138 Q165 148 180 158" stroke="#221808" stroke-width="1.5" stroke-linecap="round"/>
+
+              <!-- ── 나무 기둥 ── -->
+              <path d="M135 138 Q132 115 133 90 Q134 65 136 30" stroke="#3a2a18" stroke-width="7" stroke-linecap="round"/>
+              <path d="M145 138 Q148 115 147 90 Q146 65 144 30" stroke="#2e2010" stroke-width="7" stroke-linecap="round"/>
+              <path d="M138 138 Q137 100 138 55" stroke="#5a4025" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+
+              <!-- ── 주요 가지 ── -->
+              <!-- 왼쪽 아래 -->
+              <path d="M137 110 Q110 100 88 95"   stroke="#3a2a18" stroke-width="4" stroke-linecap="round"/>
+              <path d="M137 100 Q108 88 82 80"    stroke="#3a2a18" stroke-width="3" stroke-linecap="round"/>
+              <!-- 오른쪽 아래 -->
+              <path d="M143 108 Q168 97 190 92"   stroke="#3a2a18" stroke-width="4" stroke-linecap="round"/>
+              <path d="M143 98  Q170 86 194 80"   stroke="#3a2a18" stroke-width="3" stroke-linecap="round"/>
+              <!-- 왼쪽 위 -->
+              <path d="M137 80 Q112 68 90 55"     stroke="#2e2010" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M137 70 Q118 55 105 40"    stroke="#2e2010" stroke-width="2" stroke-linecap="round"/>
+              <!-- 오른쪽 위 -->
+              <path d="M143 78 Q165 65 184 52"    stroke="#2e2010" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M143 68 Q162 53 174 38"    stroke="#2e2010" stroke-width="2" stroke-linecap="round"/>
+              <!-- 중앙 위 -->
+              <path d="M140 60 Q138 45 140 25"    stroke="#2e2010" stroke-width="3" stroke-linecap="round"/>
+
+              <!-- ── 잎 클러스터 ── (여러 타원 겹치기) -->
+              <!-- 정상 -->
+              <g style="transform-origin: 140px 20px; animation: sway-l 5s ease-in-out infinite;">
+                <ellipse cx="140" cy="16" rx="26" ry="18" fill="#1a3d18" opacity="0.9"/>
+                <ellipse cx="140" cy="12" rx="18" ry="13" fill="#224d20" opacity="0.8"/>
+                <ellipse cx="140" cy="9"  rx="11" ry="8"  fill="#2a5e28" opacity="0.7"/>
+              </g>
+
+              <!-- 왼쪽 위 -->
+              <g style="transform-origin: 95px 42px; animation: sway-r 4.5s ease-in-out 0.5s infinite;">
+                <ellipse cx="95"  cy="42" rx="20" ry="14" fill="#1a3d18" opacity="0.85"/>
+                <ellipse cx="93"  cy="38" rx="13" ry="9"  fill="#224d20" opacity="0.75"/>
+              </g>
+
+              <!-- 오른쪽 위 -->
+              <g style="transform-origin: 180px 38px; animation: sway-l 5.5s ease-in-out 1s infinite;">
+                <ellipse cx="180" cy="38" rx="20" ry="13" fill="#1a3d18" opacity="0.85"/>
+                <ellipse cx="182" cy="34" rx="13" ry="9"  fill="#224d20" opacity="0.75"/>
+              </g>
+
+              <!-- 왼쪽 -->
+              <g style="transform-origin: 82px 78px; animation: sway-r 4s ease-in-out 0.3s infinite;">
+                <ellipse cx="82"  cy="78" rx="22" ry="14" fill="#1e4018" opacity="0.8"/>
+                <ellipse cx="80"  cy="74" rx="14" ry="9"  fill="#2a5020" opacity="0.7"/>
+              </g>
+
+              <!-- 오른쪽 -->
+              <g style="transform-origin: 195px 74px; animation: sway-l 4.8s ease-in-out 0.8s infinite;">
+                <ellipse cx="195" cy="74" rx="22" ry="14" fill="#1e4018" opacity="0.8"/>
+                <ellipse cx="197" cy="70" rx="14" ry="9"  fill="#2a5020" opacity="0.7"/>
+              </g>
+
+              <!-- 하단 양 옆 가지 잎 -->
+              <ellipse cx="88"  cy="93" rx="16" ry="10" fill="#162e14" opacity="0.7"/>
+              <ellipse cx="192" cy="90" rx="16" ry="10" fill="#162e14" opacity="0.7"/>
+
+              <!-- ── 잿불 / 불씨 파티클 ── -->
+              <!-- 파티클 1 -->
+              <circle cx="132" cy="128" r="1.5" fill="#ff7020" opacity="0.9" style="--dx:-8px">
+                <animate attributeName="cy" from="128" to="80" dur="2.8s" repeatCount="indefinite" begin="0s"/>
+                <animate attributeName="opacity" values="0.9;0.5;0" dur="2.8s" repeatCount="indefinite" begin="0s"/>
+                <animate attributeName="r" values="1.5;0.8;0.2" dur="2.8s" repeatCount="indefinite" begin="0s"/>
+                <animate attributeName="cx" values="132;126;120" dur="2.8s" repeatCount="indefinite" begin="0s"/>
+              </circle>
+              <!-- 파티클 2 -->
+              <circle cx="148" cy="130" r="1.2" fill="#ffaa40" opacity="0.85" style="--dx:6px">
+                <animate attributeName="cy" from="130" to="85" dur="3.4s" repeatCount="indefinite" begin="0.6s"/>
+                <animate attributeName="opacity" values="0.85;0.4;0" dur="3.4s" repeatCount="indefinite" begin="0.6s"/>
+                <animate attributeName="r" values="1.2;0.6;0.1" dur="3.4s" repeatCount="indefinite" begin="0.6s"/>
+                <animate attributeName="cx" values="148;153;158" dur="3.4s" repeatCount="indefinite" begin="0.6s"/>
+              </circle>
+              <!-- 파티클 3 -->
+              <circle cx="140" cy="125" r="1.8" fill="#ff5000" opacity="0.7" style="--dx:0px">
+                <animate attributeName="cy" from="125" to="70" dur="4s" repeatCount="indefinite" begin="1.2s"/>
+                <animate attributeName="opacity" values="0.7;0.35;0" dur="4s" repeatCount="indefinite" begin="1.2s"/>
+                <animate attributeName="r" values="1.8;0.9;0.2" dur="4s" repeatCount="indefinite" begin="1.2s"/>
+              </circle>
+              <!-- 파티클 4 -->
+              <circle cx="128" cy="132" r="1.0" fill="#ff8030" opacity="0.8">
+                <animate attributeName="cy" from="132" to="95" dur="2.2s" repeatCount="indefinite" begin="1.8s"/>
+                <animate attributeName="opacity" values="0.8;0.3;0" dur="2.2s" repeatCount="indefinite" begin="1.8s"/>
+                <animate attributeName="cx" values="128;123;118" dur="2.2s" repeatCount="indefinite" begin="1.8s"/>
+              </circle>
+              <!-- 파티클 5 -->
+              <circle cx="152" cy="127" r="1.0" fill="#ffcc60" opacity="0.75">
+                <animate attributeName="cy" from="127" to="88" dur="3s" repeatCount="indefinite" begin="0.4s"/>
+                <animate attributeName="opacity" values="0.75;0.3;0" dur="3s" repeatCount="indefinite" begin="0.4s"/>
+                <animate attributeName="cx" values="152;158;163" dur="3s" repeatCount="indefinite" begin="0.4s"/>
+              </circle>
+
+              <!-- 바닥 잿불 빛 -->
+              <ellipse cx="140" cy="140" rx="40" ry="8" fill="#ff4010" opacity="0.15" filter="url(#blur2)"/>
+              <ellipse cx="140" cy="141" rx="20" ry="4" fill="#ff6020" opacity="0.2"  filter="url(#blur1)"/>
+
             </svg>
-          </a>
+
+            <!-- 타입 아이콘 -->
+            <div class="type-tag">🔥</div>
+          </div>
+
+          <!-- ── INFO STRIP ── -->
+          <div class="card-info">
+            <div>
+              <div class="info-label">Type</div>
+              <div class="info-value">Eternal Flame</div>
+            </div>
+            <div style="text-align:center">
+              <div class="info-label">Origin</div>
+              <div class="info-value">Yggdrasil</div>
+            </div>
+            <div style="text-align:right">
+              <div class="info-label">Element</div>
+              <div class="info-value">Fire · Wood</div>
+            </div>
+          </div>
+
+          <!-- ── DIVIDER ── -->
+          <div class="card-divider"></div>
+
+          <!-- ── ABILITY ── -->
+          <div class="card-ability">
+            <div class="ability-name">World Root</div>
+            <div class="ability-text">
+              이 카드가 필드에 있는 한, 모든 재생 효과를 2배로 받는다.
+              잿더미에서 태어난 것들은 다시 피어난다.
+            </div>
+          </div>
+
+          <!-- ── ATTACK ── -->
+          <div class="card-attack" style="flex-wrap: wrap;">
+            <div class="attack-cost">
+              <div class="cost-circle cost-fire"></div>
+              <div class="cost-circle cost-fire"></div>
+              <div class="cost-circle cost-colorless"></div>
+            </div>
+            <div class="attack-name">Ember Rebirth</div>
+            <div class="attack-damage">120</div>
+            <div class="attack-desc" style="margin-top: 3px;">
+              상대 포켓몬에게 120 데미지. 자신에게 불꽃 에너지 카드 2장을 덱에서 회수한다.
+            </div>
+          </div>
+
+          <!-- ── STATS ── -->
+          <div class="card-stats">
+            <div class="stat-block">
+              <div class="stat-label">Weakness</div>
+              <div class="stat-value">💧 ×2</div>
+            </div>
+            <div class="stat-block">
+              <div class="stat-label">Resistance</div>
+              <div class="stat-value">🌿 −30</div>
+            </div>
+            <div class="stat-block">
+              <div class="stat-label">Retreat</div>
+              <div class="stat-value">⚪⚪</div>
+            </div>
+          </div>
+
+          <!-- ── FOOTER ── -->
+          <div class="card-footer">
+            <div class="footer-flavor">
+              "불이 남긴 자리에서만<br/>진짜 나무가 자란다."
+            </div>
+            <div class="footer-number">
+              ash.kr<br/>
+              No. 001/∞
+            </div>
+          </div>
 
         </div>
-        <!-- /CARD BODY -->
+        <!-- /card-inner -->
 
       </div>
-      <!-- /카드 본체 -->
+      <!-- /card -->
 
-      <!-- 카드 하단 그림자 -->
-      <div class="absolute -bottom-4 left-8 right-8 h-8 bg-black/40 blur-xl rounded-full -z-10"></div>
+    </div>
+    <!-- /card-wrap -->
+  </div>
+  <!-- /scene -->
 
-    </article>
-    <!-- /CARD -->
+  <script>
+    const wrap = document.getElementById('cardWrap');
+    let rafId = null;
+    let isHovering = false;
 
-  </body>
+    // 목표 회전값 (부드러운 lerp용)
+    let targetX = 0, targetY = 0;
+    let currentX = 0, currentY = 0;
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function animate() {
+      currentX = lerp(currentX, targetX, 0.12);
+      currentY = lerp(currentY, targetY, 0.12);
+
+      wrap.style.transform = isHovering
+        ? `rotateX(${currentX}deg) rotateY(${currentY}deg) scale(1.04)`
+        : `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+
+      rafId = requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    wrap.addEventListener('mouseenter', () => {
+      isHovering = true;
+      wrap.classList.remove('idle');
+      wrap.style.animation = 'none';
+    });
+
+    wrap.addEventListener('mouseleave', () => {
+      isHovering = false;
+      targetX = 0;
+      targetY = 0;
+      // CSS 변수 초기화
+      wrap.querySelector('.card').style.setProperty('--mx', '50%');
+      wrap.querySelector('.card').style.setProperty('--my', '50%');
+      wrap.querySelector('.card').style.setProperty('--r', '130deg');
+    });
+
+    wrap.addEventListener('mousemove', (e) => {
+      const rect = wrap.getBoundingClientRect();
+      const cx = rect.left + rect.width  / 2;
+      const cy = rect.top  + rect.height / 2;
+
+      // 중심 기준 -1 ~ +1 정규화
+      const nx = (e.clientX - cx) / (rect.width  / 2);
+      const ny = (e.clientY - cy) / (rect.height / 2);
+
+      // tilt 각도 (최대 ±18도)
+      targetY =  nx * 18;
+      targetX = -ny * 18;
+
+      // 홀로그래픽 레이어에 마우스 위치 전달
+      const pctX = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%';
+      const pctY = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%';
+
+      const card = wrap.querySelector('.card');
+      card.style.setProperty('--mx', pctX);
+      card.style.setProperty('--my', pctY);
+
+      // 레인보우 각도 — 마우스 각도 기반
+      const angle = Math.atan2(ny, nx) * (180 / Math.PI) + 90;
+      card.style.setProperty('--r', `${angle.toFixed(1)}deg`);
+
+      // shine 레이어도 업데이트
+      const shine = wrap.querySelector('.card-shine');
+      shine.style.setProperty('--mx', pctX);
+      shine.style.setProperty('--my', pctY);
+    });
+  </script>
+
+</body>
 </html>

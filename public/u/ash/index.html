@@ -1,280 +1,1135 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASH.KR - @ash</title>
-    
-    <!-- Tailwind CSS 4.0 -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ash.kr/">
-    <meta property="og:title" content="ASH.KR - @ash">
-    <meta property="og:description" content="Digital Profile | 2026.02.19">
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="ASH.KR - @ash">
-    <meta name="twitter:description" content="Digital Profile">
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASH — ash.kr</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+      @theme {
+        --color-ash-50:  #f8f8f7;
+        --color-ash-100: #f0efed;
+        --color-ash-200: #dddbd7;
+        --color-ash-300: #c5c2bc;
+        --color-ash-400: #a8a49c;
+        --color-ash-500: #8c877e;
+        --color-ash-600: #706b63;
+        --color-ash-700: #57534c;
+        --color-ash-800: #3d3a35;
+        --color-ash-900: #242220;
+        --color-ash-950: #111110;
+
+        --color-ember-400: #f97316;
+        --color-ember-500: #ea580c;
+        --color-ember-600: #c2410c;
+
+        --color-sage-400: #86efac;
+        --color-sage-500: #4ade80;
+
+        --font-serif: 'Noto Serif KR', Georgia, serif;
+        --font-sans:  'Inter', system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--font-sans);
+        background-color: var(--color-ash-950);
+        color: var(--color-ash-200);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ── Grain overlay ── */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        background-size: 200px 200px;
+        opacity: 0.6;
+      }
+
+      /* ── Ember particle ── */
+      @keyframes float-up {
+        0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; }
+        50%  { transform: translateY(-60px) translateX(8px) scale(0.8); opacity: 0.5; }
+        100% { transform: translateY(-120px) translateX(-4px) scale(0.2); opacity: 0; }
+      }
+      @keyframes drift {
+        0%   { transform: translateY(0) rotate(0deg); }
+        100% { transform: translateY(-200px) rotate(360deg); }
+      }
+      .ember {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, #fbbf24, #f97316);
+        animation: float-up linear infinite;
+        pointer-events: none;
+      }
+
+      /* ── Ash particle ── */
+      @keyframes ash-fall {
+        0%   { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0; }
+        10%  { opacity: 0.6; }
+        90%  { opacity: 0.3; }
+        100% { transform: translateY(120px) translateX(20px) rotate(180deg); opacity: 0; }
+      }
+      .ash-particle {
+        position: absolute;
+        background: var(--color-ash-500);
+        border-radius: 2px;
+        animation: ash-fall linear infinite;
+        pointer-events: none;
+      }
+
+      /* ── Shimmer on hero ── */
+      @keyframes shimmer {
+        0%   { background-position: -400px 0; }
+        100% { background-position: 400px 0; }
+      }
+      .shimmer-text {
+        background: linear-gradient(90deg,
+          var(--color-ash-400) 0%,
+          #fff 40%,
+          var(--color-ash-300) 60%,
+          var(--color-ash-500) 100%
+        );
+        background-size: 800px auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: shimmer 4s ease-in-out infinite;
+      }
+
+      /* ── Card hover glow ── */
+      .card-ash {
+        background: linear-gradient(135deg, rgba(61,58,53,0.5), rgba(36,34,32,0.8));
+        border: 1px solid rgba(197,194,188,0.1);
+        backdrop-filter: blur(12px);
+        transition: all 0.35s ease;
+      }
+      .card-ash:hover {
+        border-color: rgba(197,194,188,0.28);
+        transform: translateY(-3px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(197,194,188,0.12);
+      }
+
+      /* ── Link button ── */
+      .link-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        border-radius: 0.75rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        border: 1px solid rgba(197,194,188,0.12);
+        background: linear-gradient(135deg, rgba(61,58,53,0.6), rgba(36,34,32,0.9));
+        color: var(--color-ash-200);
+        position: relative;
+        overflow: hidden;
+      }
+      .link-btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(197,194,188,0.05), transparent);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+      .link-btn:hover {
+        border-color: rgba(197,194,188,0.3);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      }
+      .link-btn:hover::before {
+        opacity: 1;
+      }
+      .link-btn.ember-btn {
+        border-color: rgba(249,115,22,0.3);
+        background: linear-gradient(135deg, rgba(194,65,12,0.15), rgba(36,34,32,0.9));
+      }
+      .link-btn.ember-btn:hover {
+        border-color: rgba(249,115,22,0.6);
+        box-shadow: 0 8px 32px rgba(249,115,22,0.2);
+      }
+
+      /* ── Carousel ── */
+      .carousel-track {
+        display: flex;
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      /* ── YouTube embed ── */
+      .yt-wrapper {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        border-radius: 0.75rem;
+      }
+      .yt-wrapper iframe {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        border: none;
+      }
+
+      /* ── Section divider ── */
+      .ash-divider {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(197,194,188,0.2), transparent);
+        margin: 0;
+      }
+
+      /* ── Scroll fade-in ── */
+      .reveal {
+        opacity: 0;
+        transform: translateY(24px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── Stats count ── */
+      @keyframes count-up {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ── Tag pill ── */
+      .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: rgba(197,194,188,0.08);
+        border: 1px solid rgba(197,194,188,0.15);
+        color: var(--color-ash-400);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      /* ── Toggle ── */
+      details > summary { list-style: none; cursor: pointer; }
+      details > summary::-webkit-details-marker { display: none; }
+      details[open] .chevron { transform: rotate(180deg); }
+      .chevron { transition: transform 0.25s ease; }
+
+      /* ── Music player ── */
+      @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+      .vinyl.playing {
+        animation: spin-slow 4s linear infinite;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: var(--color-ash-950); }
+      ::-webkit-scrollbar-thumb { background: var(--color-ash-700); border-radius: 3px; }
     </style>
-</head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen text-white overflow-x-hidden">
-    
-    <!-- Animated Background Elements -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div class="absolute top-40 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-    </div>
+  </head>
 
-    <!-- Main Content -->
-    <div class="relative z-10">
-        <!-- Navigation Bar -->
-        <nav class="backdrop-blur-md bg-white/5 border-b border-white/10 sticky top-0 z-50">
-            <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-                <div class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    ASH.KR
-                </div>
-                <div class="text-sm text-slate-400">@ash</div>
-            </div>
-        </nav>
+  <body class="relative">
 
-        <!-- Hero Section -->
-        <div class="max-w-4xl mx-auto px-6 py-20">
-            <!-- Profile Header -->
-            <div class="text-center mb-16">
-                <!-- Avatar -->
-                <div class="mb-8 flex justify-center">
-                    <div class="relative">
-                        <div class="w-32 h-32 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 p-1">
-                            <div class="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-5xl font-bold">
-                                A
-                            </div>
-                        </div>
-                        <div class="absolute bottom-0 right-0 w-8 h-8 bg-green-500 rounded-full border-4 border-slate-900"></div>
-                    </div>
-                </div>
+    <!-- ════════════════════════════════════════════
+         BACKGROUND: Ember & Ash particles
+    ════════════════════════════════════════════ -->
+    <div id="particles" class="fixed inset-0 z-0 overflow-hidden pointer-events-none"></div>
 
-                <!-- Profile Info -->
-                <h1 class="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">
-                    ASH
-                </h1>
-                <p class="text-xl text-slate-300 mb-2">@ash</p>
-                <p class="text-slate-400 text-lg">Digital Profile & Link in Bio</p>
-            </div>
+    <!-- ════════════════════════════════════════════
+         MAIN WRAPPER
+    ════════════════════════════════════════════ -->
+    <div class="relative z-10 max-w-[480px] mx-auto px-4 py-12 pb-24">
 
-            <!-- Bio Card -->
-            <div class="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 mb-12 card-hover">
-                <p class="text-slate-200 text-center text-lg leading-relaxed">
-                    Welcome to my digital space. Explore my links and stay connected.
-                </p>
-                <p class="text-slate-500 text-center text-sm mt-4">
-                    📍 Last Updated: 2026.02.19
-                </p>
-            </div>
+      <!-- ── HERO SECTION ── -->
+      <header class="text-center mb-10 reveal">
 
-            <!-- Links Section -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                
-                <!-- Link Card 1 -->
-                <a href="#" class="group card-hover">
-                    <div class="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-md rounded-xl border border-white/10 p-6 hover:border-purple-500/50">
-                        <div class="flex items-center gap-4 mb-3">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-xl">
-                                💼
-                            </div>
-                            <h3 class="text-lg font-semibold group-hover:text-purple-300 transition">Portfolio</h3>
-                        </div>
-                        <p class="text-slate-400 text-sm">View my work and projects</p>
-                    </div>
-                </a>
-
-                <!-- Link Card 2 -->
-                <a href="#" class="group card-hover">
-                    <div class="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-md rounded-xl border border-white/10 p-6 hover:border-blue-500/50">
-                        <div class="flex items-center gap-4 mb-3">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-xl">
-                                🔗
-                            </div>
-                            <h3 class="text-lg font-semibold group-hover:text-blue-300 transition">Social Links</h3>
-                        </div>
-                        <p class="text-slate-400 text-sm">Connect with me on social media</p>
-                    </div>
-                </a>
-
-                <!-- Link Card 3 -->
-                <a href="#" class="group card-hover">
-                    <div class="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-md rounded-xl border border-white/10 p-6 hover:border-green-500/50">
-                        <div class="flex items-center gap-4 mb-3">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-green-400 to-emerald-400 flex items-center justify-center text-xl">
-                                📧
-                            </div>
-                            <h3 class="text-lg font-semibold group-hover:text-green-300 transition">Contact</h3>
-                        </div>
-                        <p class="text-slate-400 text-sm">Get in touch with me</p>
-                    </div>
-                </a>
-
-                <!-- Link Card 4 -->
-                <a href="#" class="group card-hover">
-                    <div class="bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-md rounded-xl border border-white/10 p-6 hover:border-orange-500/50">
-                        <div class="flex items-center gap-4 mb-3">
-                            <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center text-xl">
-                                📚
-                            </div>
-                            <h3 class="text-lg font-semibold group-hover:text-orange-300 transition">Resources</h3>
-                        </div>
-                        <p class="text-slate-400 text-sm">Useful tools and resources</p>
-                    </div>
-                </a>
-
-            </div>
-
-            <!-- Featured Section -->
-            <div class="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 mb-12 card-hover">
-                <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-                    <span>✨</span> Featured
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition">
-                        <p class="font-semibold text-purple-300 mb-1">Item 1</p>
-                        <p class="text-slate-400 text-sm">Description goes here</p>
-                    </div>
-                    <div class="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition">
-                        <p class="font-semibold text-blue-300 mb-1">Item 2</p>
-                        <p class="text-slate-400 text-sm">Description goes here</p>
-                    </div>
-                    <div class="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition">
-                        <p class="font-semibold text-pink-300 mb-1">Item 3</p>
-                        <p class="text-slate-400 text-sm">Description goes here</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CTA Section -->
-            <div class="text-center mb-20">
-                <button class="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-semibold transition-all hover:shadow-lg hover:shadow-purple-500/50">
-                    <span>Get Started</span>
-                    <svg class="w-5 h-5 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                    </svg>
-                </button>
-            </div>
+        <!-- Avatar -->
+        <div class="relative inline-block mb-5">
+          <!-- Glow ring -->
+          <div class="absolute inset-0 rounded-full bg-gradient-to-br from-ember-500/30 via-ash-500/20 to-transparent blur-xl scale-150 animate-pulse"></div>
+          <!-- Avatar image (placeholder) -->
+          <div class="relative w-24 h-24 rounded-full overflow-hidden border-2 border-ash-700 mx-auto">
+            <img
+              src="https://api.dicebear.com/9.x/shapes/svg?seed=ash&backgroundColor=242220&color=8c877e,57534c&shape0=polygon&shape1=ellipse"
+              alt="ASH avatar"
+              class="w-full h-full object-cover"
+              onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#3d3a35,#111110)'"
+            />
+          </div>
+          <!-- Status dot -->
+          <span class="absolute bottom-1 right-1 w-3.5 h-3.5 bg-sage-500 rounded-full border-2 border-ash-950 block"></span>
         </div>
 
-        <!-- Footer -->
-        <footer class="border-t border-white/10 bg-white/5 backdrop-blur-md">
-            <div class="max-w-4xl mx-auto px-6 py-12">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                    <div>
-                        <h3 class="font-semibold text-white mb-4">ASH.KR</h3>
-                        <p class="text-slate-400 text-sm">Your digital presence starts here.</p>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-white mb-4">Quick Links</h3>
-                        <ul class="space-y-2 text-sm text-slate-400">
-                            <li><a href="#" class="hover:text-white transition">Home</a></li>
-                            <li><a href="#" class="hover:text-white transition">About</a></li>
-                            <li><a href="#" class="hover:text-white transition">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-white mb-4">Connect</h3>
-                        <ul class="space-y-2 text-sm text-slate-400">
-                            <li><a href="#" class="hover:text-white transition">Twitter</a></li>
-                            <li><a href="#" class="hover:text-white transition">GitHub</a></li>
-                            <li><a href="#" class="hover:text-white transition">LinkedIn</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
-                    <p class="text-slate-400 text-sm">© 2026 ASH.KR. All rights reserved.</p>
-                    <p class="text-slate-500 text-xs mt-4 md:mt-0">Last updated: 2026.02.19</p>
-                </div>
+        <!-- Name & domain -->
+        <h1 class="font-serif text-3xl font-semibold shimmer-text mb-1 tracking-wide">ASH</h1>
+        <p class="text-ash-500 text-sm font-light tracking-[0.2em] uppercase mb-3">ash.kr</p>
+
+        <!-- Bio -->
+        <p class="text-ash-300 text-sm leading-relaxed max-w-[320px] mx-auto mb-4">
+          From ember to existence —<br/>
+          <span class="text-ash-400">무언가 타고 남은 것에서, 다시 시작되는 것.</span>
+        </p>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap justify-center gap-2 mb-5">
+          <span class="tag-pill">🌿 물푸레나무</span>
+          <span class="tag-pill">🔥 재생</span>
+          <span class="tag-pill">🩶 애쉬 그레이</span>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="flex justify-center gap-8">
+          <div class="text-center">
+            <p class="text-ash-100 font-semibold text-lg">2.4K</p>
+            <p class="text-ash-500 text-xs uppercase tracking-widest">팔로워</p>
+          </div>
+          <div class="w-px bg-ash-800"></div>
+          <div class="text-center">
+            <p class="text-ash-100 font-semibold text-lg">128</p>
+            <p class="text-ash-500 text-xs uppercase tracking-widest">게시물</p>
+          </div>
+          <div class="w-px bg-ash-800"></div>
+          <div class="text-center">
+            <p class="text-ash-100 font-semibold text-lg">47</p>
+            <p class="text-ash-500 text-xs uppercase tracking-widest">프로젝트</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="ash-divider mb-8"></div>
+
+      <!-- ── ANNOUNCEMENT BANNER ── -->
+      <div class="card-ash rounded-xl p-4 mb-6 reveal flex gap-3 items-start border-l-2 border-l-ember-500/60">
+        <span class="text-xl flex-shrink-0 mt-0.5">🔥</span>
+        <div>
+          <p class="text-ash-100 text-sm font-semibold mb-0.5">새 프로젝트 오픈!</p>
+          <p class="text-ash-400 text-xs leading-relaxed">재와 불꽃 사이에서 피어난 새 작업물이 공개되었습니다. 지금 바로 확인해보세요.</p>
+          <a href="#" class="text-ember-400 text-xs font-medium mt-1 inline-block hover:text-ember-300 transition-colors">
+            자세히 보기 →
+          </a>
+        </div>
+      </div>
+
+      <!-- ── SOCIAL LINKS ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">소셜 채널</p>
+        <div class="flex flex-col gap-2.5">
+
+          <!-- Instagram -->
+          <a href="#" class="link-btn">
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </span>
+            <span class="flex-1">Instagram</span>
+            <span class="text-ash-500 text-xs">@ash.kr</span>
+            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+          <!-- YouTube -->
+          <a href="#" class="link-btn ember-btn">
+            <span class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </span>
+            <span class="flex-1">YouTube</span>
+            <span class="text-ash-500 text-xs">ASH Channel</span>
+            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+          <!-- X / Twitter -->
+          <a href="#" class="link-btn">
+            <span class="w-8 h-8 rounded-lg bg-ash-900 border border-ash-700 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-ash-200" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </span>
+            <span class="flex-1">X (Twitter)</span>
+            <span class="text-ash-500 text-xs">@ash_kr</span>
+            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+          <!-- GitHub -->
+          <a href="#" class="link-btn">
+            <span class="w-8 h-8 rounded-lg bg-ash-900 border border-ash-700 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-ash-200" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+              </svg>
+            </span>
+            <span class="flex-1">GitHub</span>
+            <span class="text-ash-500 text-xs">ash-kr</span>
+            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+          <!-- Email -->
+          <a href="mailto:hello@ash.kr" class="link-btn">
+            <span class="w-8 h-8 rounded-lg bg-ash-800 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-ash-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </span>
+            <span class="flex-1">이메일</span>
+            <span class="text-ash-500 text-xs">hello@ash.kr</span>
+            <svg class="w-4 h-4 text-ash-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+        </div>
+      </section>
+
+      <div class="ash-divider mb-8"></div>
+
+      <!-- ── FEATURED VIDEO ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">추천 영상</p>
+        <div class="card-ash rounded-xl overflow-hidden">
+          <div class="yt-wrapper">
+            <iframe
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1"
+              title="ASH Featured Video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="p-4">
+            <h3 class="text-ash-100 font-medium text-sm mb-1">From Ember to Existence — ASH Documentary</h3>
+            <p class="text-ash-500 text-xs leading-relaxed">재에서 피어난 존재의 이야기. 불꽃이 남긴 자리에서 무엇이 자라나는지 담았습니다.</p>
+            <div class="flex items-center gap-3 mt-2">
+              <span class="text-ash-600 text-xs flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+                12.4K
+              </span>
+              <span class="text-ash-600 text-xs flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/></svg>
+                834
+              </span>
+              <span class="tag-pill ml-auto">다큐멘터리</span>
             </div>
-        </footer>
-    </div>
+          </div>
+        </div>
+      </section>
 
+      <!-- ── VIDEO PLAYLIST ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">영상 플레이리스트</p>
+        <div class="flex flex-col gap-3">
+
+          <!-- Video item -->
+          <a href="#" class="card-ash rounded-xl p-3 flex gap-3 items-center group">
+            <div class="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-ash-800">
+              <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg" alt="썸네일" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" onerror="this.style.display='none'" />
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-ash-200 text-sm font-medium truncate group-hover:text-white transition-colors">재의 철학 — Episode 01</p>
+              <p class="text-ash-500 text-xs mt-0.5">8:42 · 3.2K 조회</p>
+            </div>
+          </a>
+
+          <a href="#" class="card-ash rounded-xl p-3 flex gap-3 items-center group">
+            <div class="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-ash-800">
+              <img src="https://img.youtube.com/vi/aqz-KE-bpKQ/mqdefault.jpg" alt="썸네일" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" onerror="this.style.display='none'" />
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-ash-200 text-sm font-medium truncate group-hover:text-white transition-colors">물푸레나무 숲에서 — Yggdrasil</p>
+              <p class="text-ash-500 text-xs mt-0.5">14:05 · 7.8K 조회</p>
+            </div>
+          </a>
+
+          <a href="#" class="card-ash rounded-xl p-3 flex gap-3 items-center group">
+            <div class="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-ash-800">
+              <div class="w-full h-full bg-gradient-to-br from-ash-700 to-ash-900 flex items-center justify-center">
+                <span class="text-xl">🔥</span>
+              </div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-ash-200 text-sm font-medium truncate group-hover:text-white transition-colors">피닉스 & 재탄생의 기록</p>
+              <p class="text-ash-500 text-xs mt-0.5">22:18 · 5.1K 조회</p>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <div class="ash-divider mb-8"></div>
+
+      <!-- ── IMAGE CAROUSEL ── -->
+      <section class="mb-8 reveal">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-ash-500 text-xs uppercase tracking-[0.15em] font-medium">갤러리</p>
+          <div class="flex gap-2" id="carousel-dots"></div>
+        </div>
+
+        <div class="relative overflow-hidden rounded-xl" id="carousel-container">
+          <div class="carousel-track" id="carousel-track">
+
+            <!-- Slide 1 -->
+            <div class="min-w-full relative">
+              <div class="aspect-[4/3] bg-gradient-to-br from-ash-800 via-ash-900 to-ash-950 rounded-xl overflow-hidden relative">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
+                  <span class="text-5xl mb-4">🌿</span>
+                  <p class="font-serif text-ash-200 text-lg font-medium">세계수 Yggdrasil</p>
+                  <p class="text-ash-500 text-sm mt-1">하늘과 땅을 잇는 물푸레나무</p>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+                  <span class="tag-pill">세계수</span>
+                  <span class="text-ash-400 text-xs">1 / 5</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="min-w-full relative">
+              <div class="aspect-[4/3] rounded-xl overflow-hidden relative"
+                style="background: radial-gradient(ellipse at center bottom, rgba(249,115,22,0.4) 0%, rgba(17,17,16,1) 70%)">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
+                  <span class="text-5xl mb-4">🔥</span>
+                  <p class="font-serif text-ash-200 text-lg font-medium">정화의 불꽃</p>
+                  <p class="text-ash-500 text-sm mt-1">소멸이 아닌 순수한 시작</p>
+                </div>
+                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+                  <span class="tag-pill">재생</span>
+                  <span class="text-ash-400 text-xs">2 / 5</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="min-w-full relative">
+              <div class="aspect-[4/3] rounded-xl overflow-hidden relative"
+                style="background: linear-gradient(135deg, #3d3a35 0%, #1a1917 50%, #242220 100%)">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
+                  <div class="w-16 h-16 rounded-full mb-4"
+                    style="background:linear-gradient(135deg,#8c877e,#57534c,#3d3a35)"></div>
+                  <p class="font-serif text-ash-200 text-lg font-medium">애쉬 그레이</p>
+                  <p class="text-ash-500 text-sm mt-1">흑도 백도 아닌, 사이의 색</p>
+                </div>
+                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+                  <span class="tag-pill">색채</span>
+                  <span class="text-ash-400 text-xs">3 / 5</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="min-w-full relative">
+              <div class="aspect-[4/3] rounded-xl overflow-hidden relative bg-ash-950">
+                <img
+                  src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=600&q=80"
+                  alt="Forest"
+                  class="w-full h-full object-cover opacity-60"
+                  onerror="this.style.display='none'"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+                  <div>
+                    <p class="text-ash-100 text-sm font-medium">숲의 침묵</p>
+                    <p class="text-ash-400 text-xs">뿌리가 닿는 곳</p>
+                  </div>
+                  <span class="text-ash-400 text-xs">4 / 5</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="min-w-full relative">
+              <div class="aspect-[4/3] rounded-xl overflow-hidden relative bg-ash-950">
+                <img
+                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80"
+                  alt="Landscape"
+                  class="w-full h-full object-cover opacity-50"
+                  onerror="this.style.display='none'"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+                  <div>
+                    <p class="text-ash-100 text-sm font-medium">새벽의 경계</p>
+                    <p class="text-ash-400 text-xs">æsc — 고대영어의 빛</p>
+                  </div>
+                  <span class="text-ash-400 text-xs">5 / 5</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Prev / Next -->
+          <button id="carousel-prev"
+            class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-ash-700 flex items-center justify-center text-ash-300 hover:text-white hover:bg-black/80 transition-all z-10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <button id="carousel-next"
+            class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-ash-700 flex items-center justify-center text-ash-300 hover:text-white hover:bg-black/80 transition-all z-10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7 7 7"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Swipe hint -->
+        <p class="text-ash-600 text-xs text-center mt-2">← 스와이프하여 탐색 →</p>
+      </section>
+
+      <div class="ash-divider mb-8"></div>
+
+      <!-- ── SINGLE IMAGE FEATURE ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">대표 작업</p>
+        <div class="card-ash rounded-xl overflow-hidden group cursor-pointer">
+          <div class="relative aspect-video bg-gradient-to-br from-ash-800 to-ash-950 overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80"
+              alt="Featured Work"
+              class="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
+              onerror="this.style.display='none'"
+            />
+            <!-- Overlay text -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <p class="font-serif text-4xl font-semibold text-white/90 tracking-widest shimmer-text">ASH</p>
+              <p class="text-ash-400 text-xs tracking-[0.3em] mt-1 uppercase">From Ember to Existence</p>
+            </div>
+            <!-- Hover CTA -->
+            <div class="absolute inset-0 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div class="w-full flex justify-between items-center">
+                <span class="text-white text-sm font-medium">대표 포트폴리오 보기</span>
+                <span class="w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 class="text-ash-100 font-medium text-sm">Ember Series, 2024–25</h3>
+                <p class="text-ash-500 text-xs mt-1 leading-relaxed">불과 재 사이의 순간을 포착한 시각 작업 시리즈. 소멸과 재생의 경계를 탐구합니다.</p>
+              </div>
+              <span class="tag-pill flex-shrink-0">포트폴리오</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── MUSIC / AMBIENT PLAYER ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">앰비언트 트랙</p>
+        <div class="card-ash rounded-xl p-4">
+          <div class="flex items-center gap-4">
+            <!-- Vinyl -->
+            <div class="relative flex-shrink-0">
+              <div id="vinyl-disc" class="w-14 h-14 rounded-full border-4 border-ash-800"
+                style="background: conic-gradient(from 0deg, #242220, #3d3a35, #1a1917, #242220)">
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="w-4 h-4 rounded-full bg-ash-950 border-2 border-ash-700"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <p class="text-ash-100 text-sm font-medium truncate">Embers Fade Slowly</p>
+              <p class="text-ash-500 text-xs">ASH Ambient Vol.1 · 6:14</p>
+              <!-- Progress bar -->
+              <div class="mt-2 h-1 bg-ash-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full rounded-full transition-all duration-300"
+                  style="width:35%; background:linear-gradient(90deg,#f97316,#c2410c)"></div>
+              </div>
+              <div class="flex justify-between mt-1">
+                <span class="text-ash-600 text-xs">2:11</span>
+                <span class="text-ash-600 text-xs">6:14</span>
+              </div>
+            </div>
+            <!-- Play button -->
+            <button id="play-btn" onclick="togglePlay()"
+              class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all border border-ember-500/40"
+              style="background:linear-gradient(135deg,rgba(194,65,12,0.3),rgba(36,34,32,0.8))">
+              <svg id="play-icon" class="w-4 h-4 text-ember-400 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Track list -->
+          <div class="mt-4 space-y-2 border-t border-ash-800 pt-4">
+            <div class="flex items-center gap-3 group cursor-pointer">
+              <span class="text-ember-500 text-xs w-4 text-center font-medium">▶</span>
+              <span class="text-ash-200 text-xs flex-1">Embers Fade Slowly</span>
+              <span class="text-ash-600 text-xs">6:14</span>
+            </div>
+            <div class="flex items-center gap-3 group cursor-pointer">
+              <span class="text-ash-600 text-xs w-4 text-center">02</span>
+              <span class="text-ash-400 text-xs flex-1 group-hover:text-ash-200 transition-colors">Ash & Morning Light</span>
+              <span class="text-ash-600 text-xs">4:52</span>
+            </div>
+            <div class="flex items-center gap-3 group cursor-pointer">
+              <span class="text-ash-600 text-xs w-4 text-center">03</span>
+              <span class="text-ash-400 text-xs flex-1 group-hover:text-ash-200 transition-colors">Yggdrasil Roots</span>
+              <span class="text-ash-600 text-xs">9:01</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="ash-divider mb-8"></div>
+
+      <!-- ── PROJECT CARDS ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">진행 중인 프로젝트</p>
+        <div class="grid grid-cols-2 gap-3">
+
+          <a href="#" class="card-ash rounded-xl p-4 group">
+            <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-xl"
+              style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.2)">🔥</div>
+            <h3 class="text-ash-100 text-sm font-semibold mb-1 group-hover:text-white transition-colors">Ember Lab</h3>
+            <p class="text-ash-500 text-xs leading-relaxed">불꽃 데이터 시각화 실험 프로젝트</p>
+            <div class="mt-3 flex items-center gap-1 text-ash-500 text-xs">
+              <span>탐색하기</span>
+              <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+
+          <a href="#" class="card-ash rounded-xl p-4 group">
+            <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-xl"
+              style="background:rgba(134,239,172,0.08);border:1px solid rgba(134,239,172,0.15)">🌿</div>
+            <h3 class="text-ash-100 text-sm font-semibold mb-1 group-hover:text-white transition-colors">Tree Archive</h3>
+            <p class="text-ash-500 text-xs leading-relaxed">세계수 신화 아카이브 디지털 정원</p>
+            <div class="mt-3 flex items-center gap-1 text-ash-500 text-xs">
+              <span>탐색하기</span>
+              <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+
+          <a href="#" class="card-ash rounded-xl p-4 group">
+            <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-xl"
+              style="background:rgba(140,135,126,0.12);border:1px solid rgba(140,135,126,0.2)">🩶</div>
+            <h3 class="text-ash-100 text-sm font-semibold mb-1 group-hover:text-white transition-colors">Gray Palette</h3>
+            <p class="text-ash-500 text-xs leading-relaxed">애쉬 그레이 컬러 시스템 & 브랜딩</p>
+            <div class="mt-3 flex items-center gap-1 text-ash-500 text-xs">
+              <span>탐색하기</span>
+              <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+
+          <a href="#" class="card-ash rounded-xl p-4 group">
+            <div class="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-xl"
+              style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08)">✦</div>
+            <h3 class="text-ash-100 text-sm font-semibold mb-1 group-hover:text-white transition-colors">Open Source</h3>
+            <p class="text-ash-500 text-xs leading-relaxed">재에서 피어난 오픈소스 도구들</p>
+            <div class="mt-3 flex items-center gap-1 text-ash-500 text-xs">
+              <span>탐색하기</span>
+              <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <div class="ash-divider mb-8"></div>
+
+      <!-- ── LATEST POSTS / BLOG ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">최근 글</p>
+        <div class="flex flex-col gap-3">
+
+          <a href="#" class="card-ash rounded-xl p-4 group flex gap-4 items-start">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="tag-pill">에세이</span>
+                <span class="text-ash-600 text-xs">2025.01.14</span>
+              </div>
+              <h3 class="text-ash-100 text-sm font-semibold leading-snug group-hover:text-white transition-colors mb-1">
+                재(灰)가 된다는 것의 의미
+              </h3>
+              <p class="text-ash-500 text-xs leading-relaxed line-clamp-2">
+                불이 지나간 자리에 무엇이 남는가. 소멸이 아닌 가장 순수한 본질로 돌아가는 여정에 대하여.
+              </p>
+            </div>
+            <svg class="w-4 h-4 text-ash-600 flex-shrink-0 mt-1 group-hover:text-ash-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </a>
+
+          <a href="#" class="card-ash rounded-xl p-4 group flex gap-4 items-start">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="tag-pill">신화</span>
+                <span class="text-ash-600 text-xs">2025.01.03</span>
+              </div>
+              <h3 class="text-ash-100 text-sm font-semibold leading-snug group-hover:text-white transition-colors mb-1">
+                Yggdrasil: 세계를 잇는 나무의 뿌리
+              </h3>
+              <p class="text-ash-500 text-xs leading-relaxed line-clamp-2">
+                북유럽 신화 속 물푸레나무가 왜 세계의 중심인지, 그 상징과 현대적 의미를 탐구합니다.
+              </p>
+            </div>
+            <svg class="w-4 h-4 text-ash-600 flex-shrink-0 mt-1 group-hover:text-ash-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </a>
+
+          <a href="#" class="card-ash rounded-xl p-4 group flex gap-4 items-start">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="tag-pill">색채</span>
+                <span class="text-ash-600 text-xs">2024.12.27</span>
+              </div>
+              <h3 class="text-ash-100 text-sm font-semibold leading-snug group-hover:text-white transition-colors mb-1">
+                애쉬 그레이: 선택을 강요하지 않는 색
+              </h3>
+              <p class="text-ash-500 text-xs leading-relaxed line-clamp-2">
+                흑도 백도 아닌 그 사이. 모든 것을 담아내는 침묵의 팔레트가 지닌 미적 철학.
+              </p>
+            </div>
+            <svg class="w-4 h-4 text-ash-600 flex-shrink-0 mt-1 group-hover:text-ash-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </a>
+
+        </div>
+
+        <a href="#" class="link-btn mt-3 justify-center text-ash-400 text-sm">
+          모든 글 보기
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </section>
+
+      <div class="ash-divider mb-8"></div>
+
+      <!-- ── FAQ / ACCORDION ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">자주 묻는 질문</p>
+        <div class="flex flex-col gap-2">
+
+          <details class="card-ash rounded-xl overflow-hidden group">
+            <summary class="flex items-center justify-between p-4 select-none">
+              <span class="text-ash-200 text-sm font-medium">ASH는 어떤 의미인가요?</span>
+              <svg class="chevron w-4 h-4 text-ash-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </summary>
+            <div class="px-4 pb-4">
+              <div class="ash-divider mb-3"></div>
+              <p class="text-ash-400 text-xs leading-relaxed">
+                ASH는 세 가지 의미를 담고 있습니다. 북유럽 신화의 세계수인 <strong class="text-ash-300">물푸레나무(Ash Tree)</strong>, 불이 지나간 자리에 남는 순수한 <strong class="text-ash-300">재(灰)</strong>, 그리고 흑과 백 사이의 절제된 아름다움인 <strong class="text-ash-300">애쉬 그레이</strong>입니다.
+              </p>
+            </div>
+          </details>
+
+          <details class="card-ash rounded-xl overflow-hidden group">
+            <summary class="flex items-center justify-between p-4 select-none">
+              <span class="text-ash-200 text-sm font-medium">협업이나 의뢰는 어떻게 하나요?</span>
+              <svg class="chevron w-4 h-4 text-ash-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </summary>
+            <div class="px-4 pb-4">
+              <div class="ash-divider mb-3"></div>
+              <p class="text-ash-400 text-xs leading-relaxed">
+                hello@ash.kr 로 메일을 보내주시거나, 아래 문의 폼을 통해 연락 주시면 됩니다. 보통 1–2 영업일 내에 답변드립니다.
+              </p>
+            </div>
+          </details>
+
+          <details class="card-ash rounded-xl overflow-hidden group">
+            <summary class="flex items-center justify-between p-4 select-none">
+              <span class="text-ash-200 text-sm font-medium">ash.kr 도메인을 선택한 이유는?</span>
+              <svg class="chevron w-4 h-4 text-ash-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </summary>
+            <div class="px-4 pb-4">
+              <div class="ash-divider mb-3"></div>
+              <p class="text-ash-400 text-xs leading-relaxed">
+                고대 영어 <strong class="text-ash-300">æsc</strong>에서 온 단어로, 나무이자 불꽃의 흔적이자 새벽빛을 닮은 색조입니다. 이 도메인은 그 이름의 가장 순수한 형태를 담기 위해 선택했습니다.
+              </p>
+            </div>
+          </details>
+
+        </div>
+      </section>
+
+      <div class="ash-divider mb-8"></div>
+
+      <!-- ── CONTACT / NEWSLETTER ── -->
+      <section class="mb-8 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">뉴스레터 구독</p>
+        <div class="card-ash rounded-xl p-5">
+          <div class="flex items-start gap-3 mb-4">
+            <span class="text-2xl">📨</span>
+            <div>
+              <h3 class="text-ash-100 font-medium text-sm mb-1">재에서 피어난 소식을 받아보세요</h3>
+              <p class="text-ash-500 text-xs leading-relaxed">새로운 작업, 에세이, 프로젝트 업데이트를 가장 먼저 받아볼 수 있습니다.</p>
+            </div>
+          </div>
+          <form onsubmit="handleSubscribe(event)" class="flex gap-2">
+            <input
+              type="email"
+              placeholder="your@email.com"
+              class="flex-1 bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-200 text-sm placeholder-ash-600 outline-none focus:border-ash-500 transition-colors"
+            />
+            <button type="submit"
+              class="px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-all hover:brightness-110"
+              style="background:linear-gradient(135deg,#c2410c,#ea580c)">
+              구독
+            </button>
+          </form>
+          <p id="subscribe-msg" class="text-sage-500 text-xs mt-2 hidden">✓ 구독 완료! 재 속에서 피어나는 소식을 기대해주세요.</p>
+        </div>
+      </section>
+
+      <!-- ── CONTACT FORM ── -->
+      <section class="mb-10 reveal">
+        <p class="text-ash-500 text-xs uppercase tracking-[0.15em] mb-3 font-medium">문의하기</p>
+        <div class="card-ash rounded-xl p-5">
+          <form onsubmit="handleContact(event)" class="flex flex-col gap-3">
+            <input
+              type="text"
+              placeholder="이름"
+              class="bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-200 text-sm placeholder-ash-600 outline-none focus:border-ash-500 transition-colors"
+            />
+            <input
+              type="email"
+              placeholder="이메일"
+              class="bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-200 text-sm placeholder-ash-600 outline-none focus:border-ash-500 transition-colors"
+            />
+            <select class="bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-400 text-sm outline-none focus:border-ash-500 transition-colors appearance-none">
+              <option value="" disabled selected>문의 유형 선택</option>
+              <option>협업 제안</option>
+              <option>프로젝트 의뢰</option>
+              <option>인터뷰 요청</option>
+              <option>기타 문의</option>
+            </select>
+            <textarea
+              rows="4"
+              placeholder="메시지를 입력해주세요..."
+              class="bg-ash-900 border border-ash-700 rounded-lg px-3 py-2.5 text-ash-200 text-sm placeholder-ash-600 outline-none focus:border-ash-500 transition-colors resize-none"
+            ></textarea>
+            <button type="submit"
+              class="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-all hover:brightness-110 hover:-translate-y-0.5"
+              style="background:linear-gradient(135deg,#57534c,#3d3a35)">
+              보내기 🔥
+            </button>
+          </form>
+          <p id="contact-msg" class="text-sage-500 text-xs mt-2 hidden text-center">✓ 메시지가 전송되었습니다. 곧 연락드리겠습니다.</p>
+        </div>
+      </section>
+
+      <!-- ── FOOTER ── -->
+      <footer class="text-center reveal">
+        <div class="ash-divider mb-6"></div>
+        <!-- ASH meaning pills -->
+        <div class="flex justify-center gap-2 flex-wrap mb-4">
+          <span class="tag-pill">🌿 나무</span>
+          <span class="tag-pill text-ash-500">·</span>
+          <span class="tag-pill">🔥 불꽃</span>
+          <span class="tag-pill text-ash-500">·</span>
+          <span class="tag-pill">🩶 색</span>
+        </div>
+        <p class="font-serif text-ash-600 text-sm italic mb-1">From ember to existence</p>
+        <p class="text-ash-700 text-xs tracking-[0.15em] mb-4">— beauty born in between —</p>
+        <a href="https://ash.kr" class="text-ash-500 text-xs hover:text-ash-300 transition-colors tracking-widest uppercase">
+          ash.kr
+        </a>
+        <p class="text-ash-800 text-xs mt-3">
+          고대 영어 <span class="text-ash-700">æsc</span> · Made with Tailwind CSS 4
+        </p>
+      </footer>
+
+    </div><!-- /main wrapper -->
+
+    <!-- ════════════════════════════════════════════
+         JAVASCRIPT
+    ════════════════════════════════════════════ -->
     <script>
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
+      // ── Particles ──────────────────────────────
+      (function spawnParticles() {
+        const container = document.getElementById('particles');
+        const W = window.innerWidth;
+
+        // Embers
+        for (let i = 0; i < 12; i++) {
+          const el = document.createElement('div');
+          el.className = 'ember';
+          const size = Math.random() * 4 + 2;
+          el.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random() * 100}%;
+            bottom:${Math.random() * 30}%;
+            animation-duration:${Math.random() * 4 + 3}s;
+            animation-delay:${Math.random() * 5}s;
+          `;
+          container.appendChild(el);
+        }
+
+        // Ash flakes
+        for (let i = 0; i < 18; i++) {
+          const el = document.createElement('div');
+          el.className = 'ash-particle';
+          const size = Math.random() * 3 + 1;
+          el.style.cssText = `
+            width:${size}px; height:${size * (Math.random() + 0.5)}px;
+            left:${Math.random() * 100}%;
+            top:${Math.random() * 30}%;
+            animation-duration:${Math.random() * 6 + 5}s;
+            animation-delay:${Math.random() * 8}s;
+            opacity:${Math.random() * 0.4 + 0.1};
+          `;
+          container.appendChild(el);
+        }
+      })();
+
+      // ── Scroll reveal ───────────────────────────
+      const revealEls = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((e, i) => {
+          if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add('visible'), i * 80);
+          }
         });
+      }, { threshold: 0.1 });
+      revealEls.forEach(el => observer.observe(el));
 
-        // Add animation to elements on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+      // ── Carousel ───────────────────────────────
+      const track = document.getElementById('carousel-track');
+      const dotsContainer = document.getElementById('carousel-dots');
+      const total = track.children.length;
+      let current = 0;
+      let autoTimer;
 
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
+      // Create dots
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('button');
+        dot.className = `w-1.5 h-1.5 rounded-full transition-all ${i === 0 ? 'bg-ash-300 w-4' : 'bg-ash-700'}`;
+        dot.onclick = () => goTo(i);
+        dotsContainer.appendChild(dot);
+      }
 
-        document.querySelectorAll('.card-hover').forEach(el => {
-            observer.observe(el);
+      function goTo(n) {
+        current = (n + total) % total;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        Array.from(dotsContainer.children).forEach((d, i) => {
+          d.className = `h-1.5 rounded-full transition-all ${i === current ? 'bg-ash-300 w-4' : 'bg-ash-700 w-1.5'}`;
         });
+        resetAuto();
+      }
+
+      function resetAuto() {
+        clearInterval(autoTimer);
+        autoTimer = setInterval(() => goTo(current + 1), 4000);
+      }
+
+      document.getElementById('carousel-prev').onclick = () => goTo(current - 1);
+      document.getElementById('carousel-next').onclick = () => goTo(current + 1);
+
+      // Touch / swipe
+      let touchStartX = 0;
+      const carouselEl = document.getElementById('carousel-container');
+      carouselEl.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+      carouselEl.addEventListener('touchend', e => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+      }, {passive:true});
+
+      resetAuto();
+
+      // ── Music player (mock) ────────────────────
+      let isPlaying = false;
+      const vinyl = document.getElementById('vinyl-disc');
+      const playIcon = document.getElementById('play-icon');
+
+      function togglePlay() {
+        isPlaying = !isPlaying;
+        vinyl.classList.toggle('playing', isPlaying);
+        playIcon.innerHTML = isPlaying
+          ? `<path d="M5.5 3.5A1.5 1.5 0 017 5v10a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5zM12.5 3.5A1.5 1.5 0 0114 5v10a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5z"/>`
+          : `<path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>`;
+      }
+
+      // ── Subscribe form ─────────────────────────
+      function handleSubscribe(e) {
+        e.preventDefault();
+        document.getElementById('subscribe-msg').classList.remove('hidden');
+        e.target.reset();
+      }
+
+      // ── Contact form ───────────────────────────
+      function handleContact(e) {
+        e.preventDefault();
+        document.getElementById('contact-msg').classList.remove('hidden');
+        e.target.reset();
+      }
+
+      // ── Keyboard: carousel arrow keys ─────────
+      document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') goTo(current - 1);
+        if (e.key === 'ArrowRight') goTo(current + 1);
+      });
     </script>
 
-    <style>
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes blob {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
-    </style>
-
-</body>
+  </body>
 </html>

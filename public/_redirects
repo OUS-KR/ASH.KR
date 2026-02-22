@@ -2,7 +2,7 @@
 /@:user/!*      /u/:user/links/:splat           301
 /@:user/*       /u/:user/:splat                 301
 /@:user         /u/:user                        301
-/!*             /u/ary/links/:splat        301
+/!*             /u/esfp/links/:splat            301
 
 # Person
 /person/*       /p/:splat                       301

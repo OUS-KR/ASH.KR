@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ash.kr</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+      @theme {
+        --color-ash-50:  #f7f6f4;
+        --color-ash-100: #ede9e2;
+        --color-ash-200: #d8d0c4;
+        --color-ash-300: #bfb4a3;
+        --color-ash-400: #a4957f;
+        --color-ash-500: #8e7d68;
+        --color-ash-600: #7a6a57;
+        --color-ash-700: #655748;
+        --color-ash-800: #54483c;
+        --color-ash-900: #473d33;
+        --color-ember-400: #e8834a;
+        --color-ember-500: #d4632a;
+        --color-ember-600: #b84e1e;
+        --color-bark-900:  #1c1410;
+        --color-bark-800:  #2a1f17;
+        --color-bark-700:  #3b2c20;
+        --color-leaf-400:  #7aaa72;
+        --color-leaf-500:  #5a8f52;
+
+        --font-serif: 'Fraunces', Georgia, serif;
+        --font-sans:  'Inter', system-ui, sans-serif;
+      }
+
+      * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        font-family: var(--font-sans);
+        background-color: var(--color-bark-900);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background-image:
+          radial-gradient(ellipse 80% 50% at 50% -10%, rgba(100,70,40,0.35) 0%, transparent 70%),
+          url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.018'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+
+      /* 카드 진입 애니메이션 */
+      @keyframes card-rise {
+        from { opacity: 0; transform: translateY(28px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0)   scale(1);    }
+      }
+      .card-enter {
+        animation: card-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      /* 불씨 파티클 */
+      @keyframes ember-float {
+        0%   { opacity: 0;   transform: translateY(0)   scale(1)   rotate(0deg);   }
+        20%  { opacity: 0.8; }
+        80%  { opacity: 0.4; }
+        100% { opacity: 0;   transform: translateY(-80px) scale(0.3) rotate(40deg); }
+      }
+      .ember { animation: ember-float linear infinite; }
+      .e1  { animation-duration: 3.2s; animation-delay: 0s;    left: 18%; }
+      .e2  { animation-duration: 4.0s; animation-delay: 0.8s;  left: 35%; }
+      .e3  { animation-duration: 2.8s; animation-delay: 1.5s;  left: 52%; }
+      .e4  { animation-duration: 3.6s; animation-delay: 0.3s;  left: 68%; }
+      .e5  { animation-duration: 4.4s; animation-delay: 2.1s;  left: 80%; }
+
+      /* 나뭇잎 흔들림 */
+      @keyframes leaf-sway {
+        0%, 100% { transform: rotate(-4deg) scaleX(1);   }
+        50%       { transform: rotate( 4deg) scaleX(0.96); }
+      }
+      .leaf-sway { animation: leaf-sway 4s ease-in-out infinite; transform-origin: bottom center; }
+
+      /* 테두리 shimmer */
+      @keyframes border-shimmer {
+        0%, 100% { opacity: 0.5; }
+        50%       { opacity: 1; }
+      }
+      .border-shimmer { animation: border-shimmer 3s ease-in-out infinite; }
+
+      /* 구분선 그라디언트 */
+      .divider {
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--color-ash-600), transparent);
+      }
+
+      /* 뱃지 hover glow */
+      .badge-glow:hover {
+        box-shadow: 0 0 12px rgba(232, 131, 74, 0.45);
+        border-color: var(--color-ember-400) !important;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- ══════════════ CARD ══════════════ -->
+    <article class="card-enter relative w-full max-w-sm">
+
+      <!-- 카드 외곽 글로우 링 -->
+      <div class="border-shimmer absolute -inset-px rounded-3xl border border-ash-700/60 pointer-events-none"></div>
+
+      <!-- 카드 본체 -->
+      <div class="relative overflow-hidden rounded-3xl bg-bark-800 shadow-2xl shadow-black/70 border border-bark-700">
+
+        <!-- ── HEADER ILLUSTRATION ── -->
+        <div class="relative h-52 overflow-hidden bg-bark-900">
+
+          <!-- 배경 그라디언트 -->
+          <div class="absolute inset-0 bg-gradient-to-b from-bark-900 via-bark-900/80 to-bark-800"></div>
+
+          <!-- 별빛 점들 -->
+          <div class="absolute inset-0">
+            <div class="absolute w-0.5 h-0.5 rounded-full bg-ash-200/60 top-[12%] left-[8%]"></div>
+            <div class="absolute w-px   h-px   rounded-full bg-ash-100/50 top-[22%] left-[25%]"></div>
+            <div class="absolute w-0.5 h-0.5 rounded-full bg-ash-200/40 top-[8%]  left-[60%]"></div>
+            <div class="absolute w-px   h-px   rounded-full bg-white/40    top-[18%] left-[78%]"></div>
+            <div class="absolute w-0.5 h-0.5 rounded-full bg-ash-100/50 top-[35%] left-[88%]"></div>
+            <div class="absolute w-px   h-px   rounded-full bg-ash-200/30 top-[5%]  left-[44%]"></div>
+          </div>
+
+          <!-- SVG 물푸레나무 (Yggdrasil 스타일) -->
+          <svg
+            viewBox="0 0 200 160"
+            class="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 opacity-90"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <!-- 뿌리 -->
+            <path d="M100 140 Q85 148 72 152" stroke="#54483c" stroke-width="2" stroke-linecap="round"/>
+            <path d="M100 140 Q110 150 124 154" stroke="#54483c" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M100 140 Q95 155 94 160" stroke="#3b2c20" stroke-width="1.2" stroke-linecap="round"/>
+
+            <!-- 기둥 -->
+            <path d="M100 140 L100 70" stroke="#7a6a57" stroke-width="5" stroke-linecap="round"/>
+            <path d="M100 100 L100 70" stroke="#a4957f" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- 가지들 -->
+            <path d="M100 95 Q78 85 62 78" stroke="#7a6a57" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M100 88 Q118 78 132 70" stroke="#7a6a57" stroke-width="2"   stroke-linecap="round"/>
+            <path d="M100 80 Q88  65 80 55"  stroke="#655748" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M100 80 Q110 62 116 52" stroke="#655748" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M100 74 Q100 58 100 48" stroke="#655748" stroke-width="2"   stroke-linecap="round"/>
+            <path d="M62  78 Q50  72 44 65"  stroke="#655748" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M132 70 Q142 63 148 56" stroke="#655748" stroke-width="1.5" stroke-linecap="round"/>
+
+            <!-- 잎 클러스터 (초록) -->
+            <g class="leaf-sway">
+              <ellipse cx="100" cy="34" rx="22" ry="16" fill="#2d4a2a" opacity="0.85"/>
+              <ellipse cx="100" cy="30" rx="15" ry="11" fill="#3a5e36" opacity="0.75"/>
+            </g>
+            <ellipse cx="60"  cy="64" rx="14" ry="10" fill="#2d4a2a" opacity="0.70"/>
+            <ellipse cx="135" cy="57" rx="12" ry="9"  fill="#2d4a2a" opacity="0.65"/>
+            <ellipse cx="78"  cy="46" rx="10" ry="8"  fill="#3a5e36" opacity="0.60"/>
+            <ellipse cx="118" cy="42" rx="10" ry="8"  fill="#3a5e36" opacity="0.60"/>
+
+            <!-- 불씨/잿불 파티클 (트리 아래쪽) -->
+            <circle cx="92"  cy="130" r="1.2" fill="#e8834a" opacity="0.6"/>
+            <circle cx="108" cy="135" r="0.9" fill="#d4632a" opacity="0.5"/>
+            <circle cx="100" cy="128" r="1.0" fill="#e8834a" opacity="0.7"/>
+          </svg>
+
+          <!-- 떠오르는 불씨 파티클 (CSS 애니메이션) -->
+          <div class="absolute bottom-4 w-full pointer-events-none">
+            <span class="ember e1 absolute w-1 h-1 rounded-full bg-ember-400 opacity-0 bottom-0"></span>
+            <span class="ember e2 absolute w-0.5 h-0.5 rounded-full bg-ember-500 opacity-0 bottom-0"></span>
+            <span class="ember e3 absolute w-1 h-1 rounded-full bg-amber-300 opacity-0 bottom-0"></span>
+            <span class="ember e4 absolute w-0.5 h-0.5 rounded-full bg-ember-400 opacity-0 bottom-0"></span>
+            <span class="ember e5 absolute w-1 h-1 rounded-full bg-ember-500 opacity-0 bottom-0"></span>
+          </div>
+
+          <!-- 헤더 상단 도메인 태그 -->
+          <div class="absolute top-4 left-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-bark-900/70 backdrop-blur-sm border border-ash-700/50 text-ash-300 text-[11px] font-medium tracking-widest uppercase">
+              <span class="w-1.5 h-1.5 rounded-full bg-leaf-400 inline-block"></span>
+              ash.kr
+            </span>
+          </div>
+        </div>
+
+        <!-- ── CARD BODY ── -->
+        <div class="px-7 pb-7 pt-6 space-y-5">
+
+          <!-- 타이틀 -->
+          <div>
+            <h1 class="font-serif text-4xl font-light tracking-tight text-ash-100 leading-none">
+              ash
+              <span class="text-ember-400">.</span>
+            </h1>
+            <p class="mt-1.5 text-ash-400 text-[11px] tracking-[0.18em] uppercase font-medium">
+              Where things burn &amp; grow
+            </p>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- 의미 섹션 -->
+          <div class="space-y-4">
+
+            <!-- 의미 1: 물푸레나무 / Yggdrasil -->
+            <div class="flex gap-3.5 items-start group">
+              <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-xl bg-leaf-500/15 border border-leaf-500/25 flex items-center justify-center text-leaf-400 text-base transition-all duration-300 group-hover:bg-leaf-500/25">
+                🌳
+              </div>
+              <div>
+                <p class="text-ash-100 text-sm font-medium leading-snug">물푸레나무 · Ash Tree</p>
+                <p class="text-ash-400 text-[12px] leading-relaxed mt-0.5">
+                  북유럽 신화의 세계수 <em class="text-ash-300 not-italic">Yggdrasil</em>이자 아홉 세계를 잇는 생명의 축. 강인함과 치유, 연결을 상징합니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- 의미 2: 재 (灰) / 소멸과 재생 -->
+            <div class="flex gap-3.5 items-start group">
+              <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-xl bg-ember-500/15 border border-ember-500/25 flex items-center justify-center text-ember-400 text-base transition-all duration-300 group-hover:bg-ember-500/25">
+                🔥
+              </div>
+              <div>
+                <p class="text-ash-100 text-sm font-medium leading-snug">재(灰) · Ash &amp; Ember</p>
+                <p class="text-ash-400 text-[12px] leading-relaxed mt-0.5">
+                  불이 남긴 자리. 소멸은 끝이 아니라 <em class="text-ash-300 not-italic">재생의 씨앗</em>입니다. 잿더미에서 다시 피어오르는 것들.
+                </p>
+              </div>
+            </div>
+
+            <!-- 의미 3: 히브리어 Asher / 행복 -->
+            <div class="flex gap-3.5 items-start group">
+              <div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-xl bg-ash-600/20 border border-ash-600/30 flex items-center justify-center text-ash-300 text-base transition-all duration-300 group-hover:bg-ash-600/35">
+                ✦
+              </div>
+              <div>
+                <p class="text-ash-100 text-sm font-medium leading-snug">אָשֵׁר · Asher</p>
+                <p class="text-ash-400 text-[12px] leading-relaxed mt-0.5">
+                  히브리어 어원 <em class="text-ash-300 not-italic">Asher</em>는 '행복한 자'. 단순하고 고요한 충족감을 의미합니다.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- 태그 뱃지 -->
+          <div class="flex flex-wrap gap-2">
+            <span class="badge-glow inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-ash-900/60 border border-ash-700/50 text-ash-300 cursor-default transition-all duration-200">
+              strength
+            </span>
+            <span class="badge-glow inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-ash-900/60 border border-ash-700/50 text-ash-300 cursor-default transition-all duration-200">
+              renewal
+            </span>
+            <span class="badge-glow inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-ash-900/60 border border-ash-700/50 text-ash-300 cursor-default transition-all duration-200">
+              connection
+            </span>
+            <span class="badge-glow inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-ember-600/20 border border-ember-600/40 text-ember-400 cursor-default transition-all duration-200">
+              ash.kr
+            </span>
+          </div>
+
+          <!-- CTA 링크 -->
+          <a
+            href="https://ash.kr"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex items-center justify-between w-full px-5 py-3.5 rounded-2xl bg-gradient-to-r from-ash-800 to-bark-700 border border-ash-700/50 hover:border-ember-500/60 hover:from-ember-600/20 hover:to-bark-700 transition-all duration-300 shadow-md hover:shadow-ember-500/10"
+          >
+            <span class="text-ash-200 text-sm font-medium group-hover:text-ember-400 transition-colors duration-200">
+              ash.kr 방문하기
+            </span>
+            <svg class="w-4 h-4 text-ash-500 group-hover:text-ember-400 group-hover:translate-x-1 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+
+        </div>
+        <!-- /CARD BODY -->
+
+      </div>
+      <!-- /카드 본체 -->
+
+      <!-- 카드 하단 그림자 -->
+      <div class="absolute -bottom-4 left-8 right-8 h-8 bg-black/40 blur-xl rounded-full -z-10"></div>
+
+    </article>
+    <!-- /CARD -->
+
+  </body>
+</html>
